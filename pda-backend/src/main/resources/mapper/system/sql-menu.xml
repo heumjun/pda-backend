@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.system.mapper.MenuMapper">
+
+    <select id="getMenuList" parameterType="com.denso.pdabackend.domain.system.dto.MenuDto$MenuRequest"
+        resultType="com.denso.pdabackend.response.ResultMap">
+        
+        
+        WITH RECURSIVE tree AS (
+            SELECT men_code,
+                men_upcd,
+                men_name,
+                men_seq,
+                men_url,
+                men_lock,
+                men_icon,
+                1 AS men_level,
+                convert(LPAD(men_seq,'3','0'), char(255)) fullorder,
+                men_name as fullpath
+            FROM tb_menu
+            WHERE men_code = #{menuCode}
+		    UNION ALL
+            SELECT C.men_code,
+                C.men_upcd,
+                C.men_name,
+                C.men_seq,
+                C.men_url,
+                C.men_lock,
+                C.men_icon,
+                1 + men_level AS men_level,
+                concat(convert(tree.fullorder, char(255)), '  ', convert(LPAD(C.men_seq,'3','0'), char(255))) fullorder,
+                concat(tree.fullpath, <![CDATA['>']]>, C.men_name) fullpath
+            FROM tb_menu C
+            INNER JOIN tree ON C.men_upcd = tree.men_code
+		)
+		SELECT men_code
+			 , men_name
+			 , men_upcd
+			 , men_url
+			 , IFNULL(men_lock,'N') as men_lock
+		    , men_icon
+			 , men_seq
+			 , fullorder
+			 , men_level as level
+			 , fullpath as path
+			 , 0 as isSelected
+		from tree
+		where 1=1
+        <if test="!lock">
+            and nvl(men_lock,'N') = 'N'
+        </if>
+        order by fullorder
+    
+    </select>
+
+    <!-- 메뉴 저장 -->
+	<update id="saveOfMenu" parameterType="com.denso.pdabackend.domain.system.dto.MenuDto$Menu">
+
+		<!-- 같은레벨에서 가장끝번호 산출 (신규일경우 가장뒷번호로 추가)-->
+		<selectKey keyProperty="menSeq" resultType="int" order="BEFORE">
+			select nvl(count(*),0)+1
+			  from tb_menu
+			 where men_upcd = #{menUpcd}
+		</selectKey>
+
+        insert into tb_menu (
+            men_code,
+            men_upcd,
+            men_name,
+            men_url,
+            men_icon,
+            men_lock,
+            men_seq,
+            men_indte,
+            men_updte
+        )values(
+            #{menCode},
+            #{menUpcd},
+            #{menName},
+            #{menUrl},
+            #{menIcon},
+            #{menLock},
+            #{menSeq},
+            now(),
+            now()
+        ) ON DUPLICATE KEY UPDATE
+            men_name = #{menName}
+            ,men_upcd = #{menUpcd}
+            ,men_url = #{menUrl}
+            ,men_icon = #{menIcon}
+            ,men_lock = #{menLock}
+            ,men_updte = now()
+
+	</update>
+
+    <!-- 메뉴정보 반환 -->
+	<select id="getMenuInfo" parameterType="com.denso.pdabackend.domain.system.dto.MenuDto$MenuRequest"
+		resultType="com.denso.pdabackend.response.ResultMap">
+
+		select * 
+		  from tb_menu
+		where men_code = #{menuCode}
+		
+	</select>
+
+    <!-- 자식 메뉴 리스트 -->
+	<select id="getChildMenuList" parameterType="com.denso.pdabackend.domain.system.dto.MenuDto$MenuRequest"
+		resultType="com.denso.pdabackend.response.ResultMap">
+
+		select *
+	  	  from tb_menu
+		 where men_upcd = #{menuCode}
+		 order by men_seq
+		
+	</select>
+
+    <select id="getMenuOfUrl" parameterType="String" resultType="com.denso.pdabackend.response.ResultMap">
+		select * from tb_menu 
+		where men_url = #{url}
+
+	</select>
+
+    <!-- 순번 정렬 -->
+	<update id="updateOfMenuOrder" parameterType="java.util.List">
+		<foreach collection="menuOrderList" item="item" separator=";">
+			update tb_menu
+				set men_seq = #{item.menSeq}
+			where men_code = #{item.menCode}
+		</foreach>
+		
+	</update>
+
+	<!-- 메뉴삭제 -->
+	<delete id="deleteOfMenu" parameterType="com.denso.pdabackend.domain.system.dto.MenuDto$MenuRequest">
+		delete from tb_menu
+		where men_code = #{menuCode}
+	</delete>
+
+    
+
+
+    
+
+    
+	
+	
+</mapper> 

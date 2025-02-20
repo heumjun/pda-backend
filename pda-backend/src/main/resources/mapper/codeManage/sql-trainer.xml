@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.codeManage.mapper.TrainerMapper">
+
+    <select id="getTrainerList" parameterType="com.denso.pdabackend.domain.codeManage.dto.TrainerDto$TrainerRequest"
+        resultType="com.denso.pdabackend.response.ResultMap">
+        
+        SELECT * 
+        FROM tb_trainer
+        WHERE tra_jan = #{jan}
+        <if test="searchName != null and !searchName.equalsIgnoreCase('')">
+            AND tra_name LIKE '%${searchName}%'
+        </if>
+        <if test="searchStartEntdt != null and !searchStartEntdt.equalsIgnoreCase('') and searchEndEntdt != null and !searchEndEntdt.equalsIgnoreCase('') ">
+            AND tra_entdt BETWEEN #{searchStartEntdt} AND #{searchEndEntdt}
+        </if>
+        <if test="searchStartTaedt != null and !searchStartTaedt.equalsIgnoreCase('') and searchEndTaedt != null and !searchEndTaedt.equalsIgnoreCase('')">
+            AND tra_entdt BETWEEN #{searchStartTaedt} AND #{searchEndTaedt}
+        </if>
+        <if test="excludeQuit != null and excludeQuit">
+            and tra_taedt is null
+        </if>
+        ORDER BY tra_name
+        
+    </select>
+
+    <select id="getTrainer" parameterType="com.denso.pdabackend.domain.codeManage.dto.TrainerDto$TrainerRequest"
+        resultType="com.denso.pdabackend.response.ResultMap">
+        
+        SELECT * 
+        FROM tb_trainer
+        WHERE tra_jan = #{jan}
+          and tra_id = #{id}
+
+    </select>
+	
+    <update id="saveOfTrainer" parameterType="com.denso.pdabackend.domain.codeManage.dto.TrainerDto$TrainerInfo">
+
+        INSERT INTO tb_trainer(
+            tra_jan
+            ,tra_id
+            ,tra_pw
+            ,tra_name
+            ,tra_birth
+            ,tra_entdt
+            ,tra_taedt
+            ,tra_address1
+            ,tra_address2
+            ,tra_sex
+            ,tra_phone
+            ,tra_email
+            ,tra_rmk
+            ,tra_indte
+            ,tra_updte
+            ,tra_regid
+        ) VALUES(
+            #{traJan}
+            ,#{traId}
+            ,#{traPw}
+            ,#{traName}
+            ,#{traBirth}
+            ,#{traEntdt}
+            ,#{traTaedt}
+            ,#{traAddress1}
+            ,#{traAddress2}
+            ,#{traSex}
+            ,#{traPhone}
+            ,#{traEmail}
+            ,#{traRmk}
+            ,NOW()
+            ,NOW()
+            ,#{traRegid}
+        ) ON DUPLICATE KEY UPDATE
+            tra_name = #{traName}
+            ,tra_birth = #{traBirth}
+            ,tra_entdt = #{traEntdt}
+            ,tra_taedt = #{traTaedt}
+            ,tra_address1 = #{traAddress1}
+            ,tra_address2 = #{traAddress2}
+            ,tra_sex = #{traSex}
+            ,tra_phone = #{traPhone}
+            ,tra_email = #{traEmail}
+            ,tra_rmk = #{traRmk}
+            ,tra_updte = NOW()
+            ,tra_regid = #{traRegid}
+
+    </update>
+
+    <delete id="deleteOfTrainer" parameterType="list">
+        DELETE from tb_trainer
+        WHERE 
+        <foreach collection="list" item="item" separator="or">
+            (tra_jan = #{item.traJan} AND tra_id = #{item.traId})
+        </foreach>
+        
+    </delete>
+
+    <update id="changeOfPassword" parameterType="com.denso.pdabackend.domain.codeManage.dto.TrainerDto$TrainerInfo">
+        
+        update tb_trainer set
+            tra_pw = #{traPw}
+        where tra_jan = #{traJan}
+          and tra_id = #{traId}
+    
+    </update>
+
+    <select id="getCustomerCountByTrainer" parameterType="String" resultType="com.denso.pdabackend.response.ResultMap">
+        
+        SELECT tra_id,tra_name,
+                    (SELECT COUNT(*)
+                    FROM tb_customer
+                WHERE cus_jan = tra_jan
+                    AND cus_quitdat IS null
+                    AND cus_trainer_id = tra_id
+                    ) count
+        FROM tb_trainer
+        WHERE tra_taedt IS NULL 
+        AND tra_jan = #{jan}
+    </select>
+
+    
+	
+	
+</mapper> 
