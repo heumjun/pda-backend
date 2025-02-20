@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.pda.mapper.ConsignedMaterialsRelSearchMapper">
+
+    <select id="getCmrsList" resultType="com.denso.pdabackend.response.ResultMap">
+        SELECT 
+			MF15.MF15_COMPANY	/*회사*/
+			,MF15.MF15_FACTORY	/*공장*/
+			,MF15.MF15_NO		/*사급지시서번호*/
+			,MF15.MF15_DAT		/*사급지시일자*/
+			,MF15.MF15_SEQ		/*순번*/
+			,MF15.MF15_CUS		/*제조사코드*/
+			,CM01.CM01_NAME 	/*제조사명*/
+			,MF15.MF15_INDTE	/*등록일자*/
+			,MF15.MF15_EMPNO	/*등록자사번*/
+			,MF13.MF13_NO 
+			,MF13.MF13_DAT
+			,MF13.MF13_REV 
+			,MF13.MF13_SEQ 
+			,MF13.MF13_REV
+			,MF13.MF13_LINE_CODE 
+			,CAST(MF13.MF13_INDTE AS DATE) as MF13_INDTE
+			,MF13.MF13_EMPNO 
+			,MF13.MF13_DAT_TIME 
+		FROM TB_MF_15 MF15
+		LEFT JOIN TB_MF_13 MF13
+		ON MF15.MF15_COMPANY = MF13.MF13_COMPANY 
+		AND MF15.MF15_FACTORY = MF13.MF13_FACTORY 
+		AND MF15.MF15_NO = MF13.MF13_NO
+		LEFT JOIN TB_CM_01 CM01
+		ON MF15.MF15_COMPANY = CM01.CM01_COMPANY 
+		AND MF15.MF15_FACTORY = CM01.CM01_FACTORY 
+		AND MF15.MF15_CUS = CM01.CM01_CODE
+		ORDER BY MF15.MF15_INDTE DESC
+    </select>
+    
+</mapper> 

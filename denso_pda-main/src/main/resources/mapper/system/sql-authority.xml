@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.system.mapper.AuthorityMapper">
+
+    <select id="getAuthority" parameterType="com.denso.pdabackend.domain.system.dto.AuthorityDto$AuthorityRequest"
+		resultType="com.denso.pdabackend.response.ResultMap">
+
+         SELECT * FROM tb_authority
+          WHERE ath_jan = #{jan}
+            AND ath_url = #{menuUrl}
+        <if test="id != null and !id.equalsIgnoreCase('')">
+            and ath_id = #{id}    
+        </if>
+          ORDER BY ath_id
+    </select>
+
+    
+    <update id="saveOfAuthority" parameterType="com.denso.pdabackend.domain.system.dto.AuthorityDto$Authority">
+        insert into tb_authority (
+            ath_jan,
+            ath_url,
+            ath_id,
+            ath_ins,
+            ath_del,
+            ath_lock,
+            ath_indte,
+            ath_updte
+        )values(
+            #{athJan},
+            #{athUrl},
+            #{athId},
+            #{athIns},
+            #{athDel},
+            #{athLock},
+            now(),
+            now()
+        ) ON DUPLICATE KEY UPDATE
+            ath_ins = #{athIns}
+            ,ath_del = #{athDel}
+            ,ath_lock = #{athLock}
+            ,ath_updte = now()
+    </update>
+
+    <delete id="deleteOfAuthority" parameterType="com.denso.pdabackend.domain.system.dto.AuthorityDto$Authority">
+        	DELETE FROM tb_authority
+             WHERE ath_jan = #{athJan}
+               AND ath_url = #{athUrl}
+               AND ath_id = #{athId}
+    </delete>
+
+    <delete id="deleteAllOfAuthority" parameterType="com.denso.pdabackend.domain.system.dto.AuthorityDto$AuthorityRequest">
+        delete from tb_authority
+        where ath_url = #{menuUrl}
+    </delete>
+
+    <insert id="copyOfAuthority" parameterType="com.denso.pdabackend.domain.system.dto.AuthorityDto$AuthorityCopyRequest">
+        <foreach collection="copyList" item="item" index="index" separator=";">
+
+            INSERT INTO tb_authority	
+                SELECT ath_jan
+                        ,ath_url
+                        ,#{item}
+                        ,ath_ins
+                        ,ath_del
+                        ,ath_lock
+                        ,NOW()
+                        ,NOW()
+                FROM tb_authority a
+                WHERE ath_jan = '1001'
+                and ath_id = 'admin'
+                AND NOT EXISTS(SELECT 1
+                                        FROM tb_authority b
+                                        WHERE b.ath_jan = a.ath_jan
+                                        AND b.ath_url = a.ath_url
+                                        AND b.ath_id = #{item})
+
+           
+        </foreach>
+    </insert>
+
+    <!-- 메뉴에서 url변경시 메뉴url을 키로 하는 권한테이블도 같이 변경함. -->
+    <update id="updateOfAuthorityUrl" parameterType="com.denso.pdabackend.domain.system.dto.AuthorityDto$AuthorityRequest">
+		
+        update tb_authority set ath_url = #{menuUrl}
+        where ath_url = #{menuOldUrl}
+
+    </update>
+    
+	
+	
+</mapper> 

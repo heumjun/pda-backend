@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.material.mapper.MaterialMapper">
+	
+	<select id="getMaterialList" parameterType="com.denso.pdabackend.domain.material.dto.MaterialDto$MaterialRequest"
+        resultType="com.denso.pdabackend.response.ResultMap">
+
+        SELECT * 
+        FROM tb_material 
+        <where>
+            <if test="jil != null and !jil.equalsIgnoreCase('')">
+                mat_code LIKE CONCAT('%',#{code},'%')
+                
+            </if>    
+            <if test="jil != null and !jil.equalsIgnoreCase('')">
+                AND mat_jil = #{jil}
+            </if>        
+        </where>
+        
+    </select>
+
+    <select id="getMaterial" parameterType="com.denso.pdabackend.domain.material.dto.MaterialDto$MaterialRequest"
+        resultType="com.denso.pdabackend.response.ResultMap">
+        
+        select * 
+        from tb_material
+        where mat_code = #{code}
+          and mat_jil = #{jil}
+          and mat_hcd = #{hcd}    
+    </select>
+
+    <select id="getAutocompleteCode" parameterType="String" resultType="com.denso.pdabackend.response.ResultMap">
+        select mat_code
+        from tb_material
+        where mat_code LIKE CONCAT('%',#{code},'%')
+        group by mat_code
+        order by mat_code
+
+    </select>
+
+    <update id="saveOfMaterial" parameterType="com.denso.pdabackend.domain.material.dto.MaterialDto$Material">
+  
+        INSERT INTO tb_material(
+                mat_code
+                ,mat_jil
+                ,mat_hcd
+                ,mat_unit
+                ,mat_qty
+                ,mat_stock
+                ,mat_indte
+                ,mat_updte
+            ) VALUES(
+                #{matCode}
+                ,#{matJil}
+                ,#{matHcd}
+                ,#{matUnit}
+                ,#{matQty}
+                ,#{matStock}
+                ,NOW()
+                ,NOW()
+            ) ON DUPLICATE KEY UPDATE 
+                mat_unit = #{matUnit}
+                ,mat_qty = #{matQty}
+                ,mat_stock = #{matStock}
+                ,mat_updte = NOW()
+                
+    </update>
+
+    <delete id="deleteOfMaterial" parameterType="com.denso.pdabackend.domain.material.dto.MaterialDto$Material">
+    
+        delete from tb_material
+        where mat_code = #{matCode}
+          and mat_jil = #{matJil}
+          and mat_hcd = #{matHcd}
+    </delete>
+	
+</mapper> 
