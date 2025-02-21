@@ -4,7 +4,40 @@
 <mapper namespace="com.denso.pdabackend.domain.pda.mapper.ConsignedMaterialsRelSearchMapper">
 
     <select id="getCmrsList" resultType="com.denso.pdabackend.response.ResultMap">
-        SELECT 
+    	SELECT 
+			MF15.MF15_COMPANY	/*회사*/
+			,MF15.MF15_FACTORY	/*공장*/
+			,MF15.MF15_NO		/*사급지시서번호*/
+			,MF15.MF15_DAT		/*사급지시일자*/
+			,MF15.MF15_SEQ		/*순번*/
+			,MF15.MF15_CUS		/*제조사코드*/
+			,CM01.CM01_NAME 	/*제조사명*/
+			,MF15.MF15_INDTE	/*등록일자*/
+			,MF15.MF15_EMPNO	/*등록자사번*/
+			,ST03.ST03_NO 		/*출고번호*/
+			,TO_CHAR(ST03.ST03_DAT,'YYYY-MM-DD') AS ST03_DAT 		/*출고일자*/
+			,ST03.ST03_INDTE 	/*출고시간*/
+			,ST03.ST03_SEQ		/*출고순번*/ 
+		FROM TB_MF_15 MF15
+		LEFT JOIN (
+			SELECT 
+				* 
+			FROM (
+				SELECT ROW_NUMBER() OVER(PARTITION BY ST03.ST03_SBNO ORDER BY ST03.ST03_SBNO, ST03.ST03_SEQ) RNUM,ST03.*
+				FROM TB_ST_03 ST03
+				WHERE ST03.ST03_GBN ='SB'
+			) ST03
+			WHERE ST03.RNUM = 1
+		) ST03
+		ON MF15.MF15_COMPANY = ST03.ST03_COMPANY 
+		AND MF15.MF15_FACTORY = ST03.ST03_FACTORY 
+		AND MF15.MF15_NO = ST03.ST03_SBNO
+		LEFT JOIN TB_CM_01 CM01
+		ON MF15.MF15_COMPANY = CM01.CM01_COMPANY 
+		AND MF15.MF15_FACTORY = CM01.CM01_FACTORY 
+		AND MF15.MF15_CUS = CM01.CM01_CODE
+		ORDER BY MF15.MF15_INDTE DESC
+        <!-- SELECT 
 			MF15.MF15_COMPANY	/*회사*/
 			,MF15.MF15_FACTORY	/*공장*/
 			,MF15.MF15_NO		/*사급지시서번호*/
@@ -32,7 +65,7 @@
 		ON MF15.MF15_COMPANY = CM01.CM01_COMPANY 
 		AND MF15.MF15_FACTORY = CM01.CM01_FACTORY 
 		AND MF15.MF15_CUS = CM01.CM01_CODE
-		ORDER BY MF15.MF15_INDTE DESC
+		ORDER BY MF15.MF15_INDTE DESC -->
     </select>
     
 </mapper> 
