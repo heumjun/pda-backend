@@ -73,51 +73,32 @@ public class JwtTokenProvider {
      * @return
      */
     private UserDto getUserInfo(String token){
-        UserDto userInfo = new UserDto();
+    	
+    	UserDto userInfo = new UserDto();
+    	
+		String userId = Jwts.parser()
+							.setSigningKey(secretKey)
+							.parseClaimsJws(token)
+							.getBody()
+							.getSubject();
+		
+		String userCompany = Jwts.parser()
+								 .setSigningKey(secretKey)
+								 .parseClaimsJws(token)
+								 .getBody()
+								 .get("company").toString();
 
-        String id = Jwts.parser()
-                            .setSigningKey(secretKey)
-                            .parseClaimsJws(token)
-                            .getBody()
-                            .getSubject();
-        String role = Jwts.parser()
-                            .setSigningKey(secretKey)
-                            .parseClaimsJws(token)
-                            .getBody()
-                            .get("role").toString();
-        String name = Jwts.parser()
-                            .setSigningKey(secretKey)
-                            .parseClaimsJws(token)
-                            .getBody()
-                            .get("name").toString();
-        
-        String tel = Jwts.parser()
-                            .setSigningKey(secretKey)
-                            .parseClaimsJws(token)
-                            .getBody()
-                            .get("tel").toString();
+		String userFactory = Jwts.parser()
+								.setSigningKey(secretKey)
+								.parseClaimsJws(token)
+								.getBody()
+								.get("factory").toString();
 
-        String entdt = Jwts.parser()
-                            .setSigningKey(secretKey)
-                            .parseClaimsJws(token)
-                            .getBody()
-                            .get("entdt").toString();
-        
-        String jan = Jwts.parser()
-                        .setSigningKey(secretKey)
-                        .parseClaimsJws(token)
-                        .getBody()
-                        .get("jan").toString();
-        
-        userInfo.setUserId(id);
-        userInfo.setRole(role);
-        userInfo.setTel(tel);
-        userInfo.setUsername(name);
-        userInfo.setEntdt(entdt);
-        userInfo.setJan(jan);
-        
-
-        return userInfo;
+		userInfo.setUserId(userId);
+		userInfo.setCompany(userCompany);
+		userInfo.setFactory(userFactory);
+		
+		return userInfo;
     }
 
 	/**
@@ -174,15 +155,13 @@ public class JwtTokenProvider {
 	}
 
     public String createAccessToken(UserDto userDto) {
-        Claims claims = Jwts.claims().setSubject((userDto.getUserId()));	//사번을 토큰subject로
     	
-    	//이름 정보를 토큰의 playload에 넣어 보관
-    	claims.put("name", userDto.getUsername());	//사용자명
-        claims.put("entdt", userDto.getEntdt());    //입사일자
-        claims.put("tel", userDto.getTel());  //소속코드
-        claims.put("jan", userDto.getJan());    //세부작업장소(공통코드2000값)
-        claims.put("role", userDto.getRole());      //권한
-        
+    	Claims claims = Jwts.claims().setSubject(userDto.getUserId());	//로그인 id를 토큰subject로 넣음.
+    	
+    	//회사코드, 공정코드등 정보를 토큰의 playload에 넣어 보관
+    	claims.put("company", userDto.getCompany());	
+    	claims.put("factory", userDto.getFactory());
+    	
     	Date now = new Date();
     	
     	return Jwts.builder()

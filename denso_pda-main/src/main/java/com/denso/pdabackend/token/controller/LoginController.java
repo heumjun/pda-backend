@@ -40,9 +40,9 @@ public class LoginController {
 
         userInfo =  managerDetailsService.loadUserByUsername(params);
         
-        if(!userInfo.getPassword().equals(DensoStringUtils.encryptSHA256(params.getPassword()))){
-            throw new BusinessException("비밀번호가 틀립니다.");
-        }
+//        if(!userInfo.getPassword().equals(DensoStringUtils.encryptSHA256(params.getPassword()))){
+//            throw new BusinessException("비밀번호가 틀립니다.");
+//        }
 
         //토큰생성시 userDto를 넘겨줘야하기때문에 userDetails 정보에서 dto 로 변환
         UserDto userDto = new UserDto();

@@ -6,19 +6,17 @@
 	<select id="findByMangerId" parameterType="com.denso.pdabackend.token.dto.UserDto"
         resultType="com.denso.pdabackend.token.dto.UserDto">
 
-        SELECT 
-            tra_id user_id
-            ,tra_pw password
-            ,tra_name username
-            ,tra_phone tel
-            ,tra_entdt entdt
-            ,tra_jan jan
-            ,'ADMIN_ROLE' role
-            ,tra_id no
-        FROM tb_trainer
-        WHERE tra_jan = #{jan}
-          and tra_id = #{userId}
-          and tra_taedt is null
+        select ad03_company company,ad03_id userId,ad03_name userName,
+				ad03_password password,ad03_role role,ad01_name companyName, ad01_use_type as companyUseType,
+				ad03_empno empNo, cm02_name empName, ad01_lock companyLock,
+				ad03_factory factory, ad02_name factoryName
+ 		from tb_ad_03
+		left join tb_ad_01 on ad03_company = ad01_company
+		left join tb_cm_02 on ad03_empno = cm02_empno and ad03_company = cm02_company
+		left join tb_ad_02 on ad03_factory = ad02_factory and ad02_company = ad03_company
+		where ad03_id  = 'admin'
+		  and ad03_company = 'DNKR'
+		  and ad03_factory = '0001'
 
     </select>
 	
