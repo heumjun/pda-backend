@@ -38,7 +38,7 @@ public class LoginController {
         Map<String,Object> data = new HashMap<String,Object>();
         UserDetails userInfo = null;
 
-        userInfo =  managerDetailsService.loadUserByUsername(params);
+        userInfo =  managerDetailsService.loadUserByUsername(params); 
         
 //        if(!userInfo.getPassword().equals(DensoStringUtils.encryptSHA256(params.getPassword()))){
 //            throw new BusinessException("비밀번호가 틀립니다.");
