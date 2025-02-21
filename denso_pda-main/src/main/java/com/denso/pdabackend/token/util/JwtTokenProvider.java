@@ -81,7 +81,7 @@ public class JwtTokenProvider {
 							.parseClaimsJws(token)
 							.getBody()
 							.getSubject();
-		
+		 
 		String userCompany = Jwts.parser()
 								 .setSigningKey(secretKey)
 								 .parseClaimsJws(token)

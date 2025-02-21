@@ -18,6 +18,6 @@
 		  and ad03_company = 'DNKR'
 		  and ad03_factory = '0001'
 
-    </select>
+    </select> 
 	
 </mapper> 
