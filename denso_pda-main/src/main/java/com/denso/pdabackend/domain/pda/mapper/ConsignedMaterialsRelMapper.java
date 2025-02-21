@@ -14,6 +14,13 @@ public interface ConsignedMaterialsRelMapper {
 
     List<Map<String, Object>> getCmrList(Map<String,Object> params);
     Map<String, Object> getCmrInfo(Map<String,Object> params);
+    Map<String, Object> getCmrSignImage(Map<String,Object> params);
     Map<String, Object> getQrCodeInfo(Map<String,Object> params);
+    
+    void updateSign(Map<String,Object> param);
+    void updateSignNull(Map<String,Object> param);
+	void insertSt03(Map<String, Object> param);
+	void deleteSt03(Map<String, Object> param);
+	
     
 }

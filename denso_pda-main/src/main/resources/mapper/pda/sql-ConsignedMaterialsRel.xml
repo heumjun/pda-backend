@@ -18,7 +18,36 @@
 			,ST03.ST03_NO 		/*출고번호*/
 			,TO_CHAR(ST03.ST03_DAT,'YYYY-MM-DD') AS ST03_DAT		/*출고일자*/
 			,ST03.ST03_INDTE 	/*출고시간*/
-			,ST03.ST03_SEQ		/*출고순번*/ 
+			,ST03.ST03_SEQ		/*출고순번*/
+		FROM TB_MF_15 MF15
+		LEFT JOIN (
+			SELECT 
+				* 
+			FROM (
+				SELECT ROW_NUMBER() OVER(PARTITION BY ST03.ST03_SBNO ORDER BY ST03.ST03_SBNO, ST03.ST03_SEQ) RNUM,ST03.*
+				FROM TB_ST_03 ST03
+				WHERE ST03.ST03_GBN ='SB'
+			) ST03
+			WHERE ST03.RNUM = 1
+		) ST03
+		ON MF15.MF15_COMPANY = ST03.ST03_COMPANY 
+		AND MF15.MF15_FACTORY = ST03.ST03_FACTORY 
+		AND MF15.MF15_NO = ST03.ST03_SBNO
+		LEFT JOIN TB_CM_01 CM01
+		ON MF15.MF15_COMPANY = CM01.CM01_COMPANY 
+		AND MF15.MF15_FACTORY = CM01.CM01_FACTORY 
+		AND MF15.MF15_CUS = CM01.CM01_CODE
+		WHERE MF15.MF15_NO = #{mf15No}
+		ORDER BY MF15.MF15_INDTE DESC
+    </select>
+    
+    <resultMap type="java.util.Map" id="imgResult">
+		<result column="IMG" property="IMG" javaType="[B" jdbcType="BLOB"/>
+	</resultMap>
+    <select id="getCmrSignImage" parameterType="java.util.Map" resultMap="imgResult">
+    	/*getCmrSignImage :: 사급 출고 마스터 데이터*/
+        SELECT 
+			MF15.MF15_SIGN		/*사인이미지*/
 		FROM TB_MF_15 MF15
 		LEFT JOIN (
 			SELECT 
@@ -163,4 +192,64 @@
 		ORDER BY MF15.MF15_INDTE DESC
     </select>
     
+    <update id="updateSign" parameterType="map">
+    /*updateSign :: 사인 저장*/
+    	UPDATE TB_MF_15
+    	SET
+    		MF15_SIGN = #{base64Sign, jdbcType=BLOB}
+    	WHERE
+    		MF15_COMPANY		= #{company}
+			AND MF15_FACTORY	= #{factory}
+			AND MF15_NO			= #{mf15No}
+    </update>
+    
+    <update id="updateSignNull" parameterType="map">
+    /*updateSignNull :: 사인 삭제*/
+    	UPDATE TB_MF_15
+    	SET
+    		MF15_SIGN = NULL
+    	WHERE
+    		MF15_NO			= #{mf15No}
+    </update>
+    
+    <insert id="insertSt03" parameterType="map">
+    	/*insertSt03 :: 출고 저장*/
+    	INSERT INTO TB_ST_03
+    	(
+    		ST03_COMPANY
+			,ST03_FACTORY
+			,ST03_NO
+			,ST03_DAT
+			,ST03_SEQ
+			,ST03_CODE
+			,ST03_LOT
+			,ST03_GBN
+			,ST03_QTY
+			,ST03_STOK
+			,ST03_EMPNO
+			,ST03_DIST
+			,ST03_SBNO
+			,ST03_CUS
+    	) VALUES (
+    		#{company}
+    		,#{factory}
+    		,(TO_CHAR(SYSDATE,'YYYYMMDD') || (SELECT LPAD(NVL(MAX(ST03.ST03_SEQ),0)+1,5,0) FROM TB_ST_03 ST03 WHERE TO_CHAR(SYSDATE,'YYYYMMDD') = SUBSTR(ST03.ST03_NO,0,8)))
+    		,TO_CHAR(SYSDATE,'YYYY-MM-DD')
+    		,(SELECT NVL(MAX(ST03.ST03_SEQ),0)+1 FROM TB_ST_03 ST03 WHERE TO_CHAR(SYSDATE,'YYYYMMDD') = SUBSTR(ST03.ST03_NO,0,8))
+    		,#{mf16Code}
+    		,#{st01Lot}
+    		,'SB'
+    		,#{outputQty}
+    		,#{st01Stok}
+    		,'1'
+    		,#{st01District}
+    		,#{mf15No}
+    		,#{mf15Cus}
+    	)
+    </insert>
+    
+    <delete id="deleteSt03" parameterType="map">
+    /*deleteSt03 :: 출고 삭제*/
+    	DELETE FROM TB_ST_03 WHERE ST03_SBNO = #{mf15No}
+    </delete>
 </mapper> 
