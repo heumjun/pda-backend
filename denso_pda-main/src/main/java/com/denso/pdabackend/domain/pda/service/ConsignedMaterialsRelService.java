@@ -7,14 +7,17 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.denso.pdabackend.domain.pda.controller.ConsignedMaterialsRelController;
 import com.denso.pdabackend.domain.pda.mapper.ConsignedMaterialsRelMapper;
 import com.denso.pdabackend.token.dto.UserDto;
 import com.denso.pdabackend.utils.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ConsignedMaterialsRelService {
 
@@ -71,12 +74,6 @@ public class ConsignedMaterialsRelService {
             String base64Url = String.valueOf(headerInfo.get("cmrReqSign"));
             if (base64Url.startsWith(BASE_64_PREFIX)){
                 imageArray =  Base64.getDecoder().decode(base64Url.substring(BASE_64_PREFIX.length()));
-                System.out.println("\n");
-                System.out.println("=======================================");
-                System.out.println("[DBApiController] : [saveImage]");
-                System.out.println("[imageArray] : " + new String(imageArray));
-                System.out.println("=======================================");
-                System.out.println("\n");
             }
         }
         catch (Exception e){
@@ -91,7 +88,11 @@ public class ConsignedMaterialsRelService {
         	item.put("company", userInfo.getCompany());
         	item.put("factory", userInfo.getFactory());
         	item.put("st03Empno", userInfo.getUserId());
-        	cmrMapper.insertSt03(item);	
+        	
+        	item.put("opt", "output");
+        	
+        	cmrMapper.insertSt03(item);
+        	cmrMapper.updateSt01(item);
         }
         
     }
@@ -99,8 +100,15 @@ public class ConsignedMaterialsRelService {
     public void deleteOfCmr(Map<String,Object> params) throws Exception {
     	
     	Map<String,Object> headerInfo = (Map<String, Object>) params.get("headerInfo");
-        
+        List<Map<String,Object>> deleteTargetItemList = cmrMapper.getDeleteSt03List(headerInfo);
     	cmrMapper.updateSignNull(headerInfo);
+    	
+    	for(Map<String,Object> item : deleteTargetItemList) {
+    		item.put("OUTPUT_QTY", item.get("st03Qty"));
+    		item.put("ST01_LOT", item.get("st03Lot"));
+    		item.put("opt", "input");
+    		cmrMapper.updateSt01(item);
+    	}
     	cmrMapper.deleteSt03(headerInfo);
     }
 }

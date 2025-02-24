@@ -21,6 +21,8 @@ public interface ConsignedMaterialsRelMapper {
     void updateSignNull(Map<String,Object> param);
 	void insertSt03(Map<String, Object> param);
 	void deleteSt03(Map<String, Object> param);
+	void updateSt01(Map<String, Object> param);
+	List<Map<String, Object>> getDeleteSt03List(Map<String, Object> param);
 	
     
 }

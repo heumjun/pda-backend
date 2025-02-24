@@ -87,7 +87,7 @@
 			,CM08.CM08_NAME 	/*품목명*/
 			,MF16.MF16_QTY		/*사급출고요청수량*/
 			,ST03.ST03_QTY		/*출고수량*/
-			,DECODE(ST03.ST03_QTY, NULL, ST03.ST03_QTY, MF16.MF16_QTY) AS OUTPUT_QTY /*출고수량*/
+			,DECODE(ST03.ST03_QTY, NULL, MF16.MF16_QTY,ST03.ST03_QTY) AS OUTPUT_QTY /*출고수량*/
 			,MF16.MF16_GBN		/*품목구분*/
 			,ST01.ST01_GBN		/*구분*/
 			,ST01.ST01_LOT		/*LOT번호*/
@@ -230,6 +230,7 @@
 			,ST03_DIST
 			,ST03_SBNO
 			,ST03_CUS
+			,ST03_INDTE
     	) VALUES (
     		#{company}
     		,#{factory}
@@ -245,6 +246,7 @@
     		,#{st01District}
     		,#{mf15No}
     		,#{mf15Cus}
+    		,SYSDATE
     	)
     </insert>
     
@@ -252,4 +254,51 @@
     /*deleteSt03 :: 출고 삭제*/
     	DELETE FROM TB_ST_03 WHERE ST03_SBNO = #{mf15No}
     </delete>
+    
+    <select id="getDeleteSt03List" parameterType="map" resultType="com.denso.pdabackend.response.ResultMap">
+    /*getDeleteSt03List :: 출고 삭제 시 대상 아이템*/
+    SELECT
+    	ST03_COMPANY
+		,ST03_FACTORY
+		,ST03_NO
+		,ST03_DAT
+		,ST03_SEQ
+		,ST03_CODE
+		,ST03_LOT
+		,ST03_GBN
+		,ST03_PCC
+		,ST03_NAPNO
+		,ST03_UNT
+		,ST03_QTY
+		,ST03_RMK
+		,ST03_STOK
+		,ST03_INDTE
+		,ST03_EMPNO
+		,ST03_DGBN
+		,ST03_QR
+		,ST03_OUTPUT_NO
+		,ST03_RENO
+		,ST03_RTNO
+		,ST03_OUTPUT_DTL_NO
+		,ST03_DIST
+		,ST03_SBNO
+		,ST03_CUS
+		,ST03_LOT_SEQ 
+    FROM TB_ST_03 
+    WHERE ST03_SBNO = #{mf15No}
+    </select>
+    
+    <update id="updateSt01" parameterType="map">
+    	/*updateSt01 :: 재고 현황 업데이트*/
+    	UPDATE	TB_ST_01
+    	SET
+    		<if test="opt != null and opt != '' and opt eq 'output'">
+    			ST01_QTY = (#{st01Qty} - #{outputQty})
+    		</if>
+    		<if test="opt != null and opt != '' and opt eq 'input'">
+    			ST01_QTY = (ST01_QTY + #{outputQty})
+    		</if>
+    	WHERE 
+    		ST01_LOT = #{st01Lot} 
+    </update>
 </mapper> 
