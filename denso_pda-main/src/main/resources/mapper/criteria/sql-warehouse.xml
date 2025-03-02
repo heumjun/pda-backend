@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.denso.pdabackend.domain.criteria.mapper.WarehouseMapper">
+
+    <!-- 창고관리 조회 -->
+    <select id="getWarehouseList" parameterType="com.denso.pdabackend.domain.criteria.dto.WarehouseDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+        select *
+        from tb_cm_15
+        where 1 = 1
+            and cm15_company = #{company}
+            and cm15_factory = #{factory}
+        <if test="cm15Code != null and !cm15Code.equalsIgnoreCase('')" >
+            and cm15_code LIKE CONCAT ('%',#{cm15Code},'%')
+        </if>
+        <if test="cm15Name != null and !cm15Name.equalsIgnoreCase('')" >
+            and cm15_name LIKE CONCAT ('%',#{cm15Name},'%')
+        </if>
+        <if test="cm15Lock != null and !cm15Lock.equalsIgnoreCase('')" >
+            and cm15_lock = #{cm15Lock}
+        </if>
+        <if test="cm15Exclusion != null and !cm15Exclusion.equalsIgnoreCase('')" >
+            and cm15_exclusion = #{cm15Exclusion}
+        </if>
+    </select>
+
+    <!-- 창고관리 단건조회 -->
+    <select id="getWarehouseInfo" parameterType="com.denso.pdabackend.domain.criteria.dto.WarehouseDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+        select *
+        from tb_cm_15
+        where 1 = 1
+            and cm15_company = #{company}
+            and cm15_factory = #{factory}
+            and cm15_code = #{cm15Code}
+    </select>
+
+    <select id="getWarehouseCheck" parameterType="com.denso.pdabackend.domain.criteria.dto.WarehouseDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+        select *
+        from tb_cm_15
+        where 1 = 1
+            and cm15_company = #{company}
+            and cm15_factory = #{factory}
+            and cm15_code = #{cm15Code}
+            and cm15_lock = 'N'
+    </select>
+
+    <!-- 창고관리 추가 -->
+    <insert id="saveOfWarehouse" parameterType="com.denso.pdabackend.domain.criteria.dto.WarehouseDto$Info">
+        insert into tb_cm_15 (
+            cm15_company,
+            cm15_factory,
+            cm15_code,
+            cm15_name,
+            cm15_lock,
+            cm15_exclusion,
+            cm15_rmk,
+            cm15_indte,
+            cm15_empno
+        ) values (
+            #{company},
+            #{factory},
+            #{cm15Code},
+            #{cm15Name},
+            #{cm15Lock},
+            #{cm15Exclusion},
+            #{cm15Rmk},
+            sysdate,
+            #{cm15Empno}
+        )
+    </insert>
+
+    <!-- 창고관리 수정 -->
+    <update id="updateOfWarehouse" parameterType="com.denso.pdabackend.domain.criteria.dto.WarehouseDto$Info">
+        update tb_cm_15
+        set
+            cm15_name = #{cm15Name},
+            cm15_lock = #{cm15Lock},
+            cm15_exclusion = #{cm15Exclusion},
+            cm15_rmk = #{cm15Rmk},
+            cm15_updte = sysdate,
+            cm15_empno = #{cm15Empno}
+        where 1 = 1
+            and cm15_company = #{company}
+            and cm15_factory = #{factory}
+            and cm15_code = #{cm15Code}
+    </update>
+
+    <!-- 창고관리 삭제 -->
+    <delete id="deleteOfWarehouse" parameterType="com.denso.pdabackend.domain.criteria.dto.WarehouseDto$Info">
+        delete from tb_cm_15
+        where 1 = 1
+            and cm15_company = #{company}
+            and cm15_factory = #{factory}
+            and cm15_code = #{cm15Code}
+    </delete>
+
+</mapper>

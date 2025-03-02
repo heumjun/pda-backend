@@ -34,7 +34,7 @@ public class WarehousingController {
 		
         Map<String,Object> data = new HashMap<String,Object>();
         List<Map<String,Object>> warehousingList =  warehousingService.getWarehousingList(params);
-        data.put("list", warehousingList);
+        data.put("warehousingList", warehousingList);
         
         return ResponseEntityUtil.ok(data);
     }

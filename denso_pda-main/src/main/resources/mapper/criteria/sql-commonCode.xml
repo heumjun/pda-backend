@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.denso.pdabackend.domain.criteria.mapper.CommonCodeMapper">
+	
+	
+	<select id="getCommonCodeDetailList" parameterType="com.denso.pdabackend.domain.criteria.dto.CommonCodeDto$Request" 
+		resultType="com.denso.pdabackend.response.ResultMap">
+		
+			select CM04_COMPANY,
+					CM04_FACTORY,
+					CM04_CODE,
+					CM04_NAME,
+					CM04_GBN,
+					CM04_RMK,
+					CM04_TABLE,
+					CM04_INDTE,
+					CM04_UPDTE,
+					CM04_REG_ID,
+			        cm05_company,
+					cm05_factory,
+					cm05_code,
+					cm05_value,
+					cm05_name,
+					cm05_seq,
+					TO_CHAR(CM05_INDTE, 'YYYY-MM-DD HH24:MI') AS CM05_INDTE,
+					TO_CHAR(cm05_updte, 'YYYY-MM-DD HH24:MI') AS CM05_UPDTE,
+					CM05_INDTE,
+					cm05_reg_id,
+					cm05_lock
+			from tb_cm_04,tb_cm_05
+		  where cm04_company = cm05_company
+			and cm04_factory = cm05_factory
+			and cm04_code = cm05_code
+			and cm04_company = #{company}
+			and cm04_factory = #{factory}
+			<if test="code != null and !code.equalsIgnoreCase('')" >
+				and cm05_code = #{code}
+			</if>
+			<if test="lock != null and !lock.equalsIgnoreCase('')" >
+				and cm05_lock = #{lock}
+			</if>
+			<if test="gbnCcp != null and !gbnCcp.equalsIgnoreCase('')" >
+				and cm05_value = #{gbnCcp}
+			</if>
+			<if test="gbnCcp != null and !gbnCcp.equalsIgnoreCase('')" >
+				and cm05_lock = #{lock}
+			</if>
+			<if test="gbn != null and gbn > 0">
+				and cm05_value != #{gbn}
+			</if>
+			order by cm05_code,cm05_seq
+		
+	</select>
+
+</mapper>
+
+

@@ -27,9 +27,9 @@ public class WarehousingDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class WarehousingRequest{
-        private String code;
-        private String jil;
-        private String hcd;
+        private String st02Purno;
+        private String st02Dat;
+        private String st02Cus;
     }
 	
 }

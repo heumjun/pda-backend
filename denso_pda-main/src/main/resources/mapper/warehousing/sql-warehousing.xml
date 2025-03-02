@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.warehousing.mapper.WarehousingMapper">
+	
+	<select id="getWarehousingList" parameterType="com.denso.pdabackend.domain.warehousing.dto.WarehousingDto$WarehousingRequest"
+        resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-warehousing.xml] WarehousingMapper.getWarehousingList **/
+        SELECT B.*, C.ST02_PNO, NVL2(QA05.QA05_AVAILABLE, 'S', 'W') AS ST02_STATUS, QA05.QA05_AVAILABLE
+		FROM (
+			SELECT A.*, B.CM01_NAME AS PU01_CUS_NM, D.CM08_CODE, D.CM08_NAME	
+			FROM (
+					SELECT
+						PU01_COMPANY,
+						PU01_FACTORY,
+						PU01_NO,
+						PU01_REV,
+						PU01_CUS,
+						PU01_DAT,
+						MAX(PU02_CODE) AS PU02_CODE ,
+						MIN(C.PU02_WANYN) AS PU01_WANYN
+					FROM TB_PU_01 A
+					LEFT JOIN TB_PU_02 C ON C.PU02_COMPANY = A.PU01_COMPANY
+						AND C.PU02_FACTORY = A.PU01_FACTORY
+						AND C.PU02_HNO = A.PU01_NO
+					WHERE 1 = 1
+					AND PU01_NO = '20250228002'
+					AND PU01_CUS = '0002'
+					GROUP BY PU01_COMPANY, PU01_FACTORY, PU01_NO, PU01_REV, PU01_CUS, PU01_DAT
+				) A
+			LEFT JOIN TB_CM_01 B ON A.PU01_CUS = B.CM01_CODE AND A.PU01_COMPANY = B.CM01_COMPANY AND A.PU01_FACTORY = B.CM01_FACTORY
+			LEFT JOIN TB_CM_08 D ON D.CM08_COMPANY = A.PU01_COMPANY AND D.CM08_FACTORY = A.PU01_FACTORY AND D.CM08_CODE = A.PU02_CODE 
+			) B
+		LEFT JOIN (SELECT ST02_PNO FROM TB_ST_02 WHERE 1=1 GROUP BY ST02_PNO) C ON C.ST02_PNO = B.PU01_NO
+		LEFT JOIN TB_QA_05 QA05 
+		ON QA05.QA05_COMPANY = B.PU01_COMPANY 
+		AND QA05.QA05_FACTORY = B.PU01_FACTORY 
+		AND QA05.QA05_CODE = B.PU02_CODE
+		AND QA05.QA05_SDT &lt;= TO_CHAR(SYSDATE, 'YYYYMMDD')
+		AND QA05.QA05_EDT &gt;= TO_CHAR(SYSDATE, 'YYYYMMDD')
+		WHERE 1=1
+		AND ST02_PNO IS NULL
+		ORDER BY PU01_DAT DESC, PU01_NO
+    </select>
+
+    <select id="getMaterial" parameterType="com.denso.pdabackend.domain.material.dto.MaterialDto$MaterialRequest"
+        resultType="com.denso.pdabackend.response.ResultMap">
+        
+        select * 
+        from tb_material
+        where mat_code = #{code}
+          and mat_jil = #{jil}
+          and mat_hcd = #{hcd}    
+    </select>
+
+    <select id="getAutocompleteCode" parameterType="String" resultType="com.denso.pdabackend.response.ResultMap">
+        select mat_code
+        from tb_material
+        where mat_code LIKE CONCAT('%',#{code},'%')
+        group by mat_code
+        order by mat_code
+
+    </select>
+
+    <update id="saveOfMaterial" parameterType="com.denso.pdabackend.domain.material.dto.MaterialDto$Material">
+  
+        INSERT INTO tb_material(
+                mat_code
+                ,mat_jil
+                ,mat_hcd
+                ,mat_unit
+                ,mat_qty
+                ,mat_stock
+                ,mat_indte
+                ,mat_updte
+            ) VALUES(
+                #{matCode}
+                ,#{matJil}
+                ,#{matHcd}
+                ,#{matUnit}
+                ,#{matQty}
+                ,#{matStock}
+                ,NOW()
+                ,NOW()
+            ) ON DUPLICATE KEY UPDATE 
+                mat_unit = #{matUnit}
+                ,mat_qty = #{matQty}
+                ,mat_stock = #{matStock}
+                ,mat_updte = NOW()
+                
+    </update>
+
+    <delete id="deleteOfMaterial" parameterType="com.denso.pdabackend.domain.material.dto.MaterialDto$Material">
+    
+        delete from tb_material
+        where mat_code = #{matCode}
+          and mat_jil = #{matJil}
+          and mat_hcd = #{matHcd}
+    </delete>
+	
+</mapper> 
