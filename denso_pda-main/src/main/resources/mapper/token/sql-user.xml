@@ -12,7 +12,7 @@
 				ad03_factory factory, ad02_name factoryName
  		from tb_ad_03
 		left join tb_ad_01 on ad03_company = ad01_company
-		left join tb_cm_02 on ad03_empno = cm02_empno and ad03_company = cm02_company
+		left join tb_cm_02 on cm02_factory = 'TEST' and ad03_empno = cm02_empno and ad03_company = cm02_company
 		left join tb_ad_02 on ad03_factory = ad02_factory and ad02_company = ad03_company
 		where ad03_id  = 'admin'
 		  and ad03_company = 'DNKR'
