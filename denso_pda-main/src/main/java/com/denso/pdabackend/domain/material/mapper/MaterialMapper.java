@@ -21,4 +21,6 @@ public interface MaterialMapper {
 
     void deleteOfMaterial(Material item);
 
+	Map<String, Object> getMaterial(String qrCode);
+
 }

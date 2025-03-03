@@ -6,9 +6,10 @@
 	<select id="getWarehousingList" parameterType="com.denso.pdabackend.domain.warehousing.dto.WarehousingDto$WarehousingRequest"
         resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-warehousing.xml] WarehousingMapper.getWarehousingList **/
-        SELECT B.*, C.ST02_PNO, NVL2(QA05.QA05_AVAILABLE, 'S', 'W') AS ST02_STATUS, QA05.QA05_AVAILABLE
+        SELECT B.*, C.ST02_PNO, DECODE(QA05.QA05_AVAILABLE, 'Y', 'W', 'S') AS ST02_STATUS, NVL(QA05.QA05_AVAILABLE, 'N') AS QA05_AVAILABLE
+        	 , (SELECT NVL(CEIL(PU02.PU02_QTY / PU02.PU02_SBOXSU), 1) FROM TB_PU_02 PU02 WHERE PU02.PU02_COMPANY = B.PU01_COMPANY AND PU02.PU02_FACTORY = B.PU01_FACTORY AND PU02.PU02_HNO = B.PU01_NO ) AS ROW_CNT
 		FROM (
-			SELECT A.*, B.CM01_NAME AS PU01_CUS_NM, D.CM08_CODE, D.CM08_NAME	
+			SELECT A.*, B.CM01_NAME AS PU01_CUS_NM, D.CM08_CODE, D.CM08_NAME, D.CM08_GBN, D.CM08_DGBN	
 			FROM (
 					SELECT
 						PU01_COMPANY,
@@ -24,8 +25,7 @@
 						AND C.PU02_FACTORY = A.PU01_FACTORY
 						AND C.PU02_HNO = A.PU01_NO
 					WHERE 1 = 1
-					AND PU01_NO = '20250228002'
-					AND PU01_CUS = '0002'
+					AND PU01_NO = #{pu01No}
 					GROUP BY PU01_COMPANY, PU01_FACTORY, PU01_NO, PU01_REV, PU01_CUS, PU01_DAT
 				) A
 			LEFT JOIN TB_CM_01 B ON A.PU01_CUS = B.CM01_CODE AND A.PU01_COMPANY = B.CM01_COMPANY AND A.PU01_FACTORY = B.CM01_FACTORY
@@ -43,59 +43,228 @@
 		ORDER BY PU01_DAT DESC, PU01_NO
     </select>
 
-    <select id="getMaterial" parameterType="com.denso.pdabackend.domain.material.dto.MaterialDto$MaterialRequest"
-        resultType="com.denso.pdabackend.response.ResultMap">
-        
-        select * 
-        from tb_material
-        where mat_code = #{code}
-          and mat_jil = #{jil}
-          and mat_hcd = #{hcd}    
+    <!-- 입고된 품목이 출고되었을 때 수정못하도록 validation -->
+    <select id="getOutputChk" parameterType="com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto$Request" 
+    resultType="com.denso.pdabackend.response.ResultMap">
+    	/** [sql-warehousing.xml] WarehousingMapper.getOutputChk **/
+        SELECT *
+        FROM TB_ST_03
+        WHERE ST03_COMPANY = #{company}
+          AND ST03_FACTORY = #{factory}
+          AND ST03_CODE = #{st02Code}
+          AND ST03_LOT = #{st02Lot}
+          AND ST03_LOT_SEQ = #{st02LotSeq}
     </select>
-
-    <select id="getAutocompleteCode" parameterType="String" resultType="com.denso.pdabackend.response.ResultMap">
-        select mat_code
-        from tb_material
-        where mat_code LIKE CONCAT('%',#{code},'%')
-        group by mat_code
-        order by mat_code
-
-    </select>
-
-    <update id="saveOfMaterial" parameterType="com.denso.pdabackend.domain.material.dto.MaterialDto$Material">
-  
-        INSERT INTO tb_material(
-                mat_code
-                ,mat_jil
-                ,mat_hcd
-                ,mat_unit
-                ,mat_qty
-                ,mat_stock
-                ,mat_indte
-                ,mat_updte
-            ) VALUES(
-                #{matCode}
-                ,#{matJil}
-                ,#{matHcd}
-                ,#{matUnit}
-                ,#{matQty}
-                ,#{matStock}
-                ,NOW()
-                ,NOW()
-            ) ON DUPLICATE KEY UPDATE 
-                mat_unit = #{matUnit}
-                ,mat_qty = #{matQty}
-                ,mat_stock = #{matStock}
-                ,mat_updte = NOW()
-                
-    </update>
-
-    <delete id="deleteOfMaterial" parameterType="com.denso.pdabackend.domain.material.dto.MaterialDto$Material">
     
-        delete from tb_material
-        where mat_code = #{matCode}
-          and mat_jil = #{matJil}
-          and mat_hcd = #{matHcd}
-    </delete>
+    <update id="updateOfPdStock" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Info">
+    	/** [sql-warehousing.xml] WarehousingMapper.updateOfPdStock **/
+		UPDATE tb_st_01
+		<if test="operator == 'change'" > -- 재고수량을 변경하는 경우
+	    	SET st01_qty = st01_qty - #{outQty} + #{ipQty}
+		</if>
+		<if test="operator == 'minus'"> -- 재고 차감 (출고등록/입고삭제)
+	    	SET st01_qty =  st01_qty - #{outQty}
+		</if>
+	    <if test="operator == 'plus'"> -- 재고 증가 (입고등록/출고삭제)
+	    	SET st01_qty =  st01_qty + #{ipQty}
+		</if>
+		<if test="operator == 'sum'"> -- 재고실사 품목일때 기존의 수량 0
+	    	SET st01_qty = '0'
+		</if>
+	    WHERE 1=1
+	    AND st01_company = #{company}
+	    AND st01_factory = #{factory}
+	    AND st01_code = #{code}
+	    AND st01_stok = #{stock}
+	    <if test="lot != null and !lot.equalsIgnoreCase('')" >
+	    	AND st01_lot = #{lot}
+			AND st01_lot_seq = #{lotSeq}
+		</if>
+   </update>
+    
+    <!-- 입고이력 수정 -->
+    <update id="updateOfInputHistory" parameterType="com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto">
+    	/** [sql-warehousing.xml] WarehousingMapper.updateOfInputHistory **/
+        UPDATE tb_st_02
+        SET st02_dat = #{st02Dat},
+            st02_cus = #{st02Cus},
+            st02_gbn = #{st02Gbn},
+            st02_qrcode = #{st02Qrcode},
+            st02_ipqty = #{st02Ipqty},
+            st02_ipunt = #{st02Ipunt},
+            st02_status = #{st02Status},
+            st02_stok = #{st02Stok},
+            st02_dist = #{st02Dist}
+        WHERE 1=1
+          AND st02_company = #{company}
+          AND st02_factory = #{factory}
+          AND st02_purno = #{st02Purno}
+    </update>
+    
+    <!-- 모달o - 입고상세이력 조회 -->
+    <select id="getInputHistorySearchInfo" parameterType="com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto$Request" 
+    resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-warehousing.xml] WarehousingMapper.getInputHistorySearchInfo **/
+        SELECT *
+        FROM tb_st_02
+        WHERE st02_company = #{company}
+          AND st02_factory = #{factory}
+          AND st02_pno = #{st02Pno}
+        ORDER BY ST02_NO
+    </select>
+    
+     <!-- 모달o - 입고 시 시퀀스 가져오기 조회 -->
+    <select id="getSeq" parameterType="com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto$Request" 
+    resultType="com.denso.pdabackend.response.ResultMap">
+    	/** [sql-warehousing.xml] WarehousingMapper.getSeq **/
+        SELECT COALESCE(MAX(st02_seq)+1,1) AS st02_seq
+        FROM tb_st_02
+        WHERE st02_company = #{company}
+          AND st02_factory = #{factory}
+          AND st02_dat = #{st02Dat}
+    </select>
+    
+    <!-- 입고 -> 새로운 LOT SEQ 생성 -->
+    <select id="getNewLotSeq" parameterType="com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto$Info" resultType="int">
+    	/** [sql-warehousing.xml] WarehousingMapper.getNewLotSeq **/
+        SELECT NVL(MAX(ST02_LOT_SEQ)+1, 1) as lot_seq
+        FROM TB_ST_02
+        WHERE ST02_COMPANY = #{company}
+          AND ST02_FACTORY = #{factory}
+    </select>
+    
+    <!-- 로트 - 재고 등록 -->
+   <insert id="insertOfLotStock" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Info">
+		/** [sql-warehousing.xml] WarehousingMapper.insertOfLotStock **/
+		INSERT INTO tb_st_01 (
+	         st01_company,
+	         st01_factory,
+	         st01_gbn,
+	         st01_lot,
+	          st01_lot_seq,
+	         st01_code,
+	         st01_stok,
+	         st01_district,
+	         st01_field,
+	         st01_unt,
+	         st01_qty
+		) values (
+	          #{company},
+	          #{factory},
+	          #{gbn},
+	          #{lot},
+	          #{lotSeq},
+	          #{code},
+	          #{stock},
+	          COALESCE(#{st01District}, null),
+	          COALESCE(#{st01Field}, null),
+	          #{unt},
+	          #{ipQty}
+		)
+   </insert>
+   
+   <!-- 입고이력 등록 -->
+    <insert id="insertOfInputHistory" parameterType="com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto">
+    	/** [sql-warehousing.xml] WarehousingMapper.insertOfInputHistory **/
+        INSERT INTO tb_st_02 (
+            st02_company,
+            st02_factory,
+            st02_no,
+            st02_dat,
+            st02_seq,
+            st02_code,
+            st02_lot,
+            st02_lot_seq,
+            st02_gbn,
+            st02_cus,
+            st02_pno,
+            st02_purno,
+            st02_ipunt,
+            st02_ipqty,
+            st02_qrcode,
+            st02_status,
+            st02_stok,
+            st02_dist,
+            st02_opunt,
+            st02_qty,
+            st02_indte,
+            st02_empno
+        ) VALUES (
+            #{company},
+            #{factory},
+            CONCAT(REPLACE(#{st02Dat},'-',''),lpad(#{st02Seq},5,'0')),
+            #{st02Dat},
+            #{st02Seq},
+            #{cm08Code},
+            #{st02Lot},
+            #{st02LotSeq},
+            'PU',
+            #{st02Cus},
+            #{st02Pno},
+            CONCAT(#{st02Pno},lpad(#{st02Seq},5,'0')),
+            #{st02Ipunt},
+            #{st02Ipqty},
+            #{st02Qrcode},
+            #{st02Status},
+            #{st02Stok},
+            #{st02Dist},
+            '',
+            0,
+            sysdate,
+            #{st02Empno}
+        )
+    </insert>
+    
+    <!-- 모달o - 유무검사 여부 Y인 경우 기한 체크(MAP) -->
+    <select id="getAvailable" parameterType="com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-warehousing.xml] WarehousingMapper.getAvailable **/
+        SELECT *
+        FROM tb_qa_05
+        WHERE qa05_company = #{company}
+          AND qa05_factory = #{factory}
+          AND qa05_code = #{cm08Code}
+          AND qa05_sdt &lt;= SUBSTR(#{st02Dat},1,10)
+          AND qa05_edt &gt;= SUBSTR(#{st02Dat},1,10)
+    </select>
+    
+    <!-- 입고이력 등록 -->
+    <insert id="insertInspectionConf" parameterType="com.denso.pdabackend.domain.warehousing.dto.InspectionConfDto">
+    	/** [sql-warehousing.xml] WarehousingMapper.insertInspectionConf **/
+        <selectKey resultType="String" keyProperty="qa07No" order="BEFORE">
+            select CONCAT(REPLACE(TO_CHAR(sysdate,'YYYY-MM-DD'), '-', '') , lpad(COALESCE(MAX(substr(qa07_no, -5, 5))+1, 1),5,'0'))
+            from tb_qa_07
+            where qa07_company = #{qa07Company}
+            and qa07_factory = #{qa07Factory}
+            and qa07_dat = REPLACE(#{qa07Dat}, '-', '')
+        </selectKey>
+        INSERT INTO tb_qa_07 (
+            qa07_company
+            , qa07_factory
+            , qa07_no
+            , qa07_code
+            , qa07_gbn
+            , qa07_dat
+            , qa05_no
+            , qa07_lot
+            , qa07_lot_seq
+            , qa07_status
+            , qa07_indte
+            , qa07_empno
+        ) VALUES (
+            #{qa07Company}
+            , #{qa07Factory}
+            , #{qa07No}
+            , #{qa07Code}
+            , NVL(#{qa07Gbn},'')
+            , #{qa07Dat}
+            , #{qa05No}
+            , #{qa07Lot}
+            , #{qa07LotSeq}
+            , #{qa07Status}
+            , sysdate
+            , #{qa07Empno}
+        )
+    </insert>
 	
 </mapper> 

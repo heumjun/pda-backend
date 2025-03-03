@@ -93,7 +93,7 @@ public class JwtTokenProvider {
 								.parseClaimsJws(token)
 								.getBody()
 								.get("factory").toString();
-
+		
 		userInfo.setUserId(userId);
 		userInfo.setCompany(userCompany);
 		userInfo.setFactory(userFactory);
@@ -161,6 +161,7 @@ public class JwtTokenProvider {
     	//회사코드, 공정코드등 정보를 토큰의 playload에 넣어 보관
     	claims.put("company", userDto.getCompany());	
     	claims.put("factory", userDto.getFactory());
+    	claims.put("empNo", userDto.getEmpNo());
     	
     	Date now = new Date();
     	

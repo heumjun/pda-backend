@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.material.mapper.MaterialInfoMapper">
+	
+	<select id="getMaterial" parameterType="java.util.Map" resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-materialInfo.xml] MaterialInfoMapper.getMaterial **/
+		SELECT CM08.CM08_NAME
+			 , ST02.ST02_CODE
+			 , ST01.ST01_QTY
+			 , CM05.CM05_NAME 
+		FROM TB_ST_02 ST02
+		INNER JOIN TB_ST_01 ST01 
+		ON ST02.ST02_COMPANY = ST01.ST01_COMPANY 
+		AND ST02.ST02_FACTORY = ST01.ST01_FACTORY 
+		AND ST02.ST02_LOT_SEQ = ST01.ST01_LOT_SEQ
+		LEFT JOIN TB_CM_08 CM08 
+		ON CM08.CM08_COMPANY = ST02.ST02_COMPANY 
+		AND CM08.CM08_FACTORY = ST02.ST02_FACTORY
+		AND CM08.CM08_CODE = ST02.ST02_CODE 
+		LEFT JOIN TB_CM_05 CM05 
+		ON CM05.CM05_COMPANY = ST02.ST02_COMPANY 
+		AND CM05.CM05_FACTORY = ST02.ST02_FACTORY
+		AND CM05.CM05_CODE = 'W005'
+		AND CM05.CM05_VALUE = ST02.ST02_STATUS
+		WHERE 1=1
+		AND ST02.ST02_QRCODE = #{qrCode}
+    </select>
+
+</mapper> 
