@@ -27,6 +27,7 @@
     <!-- 출고요청서를 선택 시 값 조회해서 넣어주는 부분 -->
     <select id="getOutputRequestSel" parameterType="com.denso.pdabackend.domain.output.dto.OutputRequestDto$Request"
             resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-output.xml] OutputMapper.getOutputRequestSel **/
         SELECT MF14_COMPANY
              , MF14_FACTORY
              , MF14_HNO
@@ -54,6 +55,7 @@
     <!-- 출고이력리스트 개수 확인 -->
     <select id="getOutputHistorySearchInfo" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Request"
             resultType="com.denso.pdabackend.response.ResultMap">
+        /** [sql-output.xml] OutputMapper.getOutputHistorySearchInfo **/
         SELECT *
         FROM TB_ST_03
         WHERE ST03_COMPANY = #{company}
@@ -64,6 +66,7 @@
     <!-- 출고 시 해당 품목이 수입검사체크 -->
     <select id="inspectChk" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Request"
             resultType="com.denso.pdabackend.response.ResultMap">
+        /** [sql-output.xml] OutputMapper.inspectChk **/
         SELECT *
         FROM TB_QA_07
         WHERE QA07_COMPANY = #{company}
@@ -76,6 +79,7 @@
     <!-- 출고 시 해당 품목이 수입검사체크 -->
     <select id="inspectSpecChk" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Request"
             resultType="com.denso.pdabackend.response.ResultMap">
+        /** [sql-output.xml] OutputMapper.inspectSpecChk **/
         SELECT QA08_STATUS
         FROM TB_QA_07 QA07
         LEFT JOIN TB_QA_08 QA08 ON QA07.QA07_COMPANY = QA08.QA08_COMPANY AND QA07.QA07_FACTORY = QA08.QA08_FACTORY AND QA07.QA07_CODE = QA08.QA08_CODE AND QA07.QA07_NO = QA08.QA07_NO
@@ -87,6 +91,7 @@
     
     <!-- 출고이력 등록 -->
     <insert id="insertOfOutputHistory" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto">
+    	/** [sql-output.xml] OutputMapper.insertOfOutputHistory **/
         <selectKey resultType="int" keyProperty="st03Seq" order="BEFORE">
             SELECT COALESCE(MAX(ST03_SEQ)+1,1) AS ST03_SEQ
             FROM TB_ST_03
@@ -151,5 +156,31 @@
             , #{st03LotSeq}
         )
     </insert>
+    
+    <update id="updateOfPdStock" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Info">
+    	/** [sql-output.xml] OutputMapper.updateOfPdStock **/
+		UPDATE tb_st_01
+		<if test="operator == 'change'" > -- 재고수량을 변경하는 경우
+		   SET st01_qty = st01_qty - #{outQty} + #{ipQty}
+		</if>
+		<if test="operator == 'minus'"> -- 재고 차감 (출고등록/입고삭제)
+		   SET st01_qty =  st01_qty - #{outQty}
+		</if>
+		<if test="operator == 'plus'"> -- 재고 증가 (입고등록/출고삭제)
+		   SET st01_qty =  st01_qty + #{ipQty}
+		</if>
+		<if test="operator == 'sum'"> -- 재고실사 품목일때 기존의 수량 0
+		   SET st01_qty = '0'
+		</if>
+		WHERE 1=1
+		AND st01_company = #{company}
+		AND st01_factory = #{factory}
+		AND st01_code = #{code}
+		AND st01_stok = #{stock}
+		<if test="lot != null and !lot.equalsIgnoreCase('')" >
+		   AND st01_lot = #{lot}
+		   AND st01_lot_seq = #{lotSeq}
+		</if>
+   </update>
 	
 </mapper> 

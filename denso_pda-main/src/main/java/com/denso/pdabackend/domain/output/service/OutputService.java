@@ -63,7 +63,7 @@ public class OutputService {
                 stockInfo.setGbn(item.getCm08Gbn()); // 품목구분
                 stockInfo.setUnt(item.getSt03Unt()); // 출고단위 = 재고단위
                 stockInfo.setLotSeq(String.valueOf(item.getSt03LotSeq())); // lotSEQ
-                stockMapper.updateOfPdStock(stockInfo);
+                outputMapper.updateOfPdStock(stockInfo);
 
                 // 출고 테이블 등록
                 outputMapper.insertOfOutputHistory(item);
