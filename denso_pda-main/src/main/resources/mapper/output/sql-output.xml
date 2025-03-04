@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.output.mapper.OutputMapper">
+	
+	<!-- 출고요청서를 조회(출고요청서 선택) -->
+	<select id="getOutputRequestSearch"	parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Request" 
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-output.xml] OutputMapper.getOutputRequestSearch **/
+    	SELECT MF13_COMPANY
+             , MF13_FACTORY
+             , MF13_NO
+             , MF13_DAT
+             , MF13_DAT_TIME
+             , MF13_LINE_CODE
+             , LINE_NM AS MF13_LINE_NM
+        FROM TB_MF_13 mf13
+        LEFT JOIN DNKR_LINE_CODE line on mf13.MF13_COMPANY = line.COMPANY AND mf13.MF13_FACTORY = line.FACTORY AND mf13.MF13_LINE_CODE = line.LINE_CODE
+        LEFT JOIN TB_ST_03 st03 on mf13.MF13_COMPANY = st03.ST03_COMPANY AND mf13.MF13_FACTORY = st03.ST03_FACTORY AND mf13.MF13_NO = st03.ST03_OUTPUT_NO
+        WHERE MF13_COMPANY = 'DNKR'
+          AND MF13_FACTORY = '0001'
+          AND MF13_COMP_GBN = 'N'
+          AND ST03_OUTPUT_NO IS NULL
+        ORDER BY MF13_DAT DESC, MF13_NO DESC
+    </select>
+    
+    <!-- 출고요청서를 선택 시 값 조회해서 넣어주는 부분 -->
+    <select id="getOutputRequestSel" parameterType="com.denso.pdabackend.domain.output.dto.OutputRequestDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+        SELECT MF14_COMPANY
+             , MF14_FACTORY
+             , MF14_HNO
+             , MF13_NO
+             , MF13_DAT
+             , MF13_DAT_TIME
+             , MF13_LINE_CODE
+             , MF14_NO
+             , MF14_SEQ
+             , MF14_CODE
+             , CM08_DGBN
+             , CM08_NAME
+             , CM08_GBN
+             , MF14_GBN
+             , MF14_QTY
+             , MF14_UNT
+        FROM TB_MF_14 mf14
+        LEFT JOIN TB_MF_13 mf13 ON mf14.MF14_COMPANY = mf13.MF13_COMPANY AND mf14.MF14_FACTORY = mf13.MF13_FACTORY AND mf14.MF14_HNO = mf13.MF13_NO
+        LEFT JOIN TB_CM_08 cm08 ON mf14.MF14_COMPANY = cm08.CM08_COMPANY AND mf14.MF14_FACTORY = cm08.CM08_FACTORY AND mf14.MF14_CODE = cm08.CM08_CODE
+        WHERE MF13_COMPANY = 'DNKR'
+          AND MF13_FACTORY = '0001'
+          AND MF13_NO = #{mf13No}
+    </select>
+    
+    <!-- 출고이력리스트 개수 확인 -->
+    <select id="getOutputHistorySearchInfo" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+        SELECT *
+        FROM TB_ST_03
+        WHERE ST03_COMPANY = #{company}
+          AND ST03_FACTORY = #{factory}
+          AND ST03_OUTPUT_NO = #{st03OutputNo}
+    </select>
+    
+    <!-- 출고 시 해당 품목이 수입검사체크 -->
+    <select id="inspectChk" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+        SELECT *
+        FROM TB_QA_07
+        WHERE QA07_COMPANY = #{company}
+          AND QA07_FACTORY = #{factory}
+          AND QA07_CODE = #{st03Code}
+          AND QA07_LOT = #{st03Lot}
+          AND QA07_LOT_SEQ = #{st03LotSeq}
+    </select>
+    
+    <!-- 출고 시 해당 품목이 수입검사체크 -->
+    <select id="inspectSpecChk" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+        SELECT QA08_STATUS
+        FROM TB_QA_07 QA07
+        LEFT JOIN TB_QA_08 QA08 ON QA07.QA07_COMPANY = QA08.QA08_COMPANY AND QA07.QA07_FACTORY = QA08.QA08_FACTORY AND QA07.QA07_CODE = QA08.QA08_CODE AND QA07.QA07_NO = QA08.QA07_NO
+        WHERE QA07_COMPANY = #{company}
+          AND QA07_FACTORY = #{factory}
+          AND QA07_CODE = #{st03Code}
+          AND QA07_LOT_SEQ = #{st03LotSeq}
+    </select>
+    
+    <!-- 출고이력 등록 -->
+    <insert id="insertOfOutputHistory" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto">
+        <selectKey resultType="int" keyProperty="st03Seq" order="BEFORE">
+            SELECT COALESCE(MAX(ST03_SEQ)+1,1) AS ST03_SEQ
+            FROM TB_ST_03
+            WHERE ST03_COMPANY = #{company}
+              AND ST03_FACTORY = #{factory}
+              AND ST03_DAT = #{st03Dat}
+        </selectKey>
+
+        INSERT INTO TB_ST_03 (
+            ST03_COMPANY
+            , ST03_FACTORY
+            , ST03_NO
+            , ST03_DAT
+            , ST03_CUS
+            , ST03_SEQ
+            , ST03_CODE
+            , ST03_LOT
+            , ST03_GBN
+            , ST03_UNT
+            , ST03_QTY
+            , ST03_RMK
+            , ST03_STOK
+            , ST03_DIST
+            , ST03_INDTE
+            , ST03_EMPNO
+            , ST03_DGBN
+            , ST03_QR
+            , ST03_OUTPUT_NO
+            , ST03_OUTPUT_DTL_NO
+            , ST03_PCC
+            , ST03_RENO
+            , ST03_RTNO
+            , ST03_LINE
+            , ST03_LOT_SEQ
+        ) VALUES (
+            #{company}
+            , #{factory}
+            , CONCAT(REPLACE(#{st03Dat},'-',''), LPAD(#{st03Seq},5,'0'))
+            , #{st03Dat}
+            , #{st03Cus}
+            , #{st03Seq}
+            , #{cm08Code}
+            , CASE WHEN #{st03Lot} = '' THEN CONCAT(REPLACE(#{st03Dat},'-',''), LPAD(#{st03Seq},5,'0'))
+            ELSE #{st03Lot} END
+            , #{st03Gbn}
+            , #{st03Unt}
+            , #{st03Qty}
+            , #{st03Rmk}
+            , #{st03Stok}
+            , #{st03Dist}
+            , sysdate
+            , #{st03Empno}
+            , #{st03Dgbn}
+            , #{st03Qr}
+            , #{st03OutputNo}
+            , CASE WHEN #{st03OutputDtlNo} IS NULL THEN CONCAT(#{st03OutputNo}, LPAD(#{st03Seq},5,'0'))
+              ELSE #{st03OutputDtlNo} END
+            , #{st03Pcc}
+            , #{st03Reno}
+            , #{st03Rtno}
+            , #{st03Line}
+            , #{st03LotSeq}
+        )
+    </insert>
+	
+</mapper> 
