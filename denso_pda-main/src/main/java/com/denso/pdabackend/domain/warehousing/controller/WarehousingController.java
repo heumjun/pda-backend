@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.denso.pdabackend.common.AuthenticationFacade;
+import com.denso.pdabackend.domain.output.dto.OutputSearchDto;
+import com.denso.pdabackend.domain.output.service.OutputService;
 import com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto;
+import com.denso.pdabackend.domain.warehousing.dto.StockDto;
 import com.denso.pdabackend.domain.warehousing.dto.WarehousingDto;
 import com.denso.pdabackend.domain.warehousing.dto.WarehousingDto.Warehousing;
 import com.denso.pdabackend.domain.warehousing.dto.WarehousingDto.WarehousingRequest;
@@ -21,6 +24,7 @@ import com.denso.pdabackend.domain.warehousing.service.WarehousingService;
 import com.denso.pdabackend.response.ResponseEntityUtil;
 import com.denso.pdabackend.response.StatusCode;
 import com.denso.pdabackend.response.exception.BusinessException;
+import com.denso.pdabackend.token.dto.UserDto;
 import com.denso.pdabackend.utils.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -36,6 +40,7 @@ public class WarehousingController {
 
 	private final AuthenticationFacade auth;
 	private final WarehousingService warehousingService;
+	private final OutputService outputService;
 
 	@GetMapping
 	@Operation(summary = "품목입고 조회", description = "품목입고 조회")
@@ -54,7 +59,7 @@ public class WarehousingController {
 	public ResponseEntity<?> saveOfWarehousing(@RequestBody Map<String,Object> params) throws Exception {
 
 		log.debug("{}", params);
-		
+
 		List<InputHistorySearchDto.Info> insertList = JsonUtils.deserialize(params.get("insertList"), new TypeReference<List<InputHistorySearchDto.Info>>() {});
 		List<InputHistorySearchDto.Info> updateList = JsonUtils.deserialize(params.get("updateList"), new TypeReference<List<InputHistorySearchDto.Info>>() {});
 
@@ -63,11 +68,11 @@ public class WarehousingController {
 		WarehousingRequest warehousingRequest = WarehousingRequest.builder().build();
 
 		for(InputHistorySearchDto.Info info : updateList) {
-			
+
 			info.setCompany(auth.getUserInfo().getCompany());
 			info.setFactory(auth.getUserInfo().getFactory());
 			info.setSt02Empno(0);
-			
+
 			InputHistorySearchDto.Request request = new InputHistorySearchDto.Request();
 			request.setCompany(auth.getUserInfo().getCompany());
 			request.setFactory(auth.getUserInfo().getFactory());
@@ -81,9 +86,9 @@ public class WarehousingController {
 			}
 		}
 		warehousingService.updateOfInputHistory(updateList);
-		
+
 		for( InputHistorySearchDto.Info info : insertList ) {
-			
+
 			info.setCompany(auth.getUserInfo().getCompany());
 			info.setFactory(auth.getUserInfo().getFactory());
 			info.setSt02Empno(0);
@@ -92,17 +97,48 @@ public class WarehousingController {
 			request.setCompany(auth.getUserInfo().getCompany());
 			request.setFactory(auth.getUserInfo().getFactory());
 			request.setSt02Pno(info.getSt02Pno());
-			
+
 			// 같은 납품확인서로 2개이상 입고하는 경우를 없애야함
 			Map<String, Object> resultMap = warehousingService.getInputHistorySearchInfo(request);
 			if (resultMap != null) {
 				return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "이미 등록된 납품확인서입니다.");
 			}
-			
+
 		}
 		warehousingService.insertOfInputHistory(insertList);
 
 		return ResponseEntityUtil.created(null);
 	}
+
+
+	@Operation(summary = "SCM라벨 품목정보", description = "SCM라벨 품목정보")
+	@GetMapping("/stock/getInputInfo")
+	public ResponseEntity<?> getInputInfo(StockDto.Request request) throws Exception{
+
+		Map<String,Object> data = new HashMap<String,Object>();
+
+		UserDto userInfo = auth.getUserInfo();
+		String company = userInfo.getCompany();
+		String factory = userInfo.getFactory();
+
+		request.setCompany(company);
+		request.setFactory(factory);
+
+		if (company == null) {
+			return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 조회할 수 없습니다.");
+		}
+
+		if (factory == null) {
+			return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 조회할 수 없습니다.");
+		}
+
+		Map<String,Object> inputInfo = warehousingService.getInputInfo(request);
+
+		data.put("inputInfo", inputInfo);
+
+		return ResponseEntityUtil.ok(data);
+
+	}
+	
 
 }

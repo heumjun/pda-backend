@@ -13,11 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.denso.pdabackend.common.AuthenticationFacade;
-import com.denso.pdabackend.domain.output.dto.OutputSearchDto;
 import com.denso.pdabackend.domain.output.dto.OutputRequestDto;
+import com.denso.pdabackend.domain.output.dto.OutputSearchDto;
 import com.denso.pdabackend.domain.output.service.OutputService;
-import com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto;
-import com.denso.pdabackend.domain.warehousing.dto.WarehousingDto.WarehousingRequest;
 import com.denso.pdabackend.response.ResponseEntityUtil;
 import com.denso.pdabackend.response.StatusCode;
 import com.denso.pdabackend.response.exception.BusinessException;
@@ -54,8 +52,10 @@ public class OutputController {
         String company = userInfo.getCompany();
         String factory = userInfo.getFactory();
 
-        request.setCompany(company);
-        request.setFactory(factory);
+//        request.setCompany(company);
+//        request.setFactory(factory);
+        request.setCompany("DNKR");
+        request.setFactory("0001");
         
         request.setCompany(userInfo.getCompany());
         request.setFactory(userInfo.getFactory());
@@ -92,8 +92,10 @@ public class OutputController {
         String company = userInfo.getCompany();
         String factory = userInfo.getFactory();
 
-        request.setCompany(company);
-        request.setFactory(factory);
+//        request.setCompany(company);
+//        request.setFactory(factory);
+        request.setCompany("DNKR");
+        request.setFactory("0001");
 
         if (company == null) {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 조회할 수 없습니다.");
@@ -118,7 +120,7 @@ public class OutputController {
     
     @PostMapping
 	@Operation(summary = "출고이력 등록", description = "출고이력 등록")
-	public ResponseEntity<?> saveOfWarehousing(@RequestBody Map<String,Object> params) throws Exception {
+	public ResponseEntity<?> saveOfOutput(@RequestBody Map<String,Object> params) throws Exception {
 
 		log.debug("{}", params);
 		
@@ -131,21 +133,23 @@ public class OutputController {
 
         String company = userInfo.getCompany();
         String factory = userInfo.getFactory();
+        company = "DNKR";
+        factory = "0001";
 
-        if (company == null) {
-            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 수정할 수 없습니다.");
-        }
-
-        if (factory == null) {
-            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 수정할 수 없습니다.");
-        }
+//        if (company == null) {
+//            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 수정할 수 없습니다.");
+//        }
+//
+//        if (factory == null) {
+//            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 수정할 수 없습니다.");
+//        }
 		
         if(insertList != null){
         	
             for(OutputSearchDto.Info info : insertList){
                 info.setCompany(company);
                 info.setFactory(factory);
-                info.setSt03Empno(userInfo.getEmpNo());
+                info.setSt03Empno(0);
 
                 OutputSearchDto.Request request = new OutputSearchDto.Request();
                 request.setCompany(company);
@@ -174,8 +178,7 @@ public class OutputController {
                         // 불량인데 특채처리여부가 Y이면 출고가능하도록 설정
                         Map<String, Object> inspectSpecChkMap = outputService.inspectSpecChk(request);
                         if(inspectSpecChkMap == null){
-                            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "수입검사불량인 항목은 출고 불가능합니다.\n" +
-                                                                                           "특채처리여부를 확인하세요");
+                            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "수입검사불량인 항목은 출고 불가능합니다.\n특채처리여부를 확인하세요");
                         }
                     }
                 }
@@ -186,5 +189,40 @@ public class OutputController {
 
 		return ResponseEntityUtil.created("출고이력이 등록되었습니다.");
 	}
+    
+    @Operation(summary = "창고, 구역 가져오기(리딩기)", description = "창고, 구역 가져오기(리딩기)")
+    @GetMapping("getStokDist")
+    public ResponseEntity<?> getStokDist(OutputSearchDto.Request params) throws Exception {
+    	
+        Map<String,Object> data = new HashMap<String,Object>();
+
+        //토큰인증 사용자 정보
+        UserDto userInfo = auth.getUserInfo();
+
+        String company = userInfo.getCompany();
+        String factory = userInfo.getFactory();
+        company = "DNKR";
+        factory = "0001";
+
+        params.setCompany(company);
+        params.setFactory(factory);
+        params.setSt03Code(params.getSt03Code());
+        params.setSt03Lot(params.getSt03Lot());
+        params.setSt03LotSeq(params.getSt03LotSeq());
+
+//        if (company == null) {
+//            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 조회할 수 없습니다.");
+//        }
+//
+//        if (factory == null) {
+//            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 조회할 수 없습니다.");
+//        }
+
+        Map<String,Object> getStokDist = outputService.getStokDist(params);
+
+        data.put("stokDistInfo", getStokDist);
+
+        return ResponseEntityUtil.ok(data);
+    }
     
 }

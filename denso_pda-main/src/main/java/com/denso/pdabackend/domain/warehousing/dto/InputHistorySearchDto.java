@@ -64,6 +64,8 @@ public class InputHistorySearchDto {
 
 		// 입고이력조회 - head
 		private String pst02No;
+		
+		private String st02Moq;
 	}
 
 	@Data
@@ -89,6 +91,7 @@ public class InputHistorySearchDto {
 		private String st02Cus;
 		private String st02Gbn;
 
+		private String st02Moq;
 
 
 	}

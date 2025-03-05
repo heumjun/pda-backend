@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto;
 import com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto.Request;
 import com.denso.pdabackend.domain.warehousing.dto.InspectionConfDto;
+import com.denso.pdabackend.domain.warehousing.dto.StockDto;
 import com.denso.pdabackend.domain.warehousing.dto.StockDto.Info;
 import com.denso.pdabackend.domain.warehousing.dto.WarehousingDto.Warehousing;
 import com.denso.pdabackend.domain.warehousing.dto.WarehousingDto.WarehousingRequest;
@@ -39,5 +40,7 @@ public interface WarehousingMapper {
 	Map<String, Object> getAvailable(HashMap hashMap);
 
 	void insertInspectionConf(InspectionConfDto.Info inspectionConf);
+
+	List<Map<String, Object>> getInputInfo(StockDto.Request params);
 
 }

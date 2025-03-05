@@ -97,6 +97,10 @@ public class StockDto {
 
 	@Data
 	public static class Request extends CommonDto {
+		
+		private String company;
+		private String factory;
+		
 		private String code;
 		private String st01Code;
 		private String st01Lot;
@@ -106,14 +110,17 @@ public class StockDto {
 		private String st01Dedqty;
 		private String st01Avgqty;
 		private String st01Gbn;
-
+		
 		private String whCode;
 		private String agdtCode;
 		private String inDat;
 		private String lot;
-
+		
 		private String cm15Exclusion;
 		private String exclusionStock;
+		
+		private String napLotNo;
+		private String barcode;
 	}
 
 }

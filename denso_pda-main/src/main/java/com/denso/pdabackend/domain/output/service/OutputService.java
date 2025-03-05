@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.denso.pdabackend.domain.output.dto.OutputRequestDto;
 import com.denso.pdabackend.domain.output.dto.OutputSearchDto;
 import com.denso.pdabackend.domain.output.dto.OutputSearchDto.Info;
+import com.denso.pdabackend.domain.output.dto.OutputSearchDto.Request;
 import com.denso.pdabackend.domain.output.mapper.OutputMapper;
 import com.denso.pdabackend.domain.warehousing.dto.StockDto;
 
@@ -75,5 +76,12 @@ public class OutputService {
         });
 		
         return true;
+	}
+
+	public Map<String, Object> getStokDist(Request params) {
+		List<Map<String,Object>> list = outputMapper.getStokDist(params);
+        if(list.size()>0)
+            return list.get(0);
+        return null;
 	}
 }

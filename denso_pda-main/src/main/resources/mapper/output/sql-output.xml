@@ -17,8 +17,8 @@
         FROM TB_MF_13 mf13
         LEFT JOIN DNKR_LINE_CODE line on mf13.MF13_COMPANY = line.COMPANY AND mf13.MF13_FACTORY = line.FACTORY AND mf13.MF13_LINE_CODE = line.LINE_CODE
         LEFT JOIN TB_ST_03 st03 on mf13.MF13_COMPANY = st03.ST03_COMPANY AND mf13.MF13_FACTORY = st03.ST03_FACTORY AND mf13.MF13_NO = st03.ST03_OUTPUT_NO
-        WHERE MF13_COMPANY = 'DNKR'
-          AND MF13_FACTORY = '0001'
+        WHERE MF13_COMPANY = #{company}
+          AND MF13_FACTORY = #{factory}
           AND MF13_COMP_GBN = 'N'
           AND ST03_OUTPUT_NO IS NULL
         ORDER BY MF13_DAT DESC, MF13_NO DESC
@@ -47,8 +47,8 @@
         FROM TB_MF_14 mf14
         LEFT JOIN TB_MF_13 mf13 ON mf14.MF14_COMPANY = mf13.MF13_COMPANY AND mf14.MF14_FACTORY = mf13.MF13_FACTORY AND mf14.MF14_HNO = mf13.MF13_NO
         LEFT JOIN TB_CM_08 cm08 ON mf14.MF14_COMPANY = cm08.CM08_COMPANY AND mf14.MF14_FACTORY = cm08.CM08_FACTORY AND mf14.MF14_CODE = cm08.CM08_CODE
-        WHERE MF13_COMPANY = 'DNKR'
-          AND MF13_FACTORY = '0001'
+        WHERE MF13_COMPANY = #{company}
+          AND MF13_FACTORY = #{factory}
           AND MF13_NO = #{mf13No}
     </select>
     
@@ -182,5 +182,17 @@
 		   AND st01_lot_seq = #{lotSeq}
 		</if>
    </update>
+   
+   <!-- 출고에서 리딩기로 등록 시 창고, 구역 get -->
+    <select id="getStokDist" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+        SELECT *
+        FROM TB_ST_01
+        WHERE ST01_COMPANY = #{company}
+          AND ST01_FACTORY = #{factory}
+          AND ST01_CODE = #{st03Code}
+          AND ST01_LOT = #{st03Lot}
+          AND ST01_LOT_SEQ = #{st03LotSeq}
+    </select>
 	
 </mapper> 
