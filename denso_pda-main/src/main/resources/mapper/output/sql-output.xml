@@ -19,6 +19,9 @@
         LEFT JOIN TB_ST_03 st03 on mf13.MF13_COMPANY = st03.ST03_COMPANY AND mf13.MF13_FACTORY = st03.ST03_FACTORY AND mf13.MF13_NO = st03.ST03_OUTPUT_NO
         WHERE MF13_COMPANY = #{company}
           AND MF13_FACTORY = #{factory}
+          	<if test="mf13No != null and !mf13No.equalsIgnoreCase('')" >
+	            AND MF13_NO = #{mf13No}
+			</if>
           AND MF13_COMP_GBN = 'N'
           AND ST03_OUTPUT_NO IS NULL
         ORDER BY MF13_DAT DESC, MF13_NO DESC

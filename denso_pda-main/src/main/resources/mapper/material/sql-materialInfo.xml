@@ -24,7 +24,12 @@
 		AND CM05.CM05_CODE = 'W005'
 		AND CM05.CM05_VALUE = ST02.ST02_STATUS
 		WHERE 1=1
-		AND ST02.ST02_QRCODE = #{qrCode}
+		<if test="qrCode != null and !qrCode.equalsIgnoreCase('')" >
+			AND ST02.ST02_QRCODE = #{qrCode}
+		</if>
+		<if test="st02LotSeq != null and !st02LotSeq.equalsIgnoreCase('')" >
+			AND ST02.ST02_LOT_SEQ = #{st02LotSeq}
+		</if>
     </select>
 
 </mapper> 

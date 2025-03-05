@@ -13,12 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.denso.pdabackend.common.AuthenticationFacade;
-import com.denso.pdabackend.domain.output.dto.OutputSearchDto;
 import com.denso.pdabackend.domain.output.service.OutputService;
 import com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto;
 import com.denso.pdabackend.domain.warehousing.dto.StockDto;
 import com.denso.pdabackend.domain.warehousing.dto.WarehousingDto;
-import com.denso.pdabackend.domain.warehousing.dto.WarehousingDto.Warehousing;
 import com.denso.pdabackend.domain.warehousing.dto.WarehousingDto.WarehousingRequest;
 import com.denso.pdabackend.domain.warehousing.service.WarehousingService;
 import com.denso.pdabackend.response.ResponseEntityUtil;
@@ -47,6 +45,10 @@ public class WarehousingController {
 	public ResponseEntity<?> getWarehousingList(WarehousingDto.WarehousingRequest params) throws Exception {
 
 		Map<String,Object> data = new HashMap<String,Object>();
+		
+		params.setCompany("DNKR");
+		params.setFactory("0001");
+		
 		List<Map<String,Object>> warehousingList =  warehousingService.getWarehousingList(params);
 		//data.put("puInfo", puInfo); // 발주번호 및 제조사 정보를 가져오기 위해서
 		data.put("warehousingList", warehousingList);

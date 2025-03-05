@@ -68,9 +68,9 @@ public class OutputController {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 조회할 수 없습니다.");
         }
 
-        request.setMf13No(String.valueOf(request.getMf13No()));
-        request.setMf13DatFr(String.valueOf(request.getSt03DatFr()));
-        request.setMf13DatTo(String.valueOf(request.getSt03DatTo()));
+        //request.setMf13No(String.valueOf(request.getMf13No()));
+        //request.setMf13DatFr(String.valueOf(request.getSt03DatFr()));
+        //request.setMf13DatTo(String.valueOf(request.getSt03DatTo()));
         List<Map<String, Object>> detailInfo =  outputService.getOutputRequestSearch(request);
 
         if(detailInfo.size() < 1) {
