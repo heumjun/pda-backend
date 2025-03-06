@@ -49,13 +49,19 @@ public class OutputController {
     	Map<String,Object> data = new HashMap<String,Object>();
 
         UserDto userInfo = auth.getUserInfo();
+        
+        System.out.println("userInfo >> " + userInfo);
+        
         String company = userInfo.getCompany();
         String factory = userInfo.getFactory();
+        int empNo = userInfo.getEmpNo();
+        String empName = userInfo.getEmpName();
+        
+        System.out.println(empNo);
+        System.out.println(empName);
 
-//        request.setCompany(company);
-//        request.setFactory(factory);
-        request.setCompany("DNKR");
-        request.setFactory("0001");
+        request.setCompany(company);
+        request.setFactory(factory);
         
         request.setCompany(userInfo.getCompany());
         request.setFactory(userInfo.getFactory());
@@ -92,10 +98,8 @@ public class OutputController {
         String company = userInfo.getCompany();
         String factory = userInfo.getFactory();
 
-//        request.setCompany(company);
-//        request.setFactory(factory);
-        request.setCompany("DNKR");
-        request.setFactory("0001");
+        request.setCompany(company);
+        request.setFactory(factory);
 
         if (company == null) {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 조회할 수 없습니다.");
@@ -133,9 +137,7 @@ public class OutputController {
 
         String company = userInfo.getCompany();
         String factory = userInfo.getFactory();
-        company = "DNKR";
-        factory = "0001";
-
+        
 //        if (company == null) {
 //            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 수정할 수 없습니다.");
 //        }

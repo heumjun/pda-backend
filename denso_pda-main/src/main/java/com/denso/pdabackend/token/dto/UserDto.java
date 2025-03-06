@@ -7,13 +7,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDto implements UserDetails{
 
 	private String userId;
-	private String userName;
+	private String username;
 	private String password;
 	private String company;
 	private String factory; 
@@ -46,12 +52,6 @@ public class UserDto implements UserDetails{
 	public String getPassword() {
 		// TODO Auto-generated method stub
 		return this.password;
-	}
-
-	@Override
-	public String getUsername() {
-		// TODO Auto-generated method stub
-		return this.userName;
 	}
 
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

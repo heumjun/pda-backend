@@ -82,21 +82,57 @@ public class JwtTokenProvider {
 							.getBody()
 							.getSubject();
 		 
-		String userCompany = Jwts.parser()
-								 .setSigningKey(secretKey)
-								 .parseClaimsJws(token)
-								 .getBody()
-								 .get("company").toString();
-
-		String userFactory = Jwts.parser()
-								.setSigningKey(secretKey)
-								.parseClaimsJws(token)
-								.getBody()
-								.get("factory").toString();
+		String company = Jwts.parser()
+							.setSigningKey(secretKey)
+							.parseClaimsJws(token)
+							.getBody()
+							.get("company").toString();
+		
+		String companyName = Jwts.parser()
+							.setSigningKey(secretKey)
+							.parseClaimsJws(token)
+							.getBody()
+							.get("companyName").toString();
+		
+		String factory = Jwts.parser()
+							.setSigningKey(secretKey)
+							.parseClaimsJws(token)
+							.getBody()
+							.get("factory").toString();
+		
+		String factoryName = Jwts.parser()
+							.setSigningKey(secretKey)
+							.parseClaimsJws(token)
+							.getBody()
+							.get("factoryName").toString();
+		
+		int empNo = Integer.parseInt( Jwts.parser()
+							.setSigningKey(secretKey)
+							.parseClaimsJws(token)
+							.getBody()
+							.get("empNo").toString() );
+		
+		String empName = Jwts.parser()
+							.setSigningKey(secretKey)
+							.parseClaimsJws(token)
+							.getBody()
+							.get("empName").toString();
+		
+		System.out.println(" >>>>>>>>>>> " + userId);
+		System.out.println(" >>>>>>>>>>> " + company);
+		System.out.println(" >>>>>>>>>>> " + companyName);
+		System.out.println(" >>>>>>>>>>> " + factory);
+		System.out.println(" >>>>>>>>>>> " + factoryName);
+		System.out.println(" >>>>>>>>>>> " + empNo);
+		System.out.println(" >>>>>>>>>>> " + empName);
 		
 		userInfo.setUserId(userId);
-		userInfo.setCompany(userCompany);
-		userInfo.setFactory(userFactory);
+		userInfo.setCompany(company);
+		userInfo.setCompanyName(companyName);
+		userInfo.setFactory(factory);
+		userInfo.setFactoryName(factoryName);
+		userInfo.setEmpNo(empNo);
+		userInfo.setEmpName(empName);
 		
 		return userInfo;
     }
@@ -159,11 +195,17 @@ public class JwtTokenProvider {
     	Claims claims = Jwts.claims().setSubject(userDto.getUserId());	//로그인 id를 토큰subject로 넣음.
     	
     	//회사코드, 공정코드등 정보를 토큰의 playload에 넣어 보관
+    	claims.put("userId", userDto.getUserId());	
     	claims.put("company", userDto.getCompany());	
-    	claims.put("factory", userDto.getFactory());
+    	claims.put("companyName", userDto.getCompanyName());	
+    	claims.put("factory", userDto.getFactory());	
+    	claims.put("factoryName", userDto.getFactoryName());	
     	claims.put("empNo", userDto.getEmpNo());
+    	claims.put("empName", userDto.getEmpName());
     	
     	Date now = new Date();
+    	
+    	System.out.println("AAAAAAAAAAAAAAAAAA");
     	
     	return Jwts.builder()
     			.setHeaderParam("typ", "JWT")  //header

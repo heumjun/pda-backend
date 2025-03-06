@@ -49,7 +49,6 @@ public class LoginController {
         BeanUtils.copyProperties(userInfo, userDto);   //객체 복사
 
         String token = jwtTokenProvider.createAccessToken(userDto);
-        
         data.put("token", token);
 
         return ResponseEntityUtil.ok(data);
