@@ -124,7 +124,7 @@
         FROM tb_st_02
         WHERE st02_company = #{company}
           AND st02_factory = #{factory}
-          AND st02_dat = #{st02Dat}
+          AND TO_CHAR(st02_dat, 'YYYY-MM-DD') = #{st02Dat}
     </select>
     
     <!-- 입고 -> 새로운 LOT SEQ 생성 -->

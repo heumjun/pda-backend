@@ -100,7 +100,7 @@
             FROM TB_ST_03
             WHERE ST03_COMPANY = #{company}
               AND ST03_FACTORY = #{factory}
-              AND ST03_DAT = #{st03Dat}
+              AND TO_CHAR(ST03_DAT, 'YYYY-MM-DD') = #{st03Dat}
         </selectKey>
 
         INSERT INTO TB_ST_03 (
