@@ -26,7 +26,7 @@ public interface OutputMapper {
 
 	boolean insertOfOutputHistory(Info item);
 
-	void updateOfPdStock(StockDto.Info stockInfo);
+	boolean updateOfPdStock(StockDto.Info stockInfo);
 
 	List<Map<String, Object>> getStokDist(Request params);
 	

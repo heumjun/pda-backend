@@ -46,8 +46,8 @@ public class WarehousingController {
 
 		Map<String,Object> data = new HashMap<String,Object>();
 		
-		params.setCompany("DNKR");
-		params.setFactory("0001");
+		params.setCompany(auth.getUserInfo().getCompany());
+		params.setFactory(auth.getUserInfo().getFactory());
 		
 		List<Map<String,Object>> warehousingList =  warehousingService.getWarehousingList(params);
 		//data.put("puInfo", puInfo); // 발주번호 및 제조사 정보를 가져오기 위해서
@@ -93,7 +93,7 @@ public class WarehousingController {
 
 			info.setCompany(auth.getUserInfo().getCompany());
 			info.setFactory(auth.getUserInfo().getFactory());
-			info.setSt02Empno(0);
+			info.setSt02Empno(auth.getUserInfo().getEmpNo());
 
 			InputHistorySearchDto.Request request = new InputHistorySearchDto.Request();
 			request.setCompany(auth.getUserInfo().getCompany());

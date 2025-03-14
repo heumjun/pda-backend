@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.restore.mapper.RestoreMapper">
+	
+	<select id="getRestoreList" parameterType="com.denso.pdabackend.domain.restore.dto.RestoreDto$Request"
+        resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-restore.xml] RestoreMapper.getRestoreList **/
+        SELECT A.ST11_COMPANY,       /* 회사 */
+	            A.ST11_FACTORY,       /* 공장 */
+	            A.ST11_HNO,           /* 반납요청서번호 */
+	            A.ST11_NO,            /* 반납요청상세번호 */
+	            A.ST11_SEQ,           /* 상세순번 */
+	            A.ST11_CODE,          /* 품목코드 */
+	            A.ST11_LOT,           /* 로트번호 */
+	            A.ST11_QTY,           /* 반납수량 */
+	            A.ST11_STOK,          /* 보관장소 */
+	            A.ST11_DISTRICT AS ST11_DIST,      /* 구역 */
+	            A.ST11_INDTE,         /* 등록일자 */
+	            A.ST11_EMPNO,         /* 등록자 사번 */
+	            A.ST11_UPDTE,         /* 수정일자 */
+	            A.ST11_UPD_EMPNO,      /* 수정자 사번 */
+	            C.CM08_NAME,            /* 품목명 */
+	            C.CM08_OPUNT,            /* 출고단위 */
+	            C.CM08_GBN            /* 품목구분 */
+	          , (SELECT CM15_NAME
+	                   FROM TB_CM_15
+	                   WHERE CM15_COMPANY = A.ST11_COMPANY
+	                     AND CM15_FACTORY = A.ST11_FACTORY
+	                     AND CM15_CODE = A.ST11_STOK
+	                     AND ROWNUM <![CDATA[<]]> 2
+	            ) AS ST11_STOK_NAME  /* 창고명 */
+	          , (SELECT CM16_NAME
+	               FROM TB_CM_16
+	               WHERE CM16_COMPANY = A.ST11_COMPANY
+	                 AND CM16_FACTORY = A.ST11_FACTORY
+	                 AND CM16_CODE = A.ST11_DISTRICT
+	                 AND ROWNUM <![CDATA[<]]> 2
+	            ) AS ST11_DISTRICT_NAME  /* 구역명 */
+	          , (SELECT CM05_NAME
+	               FROM TB_CM_05
+	               WHERE CM05_COMPANY = c.CM08_COMPANY
+	                 AND CM05_FACTORY = c.CM08_FACTORY
+	                 AND CM05_VALUE = c.CM08_OPUNT
+	                 AND CM05_CODE = 'C005'
+	            ) AS cm08_opunt_name /* 출고단위명 */
+	           , NVL(E.ST02_QTY, 0) AS ST02_QTY /* 출고수량 */
+	           , TO_CHAR(NVL(E.ST02_DAT, ''), 'YYYY-MM-DD') AS ST02_DAT /* 입고일자 */
+	        FROM TB_ST_11 A         /* 반납관리 Detail 테이블 */
+	  INNER JOIN TB_ST_10 B         /* 반납관리 Master 테이블 */
+	          ON A.ST11_COMPANY = B.ST10_COMPANY
+	         AND A.ST11_FACTORY = B.ST10_FACTORY
+	         AND A.ST11_HNO = B.ST10_NO
+	  INNER JOIN TB_CM_08 C         /* 품목 테이블 */
+	          ON A.ST11_COMPANY = C.CM08_COMPANY
+	         AND A.ST11_FACTORY = C.CM08_FACTORY
+	         AND A.ST11_CODE = C.CM08_CODE
+	   LEFT OUTER JOIN  TB_ST_02 E
+	          ON E.ST02_COMPANY = A.ST11_COMPANY
+	         AND E.ST02_FACTORY = A.ST11_FACTORY
+	         AND E.ST02_RENO = A.ST11_NO
+	       WHERE A.ST11_COMPANY = #{company}
+	         AND A.ST11_FACTORY = #{factory}
+	         AND A.ST11_HNO = #{st10No}
+    </select>
+    
+    <!-- 반납요청관리 정보 조회 -->
+    <select id="getRestoreMgmtInfo" parameterType="com.denso.pdabackend.domain.restore.dto.RestoreMgmtDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-restore.xml] RestoreMapper.getRestoreMgmtInfo **/
+        SELECT  ST10_COMPANY,  /* 회사 */
+                ST10_FACTORY,  /* 공장 */
+                ST10_NO,       /* 반납요청서번호 */
+                TO_CHAR(ST10_DAT, 'YYYY-MM-DD') AS ST10_DAT,      /* 반납요청일자 */
+                ST10_SEQ,      /* 순번 */
+                ST10_DEPT,     /* 부서코드 */
+                ST10_RMK,      /* 사유 */
+                ST10_YN,       /* 승인여부 */
+                ST10_INDTE,    /* 등록일자 */
+                ST10_EMPNO,    /* 등록자사번 */
+                ST10_N_RMK     /* 미승인사유 */
+        FROM TB_ST_10  /* 반납관리 MASTER */
+        WHERE ST10_COMPANY = #{company}
+        AND ST10_FACTORY = #{factory}
+        AND ST10_NO = #{st10No}
+    </select>
+    
+    <!-- 반납요청관리 창고/구역 변경 여부 조회-->
+    <select id="getChangeDataYn" parameterType="com.denso.pdabackend.domain.restore.dto.RestoreDto$Info"
+            resultType="boolean">
+		/** [sql-restore.xml] RestoreMapper.getChangeDataYn - 반납요청관리 창고/구역 변경 여부 조회 true:변경 **/
+        SELECT (CASE WHEN NVL(COUNT(*), 0) > 0 THEN 0 ELSE 1 END) AS CHANGE_YN
+        FROM TB_ST_11
+        WHERE ST11_COMPANY = #{st11Company}
+          AND ST11_FACTORY = #{st11Factory}
+          AND ST11_NO = #{st11No}
+          AND ST11_STOK = #{st11Stok}
+          AND ST11_DISTRICT = #{st11Dist}
+    </select>
+    
+    <insert id="updateReturnForReg" parameterType="com.denso.pdabackend.domain.restore.dto.RestoreDto$Info">
+    	/** [sql-restore.xml] RestoreMapper.updateReturnForReg **/
+        UPDATE TB_ST_11
+           SET ST11_STOK 		= #{st11Stok}
+             , ST11_DISTRICT 	= #{st11Dist}
+             , ST11_UPD_EMPNO 	= #{st11UpdEmpno}
+             , ST11_UPDTE 		= SYSDATE
+         WHERE ST11_COMPANY 	= #{st11Company}
+           AND ST11_FACTORY 	= #{st11Factory}
+           AND ST11_NO 			= #{st11No}
+    </insert>
+    
+    <!-- 반납출고 등록 -->
+    <insert id="saveOfProductionOutput" parameterType="com.denso.pdabackend.domain.restore.dto.RestoreDto$Info">
+    	/** [sql-restore.xml] RestoreMapper.saveOfProductionOutput **/
+        <selectKey resultType="int" keyProperty="st03Seq" order="BEFORE">
+            /* saveOfProductionOutput - 출고수량등록및변경 */
+            SELECT NVL(MAX(ST03_SEQ)+1,1) AS st03_seq
+            FROM TB_ST_03
+            WHERE 1 = 1
+            <choose>
+                <when test="st02Dat !=null and !st02Dat.equalsIgnoreCase('')">
+                    AND ST03_DAT BETWEEN TO_DATE(#{st02Dat}, 'YYYY-MM-DD') AND TO_DATE(#{st02Dat}, 'YYYY-MM-DD') + 0.99999
+                </when>
+                <otherwise>
+                    AND ST03_DAT BETWEEN TRUNC(SYSDATE) AND TRUNC(SYSDATE) + 0.99999
+                </otherwise>
+            </choose>
+            AND ST03_COMPANY = #{st11Company}
+            AND ST03_FACTORY = #{st11Factory}
+        </selectKey>
+
+        /* saveOfProductionOutput - 반납출고 등록 */
+        MERGE INTO TB_ST_03 T1
+        USING DUAL
+        ON (
+            ST03_COMPANY = #{st11Company}
+            AND ST03_FACTORY = #{st11Factory}
+            AND ST03_RENO = #{st11No}
+        )
+        WHEN MATCHED THEN
+        UPDATE SET
+            ST03_QTY = #{st02Qty}
+            , ST03_INDTE = SYSDATE
+        WHEN NOT MATCHED THEN
+        INSERT
+        (
+            ST03_COMPANY,
+            ST03_FACTORY,
+            ST03_NO,
+            ST03_DAT,
+            ST03_SEQ,
+            ST03_CODE,
+            ST03_LOT,
+            ST03_LOT_SEQ,
+            ST03_GBN,
+            ST03_UNT,
+            ST03_QTY,
+            ST03_STOK,
+            ST03_INDTE,
+            ST03_EMPNO,
+            ST03_RENO
+        )
+        VALUES
+        (
+            #{st11Company},
+            #{st11Factory},
+            <choose>
+                <when test="st02Dat !=null and !st02Dat.equalsIgnoreCase('')">
+                    CONCAT(REPLACE(#{st02Dat},'-',''),LPAD(#{st03Seq},5,'0')),
+                </when>
+                <otherwise>
+                    CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'),LPAD(#{st03Seq},5,'0')),
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="st02Dat !=null and !st02Dat.equalsIgnoreCase('')">
+                    TO_DATE(REPLACE(#{st02Dat},'-',''), 'YYYYMMDD'),
+                </when>
+                <otherwise>
+                    TO_CHAR(SYSDATE, 'YYYYMMDD'),
+                </otherwise>
+            </choose>
+            #{st03Seq},
+            #{st11Code},
+            #{st11Lot},
+            #{st11LotSeq},
+            'RE', /* 반납 - st03_gbn */
+            #{cm08Opunt},
+            #{st02Qty},
+            #{st11Stok},
+            SYSDATE,
+            #{st11Empno},
+            #{st11No}
+        )
+    </insert>
+    
+    <!-- 반납입고 등록 -->
+    <insert id="saveOfProductionInput" parameterType="com.denso.pdabackend.domain.restore.dto.RestoreDto$Info">
+    	/** [sql-restore.xml] RestoreMapper.saveOfProductionInput **/
+        <selectKey resultType="int" keyProperty="st02Seq" order="BEFORE">
+            SELECT NVL(MAX(ST02_SEQ)+1,1) AS st02_seq
+              FROM TB_ST_02
+             WHERE 1 = 1
+            <choose>
+                <when test="st02Dat !=null and !st02Dat.equalsIgnoreCase('')">
+                    AND ST02_DAT BETWEEN TO_DATE(#{st02Dat}, 'YYYY-MM-DD') AND TO_DATE(#{st02Dat}, 'YYYY-MM-DD') + 0.99999
+                </when>
+                <otherwise>
+                    AND ST02_DAT BETWEEN TRUNC(SYSDATE) AND TRUNC(SYSDATE) + 0.99999
+                </otherwise>
+            </choose>
+               AND ST02_COMPANY = #{st11Company}
+               AND ST02_FACTORY = #{st11Factory}
+        </selectKey>
+
+        /* saveOfProductionInput - 반납입고 등록 */
+        MERGE INTO TB_ST_02 T1
+        USING DUAL
+        ON (
+            ST02_COMPANY = #{st11Company}
+            AND ST02_FACTORY = #{st11Factory}
+            AND ST02_RENO = #{st11No}
+        )
+        WHEN MATCHED THEN
+        UPDATE SET
+            ST02_QTY = #{st02Qty}
+            , ST02_STOK = #{st11Stok}
+            , ST02_DIST = #{st11Dist}
+            , ST02_INDTE = SYSDATE
+        WHEN NOT MATCHED THEN
+        INSERT
+        (
+            ST02_COMPANY,
+            ST02_FACTORY,
+            ST02_NO,
+            ST02_DAT,
+            ST02_SEQ,
+            ST02_CODE,
+            ST02_LOT,
+            ST02_LOT_SEQ,
+            ST02_GBN,
+            ST02_IPUNT,
+            ST02_OPUNT,
+            ST02_IPQTY,
+            ST02_QTY,
+            ST02_STOK,
+            ST02_DIST,
+            ST02_INDTE,
+            ST02_EMPNO,
+            ST02_QRCODE,
+            ST02_RENO
+        )
+        VALUES
+        (
+            #{st11Company},
+            #{st11Factory},
+            <choose>
+                <when test="st02Dat !=null and !st02Dat.equalsIgnoreCase('')">
+                    CONCAT(REPLACE(#{st02Dat},'-',''),LPAD(#{st02Seq},5,'0')),
+                </when>
+                <otherwise>
+                    CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'),LPAD(#{st02Seq},5,'0')),
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="st02Dat !=null and !st02Dat.equalsIgnoreCase('')">
+                    TO_DATE(REPLACE(#{st02Dat},'-',''), 'YYYYMMDD'),
+                </when>
+                <otherwise>
+                    TO_CHAR(SYSDATE, 'YYYYMMDD'),
+                </otherwise>
+            </choose>
+            #{st02Seq},
+            #{st11Code},
+            #{st11Lot},
+            #{st11LotSeq},
+            'RE', /* 반납 - st02_gbn */
+            #{cm08Ipunt},
+            #{cm08Opunt},
+            #{st02Qty},  /* st02_ipqty Qty 동일 사용 */
+            #{st02Qty},   /* st02_qty */
+            #{st11Stok},
+            #{st11Dist},
+            SYSDATE, /* st02_indte */
+            #{st11Empno},
+            #{qrcode},
+            #{st11No} /* st02_reno */
+        )
+    </insert>
+    
+    <!-- 반납 재고 등록 -->
+    <insert id="insertOfPdStock" parameterType="com.denso.pdabackend.domain.restore.dto.RestoreDto$Info">
+    	/** [sql-restore.xml] RestoreMapper.insertOfPdStock **/
+        <selectKey resultType="int" keyProperty="st01LotSeq" order="BEFORE">
+            /* insertOfPdStock - 반납 재고 등록 */
+            SELECT NVL(MAX(ST01_LOT_SEQ)+1,1) AS st01LotSeq
+            FROM TB_ST_01
+            WHERE 1 = 1
+            AND ST01_COMPANY = #{st11Company}
+            AND ST01_FACTORY = #{st11Factory}
+        </selectKey>
+
+        INSERT INTO TB_ST_01 (
+            ST01_COMPANY,
+            ST01_FACTORY,
+            ST01_GBN,
+            ST01_LOT,
+            ST01_LOT_SEQ,
+            ST01_CODE,
+            ST01_STOK,
+            ST01_DISTRICT,
+            ST01_FIELD,
+            ST01_UNT,
+            ST01_QTY
+        ) VALUES (
+            #{st11Company},
+            #{st11Factory},
+            #{cm08Gbn},
+            (#{cm08Gbn}||#{cm08Dgbn}||TO_CHAR(SYSDATE, 'YYYYMMDD')), /* LOT번호 신규 생성 - 입고라서 */
+            #{st01LotSeq}, /* LOT번호 시퀀스 신규 생성 - 입고라서 */
+            #{st11Code},
+            #{st11Stok},
+            #{st11Dist},
+            null,
+            #{cm08Opunt},
+            #{st02Qty}
+        )
+    </insert>
+    
+    <select id="getProductInfo" parameterType="com.denso.pdabackend.domain.restore.dto.ProductDto$Request" resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-restore.xml] RestoreMapper.getProductInfo **/
+		SELECT A.CM08_ORDQTY,
+		      A.CM08_COMPANY,
+		      A.CM08_FACTORY,
+		      A.CM08_CODE,
+		      A.CM08_GBN,
+		      A.CM08_DGBN,
+		      A.CM08_NAME,
+		      A.CM08_MODELNUM,
+		      A.CM08_ENAME,
+		      A.CM08_IPUNT,
+		      A.CM08_OPUNT,
+		      A.CM08_CONVERT,
+		      A.CM08_NAP,
+		      A.CM08_MINQTY,
+		      A.CM08_AVGQTY,
+		      A.CM08_AVGYN,
+		      A.CM08_CERT,
+		      A.CM08_RMK,
+		      A.CM08_FIFO,
+		      A.CM08_IQC,
+		      A.CM08_AVAILABLE,
+		      A.CM08_LOT_YN,
+		      A.CM08_INPUTYN,
+		      A.CM08_OUTPUTYN,
+		      A.CM08_BARCODE,
+		      A.CM08_CARTYPE,
+		      A.CM08_YNDTE,
+		      A.CM08_RI_DTE,
+		      A.CM08_RELEASE,
+		      A.CM08_INPUT,
+		      A.CM08_OVER,
+		      A.CM08_ABN,
+		      A.CM08_CHANGE_QTY,
+		      A.CM08_RATIOMT,
+		      A.CM08_RATIOMT_ID,
+		      A.CM08_MT,
+		      A.CM08_MT_ID,
+		      A.CM08_ORDER,
+		      A.CM08_PRFTIME,
+		      A.CM08_RATIO_ID,
+		      A.CM08_RATIO_STD,
+		      TO_CHAR(A.CM08_INDTE,'YYYY-MM-DD') AS CM08_INDTE,
+		      TO_CHAR(A.CM08_UPDTE,'YYYY-MM-DD') AS CM08_UPDTE,
+		      A.CM08_EMPNO,
+		      A.CM08_PROD_CONVERT,
+		      A.CM08_MOQ,
+		      A.CM08_CMF,
+		      COALESCE(B.TOTAL_QTY - A.CM08_ORDQTY,0) AS STOCK_QTY,
+		      A.CM08_CUS,
+		      C.CM01_NAME AS CM08_CUST_NAME,
+		      A.CM08_VAPACK_YN AS CM08_VAPACK_YN,
+		      A.CM08_MES_YN AS CM08_MES_YN
+		FROM TB_CM_08 A
+		LEFT JOIN (SELECT ST01_CODE, ST01_COMPANY, ST01_FACTORY, SUM(B.ST01_QTY) AS TOTAL_QTY FROM TB_ST_01 b GROUP BY B.ST01_COMPANY, B.ST01_FACTORY, B.ST01_CODE) B
+		   ON A.CM08_FACTORY = ST01_FACTORY
+		   AND A.CM08_COMPANY = ST01_COMPANY
+		   AND A.CM08_CODE = ST01_CODE
+		LEFT JOIN TB_CM_01 C ON A.CM08_COMPANY = C.CM01_COMPANY AND A.CM08_FACTORY = C.CM01_FACTORY AND A.CM08_CUS = C.CM01_CODE
+		WHERE 1=1
+		AND CM08_CODE = #{cm08Code}
+		AND CM08_COMPANY = #{company}
+		AND CM08_FACTORY = #{factory}
+   </select>
+	
+</mapper> 
