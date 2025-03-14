@@ -203,22 +203,20 @@ public class OutputController {
 
         String company = userInfo.getCompany();
         String factory = userInfo.getFactory();
-        company = "DNKR";
-        factory = "0001";
 
         params.setCompany(company);
         params.setFactory(factory);
         params.setSt03Code(params.getSt03Code());
-        params.setSt03Lot(params.getSt03Lot());
+        params.setSt03Lot(params.getSt03Lot());d
         params.setSt03LotSeq(params.getSt03LotSeq());
 
-//        if (company == null) {
-//            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 조회할 수 없습니다.");
-//        }
-//
-//        if (factory == null) {
-//            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 조회할 수 없습니다.");
-//        }
+        if (company == null) {
+            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 조회할 수 없습니다.");
+        }
+
+        if (factory == null) {
+            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 조회할 수 없습니다.");
+        }
 
         Map<String,Object> getStokDist = outputService.getStokDist(params);
 

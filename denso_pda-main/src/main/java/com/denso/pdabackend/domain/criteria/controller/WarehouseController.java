@@ -45,12 +45,9 @@ public class WarehouseController {
         String company = userInfo.getCompany();
         String factory = userInfo.getFactory();
 
-//        params.setCompany(company);
-//        params.setFactory(factory);
+        params.setCompany(company);
+        params.setFactory(factory);
         
-        params.setCompany("DNKR");
-        params.setFactory("0001");
-
         if (company == null) {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 조회할 수 없습니다.");
         }
@@ -78,10 +75,8 @@ public class WarehouseController {
         String factory = userInfo.getFactory();
         String code = params.getCm15Code();
 
-//        params.setCompany(company);
-//        params.setFactory(factory);
-        params.setCompany("DNKR");
-        params.setFactory("0001");
+        params.setCompany(company);
+        params.setFactory(factory);
 
         if (company == null) {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않습니다.");
@@ -120,8 +115,6 @@ public class WarehouseController {
         UserDto userInfo = auth.getUserInfo();
         String company = userInfo.getCompany();
         String factory = userInfo.getFactory();
-        company = "DNKR";
-        factory = "0001";
 
         if (warehouseAddedInfo != null) {
             for (WarehouseDto.Info info : warehouseAddedInfo) {
@@ -195,8 +188,6 @@ public class WarehouseController {
         UserDto userInfo = auth.getUserInfo();
         String company = userInfo.getCompany();
         String factory = userInfo.getFactory();
-        company = "DNKR";
-        factory = "0001";
 
         if (warehouseDeletedInfo != null) {
             for (WarehouseDto.Info info : warehouseDeletedInfo) {
