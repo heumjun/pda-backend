@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.denso.pdabackend.domain.partsInput.mapper.PartsInputMapper">
+	<!-- 부품 투입 Barcode를 읽었을 시 로드되는 정보 -->
+    <select id="getPartsInputRequestInfo" parameterType="com.denso.pdabackend.domain.partsInput.dto.PartsInputRequestDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-partsinput.xml] PartsInputMapper.getPartsInputRequestInfo **/
+        SELECT
+			 st02.ST02_COMPANY
+			,st02.ST02_FACTORY
+			,st02.ST02_NO
+			,st02.ST02_DAT
+			,st02.ST02_SEQ
+			,st02.ST02_QNO
+			,st02.ST02_CODE
+			,cm08.CM08_DGBN
+		    ,cm08.CM08_NAME
+		    ,cm08.CM08_GBN
+			,st02.ST02_LOT
+			,st02.ST02_GBN
+			,st02.ST02_CUS
+			,st02.ST02_PURNO
+			,st02.ST02_IPUNT
+			,st02.ST02_OPUNT
+			,st02.ST02_CURRENCY
+			,st02.ST02_IPQTY
+			,st02.ST02_QTY
+			,st02.ST02_COST
+			,st02.ST02_AMT
+			,st02.ST02_VAT
+			,st02.ST02_RMK
+			,st02.ST02_STOK
+			,st02.ST02_FIELD
+			,st02.ST02_RFID
+			,st02.ST02_INDTE
+			,st02.ST02_EMPNO
+			,st02.ST02_WANYN
+			,st02.ST02_PURNO2
+			,st02.ST02_PKNO
+			,st02.ST02_DTL_NO
+			,st02.ST02_QRCODE
+			,st02.ST02_STATUS
+			,st02.ST02_PNO
+			,st02.ST02_DIST
+			,st02.ST02_LOT_SEQ
+			,st02.ST02_RENO
+			,st02.ST02_LINE
+			,st02.ST02_MOQ
+			,st02.ST02_REQUEST_NO
+		FROM TB_ST_02 st02
+		LEFT JOIN TB_CM_08 cm08
+		ON st02.ST02_COMPANY = cm08.CM08_COMPANY
+		AND st02.ST02_FACTORY = cm08.CM08_FACTORY
+		AND st02.ST02_CODE = cm08.CM08_CODE
+		WHERE st02.ST02_COMPANY = #{company}
+		AND st02.ST02_FACTORY = '0001'<!--admin 계정의 factory가 TEST로 찍혀서 일단 강제로 찍고함.  #{factory} -->
+		AND st02.ST02_QRCODE = #{st02Qrcode}
+		AND st02.ST02_GBN = 'OC'
+	</select>
+
+	<update id="updateOfPdStock" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Info">
+    	/** [sql-partsinput.xml] PartsInputMapper.updateOfPdStock **/
+		UPDATE tb_st_01
+		<if test="operator == 'minus'"> -- 재고 차감 (출고등록/입고삭제)
+		   SET st01_qty =  st01_qty - #{outQty}
+		</if>
+		<if test="operator == 'plus'"> -- 재고 증가 (입고등록/출고삭제)
+		   SET st01_qty =  st01_qty + #{outQty}
+		</if>
+		WHERE 1=1
+		AND st01_company = #{company}
+		AND st01_factory = '0001'<!--admin 계정의 factory가 TEST로 찍혀서 일단 강제로 찍고함.  #{factory} -->
+		AND st01_code = #{code}
+		AND st01_stok = #{stock}
+		<if test="lot != null and !lot.equalsIgnoreCase('')" >
+		   AND st01_lot = #{lot}
+		   AND st01_lot_seq = #{lotSeq}
+		</if>
+   </update>
+
+   <update id="updateOfSmdStock" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Info">
+    	/** [sql-partsinput.xml] PartsInputMapper.updateOfSmdStock **/
+		UPDATE tb_st_02
+		<if test="operator == 'minus'"> -- 재고 차감 (출고등록/입고삭제)
+		   SET ST02_IPQTY =  ST02_IPQTY - #{outQty}
+		</if>
+		<if test="operator == 'plus'"> -- 재고 증가 (입고등록/출고삭제)
+		   SET ST02_IPQTY =  ST02_IPQTY + #{outQty}
+		</if>
+		WHERE 1=1
+		AND ST02_COMPANY = #{company}
+		AND ST02_FACTORY = '0001'<!--admin 계정의 factory가 TEST로 찍혀서 일단 강제로 찍고함.  #{factory} -->
+		AND ST02_CODE = #{code}
+		AND ST02_STOK = #{stock}
+		AND ST02_GBN = 'OC'
+		<if test="lot != null and !lot.equalsIgnoreCase('')" >
+		   AND ST02_LOT = #{lot}
+		   AND ST02_LOT_SEQ = #{lotSeq}
+		</if>
+   </update>
+</mapper>
