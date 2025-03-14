@@ -138,13 +138,13 @@ public class OutputController {
         String company = userInfo.getCompany();
         String factory = userInfo.getFactory();
         
-//        if (company == null) {
-//            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 수정할 수 없습니다.");
-//        }
-//
-//        if (factory == null) {
-//            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 수정할 수 없습니다.");
-//        }
+        if (company == null) {
+            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 수정할 수 없습니다.");
+        }
+
+        if (factory == null) {
+            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 수정할 수 없습니다.");
+        }
 		
         if(insertList != null){
         	
