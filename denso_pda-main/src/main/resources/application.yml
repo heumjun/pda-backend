@@ -35,11 +35,14 @@ spring:
       on-profile: dev
   datasource:
     hikari:
-      maximum-pool-size: 10
       driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
       jdbc-url: jdbc:log4jdbc:oracle:thin:@database-1.cy8m9fkqr5u1.ap-northeast-2.rds.amazonaws.com:1521:ORCL
       username: admin
       password: kdata4706!!
+#      driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+#      jdbc-url: jdbc:log4jdbc:oracle:thin:@10.73.254.62:1527:dnkrlot
+#      username: dnkrlot
+#      password: dnkrlot
   cloud:
     openfeign:
       client:
