@@ -215,6 +215,7 @@
 			,MF02_QTY
 			,MF02_UNT
 			,MF02_INDTE
+			,MF02_LOT_SEQ
 		)
 		VALUES
 		(
@@ -228,6 +229,7 @@
 			, #{st02Ipqty}
 			, #{st02Ipunt}
 			, SYSDATE
+			, #{st02LotSeq}
 		)
 	</insert>
 
