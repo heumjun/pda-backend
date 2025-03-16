@@ -62,7 +62,7 @@ public class PartsInputController {
             return ResponseEntityUtil.error(StatusCode.NOT_FOUND,"유효한 부품식별표 QR이 아닙니다.");
         }
 
-        if(Integer.parseInt(String.valueOf(selectInfo.get("st02Ipqty"))) == 0) {
+        if(selectInfo.get("st03Lot") != null) {
         	return ResponseEntityUtil.error(StatusCode.NOT_FOUND,"부품투입 수량이 없습니다.");
         }
 
@@ -87,6 +87,8 @@ public class PartsInputController {
 
         String company = userInfo.getCompany();
         String factory = userInfo.getFactory();
+        int empNo = userInfo.getEmpNo();
+        String empName = userInfo.getEmpName();
 
         if (company == null) {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 수정할 수 없습니다.");
@@ -101,7 +103,7 @@ public class PartsInputController {
             for(PartsInputRequestDto.Info info : insertList){
                 info.setCompany(company);
                 info.setFactory(factory);
-                info.setSt02Empno(0);
+                info.setSt02Empno(empNo);
 
                 PartsInputRequestDto.Request request = new PartsInputRequestDto.Request();
                 request.setCompany(company);

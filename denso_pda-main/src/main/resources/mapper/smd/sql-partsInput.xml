@@ -47,10 +47,17 @@
 			 , ST02.ST02_LINE
 			 , ST02.ST02_MOQ
 			 , ST02.ST02_REQUEST_NO
+			 , ST03.ST03_LOT
 		FROM TB_ST_02 ST02
 		LEFT JOIN TB_CM_08 CM08 ON ST02.ST02_COMPANY = CM08.CM08_COMPANY
 				AND ST02.ST02_FACTORY = CM08.CM08_FACTORY
 				AND ST02.ST02_CODE = CM08.CM08_CODE
+		LEFT JOIN TB_ST_03 ST03
+		ON ST02.ST02_COMPANY = ST03.ST03_COMPANY
+		AND ST02.ST02_FACTORY = ST03.ST03_FACTORY
+		AND ST02.ST02_LOT = ST03.ST03_LOT
+		AND ST02.ST02_LOT_SEQ = ST03.ST03_LOT_SEQ
+		AND ST03.ST03_GBN = 'PT'
 		WHERE ST02.ST02_COMPANY = #{company}
 		AND ST02.ST02_FACTORY = #{factory}
 		AND ST02.ST02_QRCODE = #{st02Qrcode}
@@ -77,64 +84,69 @@
 		</if>
 	</update>
 
-	<update id="updateOfSmdStock" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Info">
-		/** [sql-partsInput.xml] PartsInputMapper.updateOfSmdStock **/
-		UPDATE TB_ST_02
-		<if test="operator == 'minus'"> -- 재고 차감 (출고등록/입고삭제)
-			SET ST02_IPQTY = ST02_IPQTY - #{outQty}
-		</if>
-		<if test="operator == 'plus'"> -- 재고 증가 (입고등록/출고삭제)
-			SET ST02_IPQTY = ST02_IPQTY + #{outQty}
-		</if>
-		WHERE 1=1
-		AND ST02_COMPANY = #{company}
-		AND ST02_FACTORY = #{factory}
-		AND ST02_CODE = #{code}
-		AND ST02_STOK = #{stock}
-		AND ST02_GBN = 'OC'
-		<if test="lot != null and !lot.equalsIgnoreCase('')">
-			AND ST02_LOT = #{lot}
-			AND ST02_LOT_SEQ = #{lotSeq}
-		</if>
-	</update>
-
-	<!-- 부품투입( SMD에서 제조2 반제품공정으로 ) 히스토리 테이블 insert -->
-	<insert id="insertOfPartInputHistory" parameterType="com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto$Info">
-		/** [sql-partsInput.xml] PartsInputMapper.insertOfPartInputHistory **/
-		
-		<selectKey resultType="int" keyProperty="hs01Seq" order="BEFORE">
-            SELECT COALESCE(MAX(HS01_SEQ)+1,1) AS HS01_SEQ
-            FROM TB_HS_01
-            WHERE HS01_COMPANY = #{company}
-              AND HS01_FACTORY = #{factory}
-              AND TO_CHAR(HS01_DAT, 'YYYY-MM-DD') = #{hs01Dat}
-        </selectKey>
-		
-		INSERT INTO TB_HS_01
+	<insert id="insertOfSmdOutStock" parameterType="com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto$Info">
+		/** [sql-partsInput.xml] PartsInputMapper.updateOfSmdOutStock **/
+		INSERT INTO TB_ST_03
 		(
-			  HS01_COMPANY
-			, HS01_FACTORY
-			, HS01_NO
-			, HS01_DAT
-			, HS01_SEQ
-			, HS01_CODE
-			, HS01_QTY
-			, HS01_QR
-			, HS01_INDTE
-			, HS01_EMPNO
-		)
-		VALUES 
-		(
-			  #{company}
-			, #{factory}
-			, CONCAT(REPLACE(#{hs01Dat},'-',''), LPAD(#{hs01Dat},5,'0'))
-			, #{hs01Dat}
-			, #{hs01Seq}
-			, #{code}
-			, #{outQty}
-			, #{st02Qrcode}
-			, #{st03Empno}
-			, SYSDATE
+			ST03_COMPANY
+			,ST03_FACTORY
+			,ST03_NO
+			,ST03_DAT
+			,ST03_SEQ
+			,ST03_CODE
+			,ST03_LOT
+			,ST03_GBN
+			,ST03_PCC
+			,ST03_NAPNO
+			,ST03_UNT
+			,ST03_QTY
+			,ST03_RMK
+			,ST03_STOK
+			,ST03_INDTE
+			,ST03_EMPNO
+			,ST03_DGBN
+			,ST03_QR
+			,ST03_OUTPUT_NO
+			,ST03_RENO
+			,ST03_RTNO
+			,ST03_OUTPUT_DTL_NO
+			,ST03_DIST
+			,ST03_SBNO
+			,ST03_CUS
+			,ST03_LOT_SEQ
+			,ST03_LINE
+			,ST03_MOQ
+			,ST03_MST_NO
+		) VALUES (
+			#{company}
+			,#{factory}
+			,(TO_CHAR(SYSDATE,'YYYYMMDD') || (SELECT LPAD(NVL(MAX(ST03.ST03_SEQ),0)+1,5,0) FROM TB_ST_03 ST03 WHERE TO_CHAR(SYSDATE,'YYYYMMDD') = SUBSTR(ST03.ST03_NO,0,8)))
+			,TO_CHAR(SYSDATE,'YYYY-MM-DD')
+			,(SELECT NVL(MAX(ST03.ST03_SEQ),0)+1 FROM TB_ST_03 ST03 WHERE TO_CHAR(SYSDATE,'YYYYMMDD') = SUBSTR(ST03.ST03_NO,0,8))
+			,#{st02Code}
+			,#{st02Lot}
+			,'PT'
+			,''<!-- 지시서의 PCC가 만들어저야 들어갈 수 있음 -->
+			,''
+			,#{st02Ipunt}
+			,#{st02Ipqty}
+			,''
+			,#{st02Stok}
+			,SYSDATE
+			,#{st02Empno}
+			,''
+			,#{st02Qrcode}
+			,''
+			,''
+			,''
+			,''
+			,#{st02Dist}
+			,''
+			,#{st02Cus}
+			,#{st02LotSeq}
+			,#{st02Line}
+			,#{st02Moq}
+			,''<!-- St03MstNo 어디서?-->
 		)
 	</insert>
 
@@ -161,14 +173,14 @@
 			, MF01_DRYGBN
 		)
 		VALUES
-		(	  
+		(
 			  #{company}
 			, #{factory}
 			, ''
-			, ''
-			, ''
-			, ''
-			, ''
+			, TO_CHAR(SYSDATE,'YYYY-MM-DD')
+			, 'PT'
+			,''
+			, #{st02Code}
 			, ''
 			, 0
 			, ''

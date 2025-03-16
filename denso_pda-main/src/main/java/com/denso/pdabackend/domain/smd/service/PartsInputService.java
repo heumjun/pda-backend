@@ -30,6 +30,10 @@ public class PartsInputService {
      */
 	public boolean insertOfPartsInputHistory(List<Info> insertList) {
 		// TODO Auto-generated method stub
+
+		// 생산지시서 마스터 생성 필요 tb_mf_01
+		//partsInputMapper.createMfOrder(item);
+
 		insertList.forEach(item ->{
             try{
                 // 재고테이블 재고 감소
@@ -44,13 +48,14 @@ public class PartsInputService {
                 stockInfo.setUnt(item.getSt02Ipunt()); // 출고단위 = 재고단위
                 stockInfo.setLotSeq(String.valueOf(item.getSt02LotSeq())); // lotSEQ
                 partsInputMapper.updateOfPdStock(stockInfo);
-                partsInputMapper.updateOfSmdStock(stockInfo);
-                
+                //partsInputMapper.updateOfSmdStock(stockInfo);
+                partsInputMapper.insertOfSmdOutStock(item);
+
                 // 히스토리 테이블 insert
-                partsInputMapper.insertOfPartInputHistory(item);
-                
-                // 생산 지시서 생성 -- tb_mf_01
-                partsInputMapper.createMfOrder(item);
+                //partsInputMapper.insertOfPartInputHistory(item);
+
+                // 생산 지시서 디테일 생성 -- tb_mf_01 ?
+                //partsInputMapper.createMfOrderDetail(item);
 
             }catch(Exception e){
                 e.printStackTrace();
