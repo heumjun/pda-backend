@@ -46,6 +46,7 @@
 	            ) AS cm08_opunt_name /* 출고단위명 */
 	           , NVL(E.ST02_QTY, 0) AS ST02_QTY /* 출고수량 */
 	           , TO_CHAR(NVL(E.ST02_DAT, ''), 'YYYY-MM-DD') AS ST02_DAT /* 입고일자 */
+	           , A.ST11_LOT_SEQ
 	        FROM TB_ST_11 A         /* 반납관리 Detail 테이블 */
 	  INNER JOIN TB_ST_10 B         /* 반납관리 Master 테이블 */
 	          ON A.ST11_COMPANY = B.ST10_COMPANY

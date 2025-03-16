@@ -24,12 +24,16 @@
 		AND CM05.CM05_CODE = 'W005'
 		AND CM05.CM05_VALUE = ST02.ST02_STATUS
 		WHERE 1=1
+		AND ST02.ST02_COMPANY = #{company}
+        AND ST02.ST02_FACTORY = #{factory}
 		<if test="qrCode != null and !qrCode.equalsIgnoreCase('')" >
 			AND ST02.ST02_QRCODE = #{qrCode}
 		</if>
 		<if test="st02LotSeq != null and !st02LotSeq.equalsIgnoreCase('')" >
 			AND ST02.ST02_LOT_SEQ = #{st02LotSeq}
 		</if>
+		AND ROWNUM = 1
+		ORDER BY ST02.ST02_NO DESC
     </select>
 
 </mapper> 

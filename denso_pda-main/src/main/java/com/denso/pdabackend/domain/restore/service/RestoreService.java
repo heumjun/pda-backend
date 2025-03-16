@@ -39,9 +39,9 @@ public class RestoreService {
                     throw new BusinessException("반납요청서 상세번호가 존재하지 않아 수정할 수 없습니다.");
                 }
                 
-                if ( Double.isNaN(info.getSt02Qty()) || BigDecimal.valueOf(info.getSt02Qty()).compareTo(BigDecimal.ZERO) <= 0 ) {
-                    throw new BusinessException("수량이 존재하지 않아 수정할 수 없습니다.");
-                }
+//                if ( Double.isNaN(info.getSt02Qty()) || BigDecimal.valueOf(info.getSt02Qty()).compareTo(BigDecimal.ZERO) <= 0 ) {
+//                    throw new BusinessException("수량이 존재하지 않아 수정할 수 없습니다.");
+//                }
                 
                 if ( info.getSt11Stok() == null  || info.getSt11Stok() == "" ) {
                     throw new BusinessException("창고가 존재하지 않아 수정할 수 없습니다.");
