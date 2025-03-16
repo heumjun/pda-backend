@@ -72,6 +72,35 @@ public class PartsInputController {
 
     }
 
+    @GetMapping("/getCompMfList")
+    @Operation(summary = "완제품 목록", description = "완제품 목록 콤보박스용")
+    public ResponseEntity<?> getCompMfList(PartsInputRequestDto.Request request) throws Exception{
+
+        Map<String,Object> data = new HashMap<String,Object>();
+
+        UserDto userInfo = auth.getUserInfo();
+        String company = userInfo.getCompany();
+        String factory = userInfo.getFactory();
+
+        request.setCompany(company);
+        request.setFactory(factory);
+
+        if (company == null) {
+            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 조회할 수 없습니다.");
+        }
+
+        if (factory == null) {
+            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 조회할 수 없습니다.");
+        }
+
+        List<Map<String, Object>> selectList =  partsInputService.getCompMfList(request);
+
+        data.put("compMfList", selectList);
+
+        return ResponseEntityUtil.ok(data);
+
+    }
+
     @PostMapping
 	@Operation(summary = "출고이력 등록", description = "출고이력 등록")
 	public ResponseEntity<?> saveOfOutput(@RequestBody Map<String,Object> params) throws Exception {
@@ -98,6 +127,15 @@ public class PartsInputController {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 수정할 수 없습니다.");
         }
 
+        if(params.get("compMfCode") == null) {
+        	return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "완성품이 선택되지 않았습니다.");
+        }
+
+        if(params.get("compMfQty") == null || Integer.parseInt(String.valueOf(params.get("compMfQty"))) == 0) {
+        	return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "완성수량이 없거나 0이 될 수 없습니다.");
+        }
+
+        Map<String,Object> insertParam = new HashMap<String,Object>();
         if(insertList != null){
 
             for(PartsInputRequestDto.Info info : insertList){
@@ -121,8 +159,16 @@ public class PartsInputController {
                 }
             }
         }
+        insertParam.put("compMfCode", params.get("compMfCode"));
+        insertParam.put("compMfQty", params.get("compMfQty"));
 
-        partsInputService.insertOfPartsInputHistory(insertList);
+        insertParam.put("company", company);
+        insertParam.put("factory", factory);
+        insertParam.put("empNo", empNo);
+
+        insertParam.put("insertList", insertList);
+
+        partsInputService.insertOfPartsInputHistory(insertParam);
 
 		return ResponseEntityUtil.created("부품투입이 등록되었습니다.");
 	}

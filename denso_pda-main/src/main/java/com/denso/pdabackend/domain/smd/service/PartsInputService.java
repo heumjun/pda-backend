@@ -5,16 +5,24 @@ import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.denso.pdabackend.domain.smd.controller.PartsInputController;
 import com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto;
 import com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto.Info;
+import com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto.Request;
 import com.denso.pdabackend.domain.smd.mapper.PartsInputMapper;
 import com.denso.pdabackend.domain.warehousing.dto.StockDto;
+import com.denso.pdabackend.response.ResponseEntityUtil;
+import com.denso.pdabackend.response.StatusCode;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class PartsInputService {
 
     private final PartsInputMapper partsInputMapper;
@@ -25,15 +33,18 @@ public class PartsInputService {
 
     /**
      * 부품투입 ( SMD 출고하고 현장입고)
-     * @param insertList
+     * @param insertParam
      * @return
      */
-	public boolean insertOfPartsInputHistory(List<Info> insertList) {
+	public boolean insertOfPartsInputHistory(Map<String, Object> insertParam) {
 		// TODO Auto-generated method stub
 
 		// 생산지시서 마스터 생성 필요 tb_mf_01
-		//partsInputMapper.createMfOrder(item);
+		partsInputMapper.createMfOrder(insertParam);
 
+		log.debug("{}", insertParam);
+
+		List<PartsInputRequestDto.Info> insertList = (List<Info>) insertParam.get("insertList");
 		insertList.forEach(item ->{
             try{
                 // 재고테이블 재고 감소
@@ -47,22 +58,22 @@ public class PartsInputService {
                 stockInfo.setGbn(item.getCm08Gbn()); // 품목구분
                 stockInfo.setUnt(item.getSt02Ipunt()); // 출고단위 = 재고단위
                 stockInfo.setLotSeq(String.valueOf(item.getSt02LotSeq())); // lotSEQ
+                //재고 감소
                 partsInputMapper.updateOfPdStock(stockInfo);
-                //partsInputMapper.updateOfSmdStock(stockInfo);
-                partsInputMapper.insertOfSmdOutStock(item);
-
-                // 히스토리 테이블 insert
-                //partsInputMapper.insertOfPartInputHistory(item);
 
                 // 생산 지시서 디테일 생성 -- tb_mf_01 ?
-                //partsInputMapper.createMfOrderDetail(item);
-
+                item.setMf02Pcc((String)insertParam.get("mf01Pcc"));
+                partsInputMapper.createMfOrderDetail(item);
+                partsInputMapper.insertOfSmdOutStock(item);
             }catch(Exception e){
                 e.printStackTrace();
             }
         });
-
         return true;
+	}
+
+	public List<Map<String, Object>> getCompMfList(PartsInputRequestDto.Request params) {
+		return partsInputMapper.getCompMfList(params);
 	}
 
 }

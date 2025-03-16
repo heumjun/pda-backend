@@ -52,6 +52,10 @@ public class PartsInputRequestDto {
         private String cm08Code;        // 품목코드
         private String cm08Dgbn;        // 품목상세코드
         private String cm08Gbn;         // 품목구분
+
+        private String mf02Pcc;		//생산지시번호
+        private String mf02No;		//생산지시디테일번호
+
     }
 
     @Data
@@ -61,6 +65,7 @@ public class PartsInputRequestDto {
 
         // QR CODE 번호
         private String st02Qrcode;
+        private String cm08Smd;
 
     }
 }

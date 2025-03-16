@@ -126,7 +126,7 @@
 			,#{st02Code}
 			,#{st02Lot}
 			,'PT'
-			,''<!-- 지시서의 PCC가 만들어저야 들어갈 수 있음 -->
+			,#{mf02Pcc}<!-- 지시서의 PCC가 만들어저야 들어갈 수 있음 -->
 			,''
 			,#{st02Ipunt}
 			,#{st02Ipqty}
@@ -146,12 +146,15 @@
 			,#{st02LotSeq}
 			,#{st02Line}
 			,#{st02Moq}
-			,''<!-- St03MstNo 어디서?-->
+			,#{mf02No}
 		)
 	</insert>
 
-	<insert id="createMfOrder" parameterType="com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto$Info">
+	<insert id="createMfOrder" parameterType="map">
 		/** [sql-partsInput.xml] PartsInputMapper.createMfOrder **/
+		<selectKey keyProperty="mf01Pcc" resultType="String" order="BEFORE">
+			SELECT (TO_CHAR(SYSDATE,'YYYYMMDD') || (SELECT LPAD(NVL(MAX(MF01.MF01_SEQ),0)+1,5,0) FROM TB_MF_01 MF01 WHERE TO_CHAR(SYSDATE,'YYYYMMDD') = SUBSTR(MF01.MF01_PCC,0,8))) FROM DUAL
+		</selectKey>
 		INSERT INTO TB_MF_01
 		(
 			  MF01_COMPANY
@@ -160,6 +163,7 @@
 			, MF01_DAT
 			, MF01_GBN
 			, MF01_NO
+			, MF01_SEQ
 			, MF01_CODE
 			, MF01_PGBN
 			, MF01_QTY
@@ -176,22 +180,59 @@
 		(
 			  #{company}
 			, #{factory}
-			, ''
+			, #{mf01Pcc}
 			, TO_CHAR(SYSDATE,'YYYY-MM-DD')
-			, 'PT'
-			,''
-			, #{st02Code}
+			, '2'
 			, ''
-			, 0
+			, SUBSTR(#{mf01Pcc},9,5)
+			, #{compMfCode}
+			, ''
+			, #{compMfQty}
+			, 'N'
 			, ''
 			, ''
-			, 0
 			, ''
-			, ''
-			, 0
-			, ''
+			, SYSDATE
+			, #{empNo}
+			, 'N'
 			, 'N'
 		)
 	</insert>
+	<insert id="createMfOrderDetail" parameterType="com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto$Info">
+		/** [sql-partsInput.xml] PartsInputMapper.createMfOrderDetail **/
+		<selectKey keyProperty="mf02No" resultType="String" order="BEFORE">
+			SELECT (#{mf02Pcc} || (SELECT LPAD(NVL(MAX(MF02.MF02_SEQ),0)+1,5,0) FROM TB_MF_02 MF02 WHERE #{mf02Pcc} = SUBSTR(MF02.MF02_PCC,0,13))) FROM DUAL
+		</selectKey>
+		INSERT INTO TB_MF_02
+		(
+			MF02_COMPANY
+			,MF02_FACTORY
+			,MF02_PCC
+			,MF02_NO
+			,MF02_SEQ
+			,MF02_CODE
+			,MF02_GBN
+			,MF02_QTY
+			,MF02_UNT
+		)
+		VALUES
+		(
+			  #{company}
+			, #{factory}
+			, #{mf02Pcc}
+			, #{mf02No}
+			, SUBSTR(#{mf02No},14,18)
+			, #{st02Code}
+			, ''
+			, #{st02Ipqty}
+			, #{st02Ipunt}
+		)
+	</insert>
+
+	<select id="getCompMfList"	parameterType="com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto$Request"	resultType="com.denso.pdabackend.response.ResultMap">
+		SELECT *
+		FROM TB_CM_08
+		WHERE CM08_SMD = #{cm08Smd}
+	</select>
 
 </mapper>
