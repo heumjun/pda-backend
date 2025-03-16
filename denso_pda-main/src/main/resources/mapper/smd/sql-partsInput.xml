@@ -214,6 +214,7 @@
 			,MF02_GBN
 			,MF02_QTY
 			,MF02_UNT
+			,MF02_INDTE
 		)
 		VALUES
 		(
@@ -226,6 +227,7 @@
 			, ''
 			, #{st02Ipqty}
 			, #{st02Ipunt}
+			, SYSDATE
 		)
 	</insert>
 
