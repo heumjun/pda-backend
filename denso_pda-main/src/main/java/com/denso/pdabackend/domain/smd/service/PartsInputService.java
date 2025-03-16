@@ -1,4 +1,4 @@
-package com.denso.pdabackend.domain.partsInput.service;
+package com.denso.pdabackend.domain.smd.service;
 
 import java.util.List;
 import java.util.Map;
@@ -6,9 +6,9 @@ import java.util.Map;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import com.denso.pdabackend.domain.partsInput.dto.PartsInputRequestDto;
-import com.denso.pdabackend.domain.partsInput.dto.PartsInputRequestDto.Info;
-import com.denso.pdabackend.domain.partsInput.mapper.PartsInputMapper;
+import com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto;
+import com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto.Info;
+import com.denso.pdabackend.domain.smd.mapper.PartsInputMapper;
 import com.denso.pdabackend.domain.warehousing.dto.StockDto;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +23,11 @@ public class PartsInputService {
 		return partsInputMapper.getPartsInputRequestInfo(params);
 	}
 
+    /**
+     * 부품투입 ( SMD 출고하고 현장입고)
+     * @param insertList
+     * @return
+     */
 	public boolean insertOfPartsInputHistory(List<Info> insertList) {
 		// TODO Auto-generated method stub
 		insertList.forEach(item ->{
@@ -40,11 +45,14 @@ public class PartsInputService {
                 stockInfo.setLotSeq(String.valueOf(item.getSt02LotSeq())); // lotSEQ
                 partsInputMapper.updateOfPdStock(stockInfo);
                 partsInputMapper.updateOfSmdStock(stockInfo);
-                // 히스토리 테이블 등록 필요.. 히스토리 테이블이 없어요~~
-                //outputMapper.insertOfOutputHistory(item);
+                
+                // 히스토리 테이블 insert
+                partsInputMapper.insertOfPartInputHistory(item);
+                
+                // 생산 지시서 생성 -- tb_mf_01
+                partsInputMapper.createMfOrder(item);
 
             }catch(Exception e){
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         });

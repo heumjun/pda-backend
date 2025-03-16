@@ -207,7 +207,7 @@ public class OutputController {
         params.setCompany(company);
         params.setFactory(factory);
         params.setSt03Code(params.getSt03Code());
-        params.setSt03Lot(params.getSt03Lot());d
+        params.setSt03Lot(params.getSt03Lot());
         params.setSt03LotSeq(params.getSt03LotSeq());
 
         if (company == null) {

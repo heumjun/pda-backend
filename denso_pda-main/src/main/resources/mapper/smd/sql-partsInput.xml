@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.denso.pdabackend.domain.smd.mapper.PartsInputMapper">
+	<!-- 부품 투입 Barcode를 읽었을 시 로드되는 정보 -->
+	<select id="getPartsInputRequestInfo" parameterType="com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto$Request"
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-partsInput.xml] PartsInputMapper.getPartsInputRequestInfo **/
+		SELECT ST02.ST02_COMPANY
+			 , ST02.ST02_FACTORY
+			 , ST02.ST02_NO
+			 , ST02.ST02_DAT
+			 , ST02.ST02_SEQ
+			 , ST02.ST02_QNO
+			 , ST02.ST02_CODE
+			 , CM08.CM08_DGBN
+			 , CM08.CM08_NAME
+			 , CM08.CM08_GBN
+			 , ST02.ST02_LOT
+			 , ST02.ST02_GBN
+			 , ST02.ST02_CUS
+			 , ST02.ST02_PURNO
+			 , ST02.ST02_IPUNT
+			 , ST02.ST02_OPUNT
+			 , ST02.ST02_CURRENCY
+			 , ST02.ST02_IPQTY
+			 , ST02.ST02_QTY
+			 , ST02.ST02_COST
+			 , ST02.ST02_AMT
+			 , ST02.ST02_VAT
+			 , ST02.ST02_RMK
+			 , ST02.ST02_STOK
+			 , ST02.ST02_FIELD
+			 , ST02.ST02_RFID
+			 , ST02.ST02_INDTE
+			 , ST02.ST02_EMPNO
+			 , ST02.ST02_WANYN
+			 , ST02.ST02_PURNO2
+			 , ST02.ST02_PKNO
+			 , ST02.ST02_DTL_NO
+			 , ST02.ST02_QRCODE
+			 , ST02.ST02_STATUS
+			 , ST02.ST02_PNO
+			 , ST02.ST02_DIST
+			 , ST02.ST02_LOT_SEQ
+			 , ST02.ST02_RENO
+			 , ST02.ST02_LINE
+			 , ST02.ST02_MOQ
+			 , ST02.ST02_REQUEST_NO
+		FROM TB_ST_02 ST02
+		LEFT JOIN TB_CM_08 CM08 ON ST02.ST02_COMPANY = CM08.CM08_COMPANY
+				AND ST02.ST02_FACTORY = CM08.CM08_FACTORY
+				AND ST02.ST02_CODE = CM08.CM08_CODE
+		WHERE ST02.ST02_COMPANY = #{company}
+		AND ST02.ST02_FACTORY = #{factory}
+		AND ST02.ST02_QRCODE = #{st02Qrcode}
+		AND ST02.ST02_GBN = 'OC'
+	</select>
+
+	<update id="updateOfPdStock" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Info">
+		/** [sql-partsInput.xml] PartsInputMapper.updateOfPdStock **/
+		UPDATE TB_ST_01
+		<if test="operator == 'minus'"> -- 재고 차감 (출고등록/입고삭제)
+			SET ST01_QTY = ST01_QTY - #{outQty}
+		</if>
+		<if test="operator == 'plus'"> -- 재고 증가 (입고등록/출고삭제)
+			SET ST01_QTY = ST01_QTY + #{outQty}
+		</if>
+		WHERE 1=1
+		AND ST01_COMPANY = #{company}
+		AND ST01_FACTORY = #{factory}
+		AND ST01_CODE = #{code}
+		AND ST01_STOK = #{stock}
+		<if test="lot != null and !lot.equalsIgnoreCase('')">
+			AND ST01_LOT = #{lot}
+			AND ST01_LOT_SEQ = #{lotSeq}
+		</if>
+	</update>
+
+	<update id="updateOfSmdStock" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Info">
+		/** [sql-partsInput.xml] PartsInputMapper.updateOfSmdStock **/
+		UPDATE TB_ST_02
+		<if test="operator == 'minus'"> -- 재고 차감 (출고등록/입고삭제)
+			SET ST02_IPQTY = ST02_IPQTY - #{outQty}
+		</if>
+		<if test="operator == 'plus'"> -- 재고 증가 (입고등록/출고삭제)
+			SET ST02_IPQTY = ST02_IPQTY + #{outQty}
+		</if>
+		WHERE 1=1
+		AND ST02_COMPANY = #{company}
+		AND ST02_FACTORY = #{factory}
+		AND ST02_CODE = #{code}
+		AND ST02_STOK = #{stock}
+		AND ST02_GBN = 'OC'
+		<if test="lot != null and !lot.equalsIgnoreCase('')">
+			AND ST02_LOT = #{lot}
+			AND ST02_LOT_SEQ = #{lotSeq}
+		</if>
+	</update>
+
+	<!-- 부품투입( SMD에서 제조2 반제품공정으로 ) 히스토리 테이블 insert -->
+	<insert id="insertOfPartInputHistory" parameterType="com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto$Info">
+		/** [sql-partsInput.xml] PartsInputMapper.insertOfPartInputHistory **/
+		
+		<selectKey resultType="int" keyProperty="hs01Seq" order="BEFORE">
+            SELECT COALESCE(MAX(HS01_SEQ)+1,1) AS HS01_SEQ
+            FROM TB_HS_01
+            WHERE HS01_COMPANY = #{company}
+              AND HS01_FACTORY = #{factory}
+              AND TO_CHAR(HS01_DAT, 'YYYY-MM-DD') = #{hs01Dat}
+        </selectKey>
+		
+		INSERT INTO TB_HS_01
+		(
+			  HS01_COMPANY
+			, HS01_FACTORY
+			, HS01_NO
+			, HS01_DAT
+			, HS01_SEQ
+			, HS01_CODE
+			, HS01_QTY
+			, HS01_QR
+			, HS01_INDTE
+			, HS01_EMPNO
+		)
+		VALUES 
+		(
+			  #{company}
+			, #{factory}
+			, CONCAT(REPLACE(#{hs01Dat},'-',''), LPAD(#{hs01Dat},5,'0'))
+			, #{hs01Dat}
+			, #{hs01Seq}
+			, #{code}
+			, #{outQty}
+			, #{st02Qrcode}
+			, #{st03Empno}
+			, SYSDATE
+		)
+	</insert>
+
+	<insert id="createMfOrder" parameterType="com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto$Info">
+		/** [sql-partsInput.xml] PartsInputMapper.createMfOrder **/
+		INSERT INTO TB_MF_01
+		(
+			  MF01_COMPANY
+			, MF01_FACTORY
+			, MF01_PCC
+			, MF01_DAT
+			, MF01_GBN
+			, MF01_NO
+			, MF01_CODE
+			, MF01_PGBN
+			, MF01_QTY
+			, MF01_WANYN
+			, MF01_STOK
+			, MF01_REV
+			, MF01_RMK
+			, MF01_INDTE
+			, MF01_EMPNO
+			, MF01_MPGBN
+			, MF01_DRYGBN
+		)
+		VALUES
+		(	  
+			  #{company}
+			, #{factory}
+			, ''
+			, ''
+			, ''
+			, ''
+			, ''
+			, ''
+			, 0
+			, ''
+			, ''
+			, 0
+			, ''
+			, ''
+			, 0
+			, ''
+			, 'N'
+		)
+	</insert>
+
+</mapper>

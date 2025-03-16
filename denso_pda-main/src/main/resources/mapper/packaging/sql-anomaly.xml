@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.packaging.mapper.AnomalyMapper">
+	
+	<select id="getSeq" parameterType="com.denso.pdabackend.domain.packaging.dto.AnomalyDto$Request"
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-anomaly.xml] AnomalyMapper.getSeq **/
+		SELECT COALESCE(MAX(ST08_SEQ)+1,1) AS ST08_SEQ
+          FROM TB_ST_08
+          WHERE ST08_COMPANY = #{st08Company}
+            AND ST08_FACTORY = #{st08Factory}
+            AND TO_CHAR(ST08_DAT, 'YYYYMMDD') = TO_CHAR(TO_DATE(#{st08Dat}, 'YYYYMMDDHH24MI'), 'YYYYMMDD')
+	</select>
+	
+	<select id="getAnomalyInfo" parameterType="com.denso.pdabackend.domain.packaging.dto.AnomalyDto$Request"
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-anomaly.xml] AnomalyMapper.getAnomalyInfo **/
+		SELECT * FROM TB_ST_08
+		WHERE 1=1
+		AND ST08_COMPANY = #{st08Company}
+		AND ST08_FACTORY = #{st08Factory}
+		AND ST08_NO		 = CONCAT(TO_CHAR(TO_DATE(#{st08Dat}, 'YYMMDDHH24MI'), 'YYYYMMDD'), LPAD(#{st08Seq}, 5, '0'))
+	</select>
+	
+    <!-- 출고이력 등록 -->
+    <insert id="insertOfAnomaly" parameterType="com.denso.pdabackend.domain.packaging.dto.AnomalyDto$Info">
+    	/** [sql-anomaly.xml] AnomalyMapper.insertOfAnomaly **/
+        INSERT INTO TB_ST_08
+		(
+			  ST08_COMPANY
+			, ST08_FACTORY
+			, ST08_NO
+			, ST08_DAT
+			, ST08_SEQ
+			, ST08_GBN
+			, ST08_PGBN
+			, ST08_CODE
+			, ST08_UNT
+			, ST08_LOT
+			, ST08_RMK
+			, ST08_STOK
+			, ST08_INDTE
+			, ST08_EMPNO
+			, ST08_QTY
+			, ST08_DIST
+			, ST08_LOT_SEQ
+			, ST08_QRCODE
+		)
+		VALUES
+		(
+			  #{st08Company}
+			, #{st08Factory}
+			, CONCAT(TO_CHAR(TO_DATE(#{st08Dat}, 'YYMMDDHH24MI'), 'YYYYMMDD'), LPAD(#{st08Seq}, 5, '0'))
+			, TO_DATE(#{st08Dat}, 'YYMMDDHH24MI')
+			, #{st08Seq}
+			, #{st08Gbn}
+			, NULL
+			, #{st08Code}
+			, NULL
+			, #{st08Lot}
+			, NULL
+			, '03'
+			, SYSDATE
+			, #{st08Empno}
+			, 1
+			, '0301'
+			, #{st08LotSeq}
+			, #{st08Qrcode}
+		)
+    </insert>
+	
+</mapper> 

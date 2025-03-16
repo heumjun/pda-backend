@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.denso.pdabackend.domain.smd.mapper.SmdInputMapper">
+
+	<!-- 출고완료요청 수정 -->
+    <update id="updateOfOutputRequestComp" parameterType="com.denso.pdabackend.domain.smd.dto.SmdInputRequestDto">
+    	/** [sql-smdInput.xml] SmdInputMapper.updateOfOutputRequestComp **/
+        UPDATE TB_MF_13
+        SET MF13_COMP_GBN = 'Y'
+        WHERE 1=1
+          AND MF13_COMPANY = #{company}
+          AND MF13_FACTORY = #{factory}
+          AND MF13_NO = #{mf13No}
+    </update>
+    
+    <!-- 모달o - 입고 시 시퀀스 가져오기 조회 -->
+    <select id="getSeq" parameterType="com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto$Request"
+		resultType="com.denso.pdabackend.response.ResultMap">
+        /** [sql-smdInput.xml] SmdInputMapper.getSeq **/    
+        SELECT COALESCE(MAX(ST02_SEQ)+1,1) AS ST02_SEQ
+        FROM TB_ST_02
+        WHERE ST02_COMPANY = #{company}
+          AND ST02_FACTORY = #{factory}
+          AND ST02_DAT = #{st02Dat}
+    </select>
+    
+    <update id="updateOfStok" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Info">
+      UPDATE TB_ST_01
+         SET ST01_STOK = #{stock}
+          , st01_district = #{st01District}
+      WHERE 1=1
+      AND st01_company = #{company}
+      AND st01_factory = #{factory}
+       AND st01_lot_seq = #{lotSeq}
+   </update>
+   
+   <update id="updateOfPdStock" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Info">
+      UPDATE tb_st_01
+      <if test="operator == 'change'" > -- 재고수량을 변경하는 경우
+         SET st01_qty = st01_qty - #{outQty} + #{ipQty}
+      </if>
+      <if test="operator == 'minus'"> -- 재고 차감 (출고등록/입고삭제)
+         SET st01_qty =  st01_qty - #{outQty}
+      </if>
+      <if test="operator == 'plus'"> -- 재고 증가 (입고등록/출고삭제)
+         SET st01_qty =  st01_qty + #{ipQty}
+      </if>
+      <if test="operator == 'sum'"> -- 재고실사 품목일때 기존의 수량 0
+         SET st01_qty = '0'
+      </if>
+      WHERE 1=1
+      AND st01_company = #{company}
+      AND st01_factory = #{factory}
+      AND st01_code = #{code}
+      AND st01_stok = #{stock}
+      <if test="lot != null and !lot.equalsIgnoreCase('')" >
+         AND st01_lot = #{lot}
+         AND st01_lot_seq = #{lotSeq}
+      </if>
+   </update>
+   
+   <!-- 입고이력 등록 -->
+    <insert id="insertOfInputHistory" parameterType="com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto">
+        INSERT INTO tb_st_02 (
+            st02_company,
+            st02_factory,
+            st02_no,
+            st02_dat,
+            st02_seq,
+            st02_code,
+            st02_lot,
+            st02_lot_seq,
+            st02_gbn,
+            st02_cus,
+            st02_line,
+            st02_pno,
+            st02_purno,
+            st02_request_no,
+            st02_ipunt,
+            st02_ipqty,
+            st02_moq,
+            st02_qrcode,
+            st02_status,
+            st02_stok,
+            st02_dist,
+            st02_opunt,
+            st02_qty,
+            st02_indte,
+            st02_empno
+        ) VALUES (
+            #{company},
+            #{factory},
+            CONCAT(REPLACE(#{st02Dat},'-',''),lpad(#{st02Seq},5,'0')),
+            #{st02Dat},
+            #{st02Seq},
+            #{cm08Code},
+            #{st02Lot},
+            #{st02LotSeq},
+            #{st02Gbn},
+            #{st02Cus},
+            #{st02Line},
+            #{st02Pno},
+            CASE WHEN #{st02Pno} = '' THEN '' ELSE CONCAT(#{st02Pno},lpad(#{st02Seq},5,'0')) END,
+            #{st02RequestNo},
+            #{st02Ipunt},
+            #{st02Ipqty},
+            #{st02Moq},
+            #{st02Qrcode},
+            #{st02Status},
+            #{st02Stok},
+            #{st02Dist},
+            '',
+            0,
+            sysdate,
+            #{st02Empno}
+        )
+    </insert>
+    
+
+</mapper>

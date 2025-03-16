@@ -1,4 +1,4 @@
-package com.denso.pdabackend.domain.partsInput.dto;
+package com.denso.pdabackend.domain.smd.dto;
 
 import com.denso.pdabackend.common.CommonDto;
 

@@ -1,4 +1,4 @@
-package com.denso.pdabackend.domain.partsInput.controller;
+package com.denso.pdabackend.domain.smd.controller;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,10 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.denso.pdabackend.common.AuthenticationFacade;
-import com.denso.pdabackend.domain.output.dto.OutputRequestDto;
-import com.denso.pdabackend.domain.output.dto.OutputSearchDto;
-import com.denso.pdabackend.domain.partsInput.dto.PartsInputRequestDto;
-import com.denso.pdabackend.domain.partsInput.service.PartsInputService;
+import com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto;
+import com.denso.pdabackend.domain.smd.service.PartsInputService;
 import com.denso.pdabackend.response.ResponseEntityUtil;
 import com.denso.pdabackend.response.StatusCode;
 import com.denso.pdabackend.response.exception.BusinessException;
