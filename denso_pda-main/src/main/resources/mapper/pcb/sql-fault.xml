@@ -10,7 +10,7 @@
           FROM TB_ST_08
           WHERE ST08_COMPANY = #{st08Company}
             AND ST08_FACTORY = #{st08Factory}
-            AND TO_CHAR(ST08_DAT, 'YYYYMMDD') = TO_CHAR(TO_DATE(#{st08Dat}, 'YYYYMMDDHH24MI'), 'YYYYMMDD')
+            AND TO_CHAR(ST08_DAT, 'YYYYMMDD') = TO_CHAR(TO_DATE(#{st08Dat}, 'YYMMDDHH24MI'), 'YYYYMMDD')
 	</select>
 	
 	<select id="getFaultInfo" parameterType="com.denso.pdabackend.domain.pcb.dto.FaultDto$Request"
@@ -58,14 +58,24 @@
 			, NULL
 			, #{st08Code}
 			, NULL
-			, #{st08Lot}
+			, (SELECT ST02_LOT 
+				FROM TB_ST_02 
+				WHERE ST02_COMPANY = #{st08Company}
+				AND ST02_FACTORY = #{st08Factory} 
+				AND ST02_QRCODE = #{st08Qrcode} 
+			  )
 			, NULL
 			, #{st08Stok}
 			, SYSDATE
 			, #{st08Empno}
 			, 1
 			, #{st08Dist}
-			, #{st08LotSeq}
+			, (SELECT ST02_LOT_SEQ 
+				FROM TB_ST_02 
+				WHERE ST02_COMPANY = #{st08Company}
+				AND ST02_FACTORY = #{st08Factory} 
+				AND ST02_QRCODE = #{st08Qrcode} 
+			  )
 			, #{st08Qrcode}
 		)
     </insert>
