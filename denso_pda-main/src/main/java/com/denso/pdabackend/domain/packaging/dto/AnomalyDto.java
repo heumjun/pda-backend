@@ -1,7 +1,6 @@
 package com.denso.pdabackend.domain.packaging.dto;
 
 import com.denso.pdabackend.common.CommonDto;
-import com.denso.pdabackend.domain.codeManage.dto.TrainerDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,24 +17,24 @@ public class AnomalyDto {
     @AllArgsConstructor
     public static class Info {
     	
-    	private String st08Company;
-    	private String st08Factory;
-    	private String st08No;
-    	private String st08Dat;
-    	private int st08Seq;
-    	private String st08Gbn;
-    	private String st08Pgbn;
-    	private String st08Code;
-    	private String st08Unt;
-    	private String st08Lot;
-    	private String st08Rmk;
-    	private String st08Stok;
-    	private String st08Indte;
-    	private int st08Empno;
-    	private int st08Qty;
-    	private String st08Dist;
-    	private int st08LotSeq;
-    	private String st08Qrcode;
+    	private String st09Company;
+    	private String st09Factory;
+    	private String st09No;
+    	private String st09Dat;
+    	private int st09Seq;
+    	private String st09Gbn;
+    	private String st09Pgbn;
+    	private String st09Code;
+    	private String st09Unt;
+    	private String st09Lot;
+    	private String st09Rmk;
+    	private String st09Indte;
+    	private int st09Empno;
+    	private int st09Qty;
+    	private int st09LotSeq;
+    	private String st09Qrcode;
+    	private String st09Line;
+    	private String st09EquipCode;
     	
     }
     
@@ -45,10 +44,11 @@ public class AnomalyDto {
     @EqualsAndHashCode(callSuper = false)
     public static class Request extends CommonDto {
     	
-        private String st08Company;
-        private String st08Factory;
-        private String st08Dat;
-        private int st08Seq;
+        private String st09Company;
+        private String st09Factory;
+        private String st09Dat;
+        private int st09Seq;
+        private String st09Qrcode;
     }
 
 }

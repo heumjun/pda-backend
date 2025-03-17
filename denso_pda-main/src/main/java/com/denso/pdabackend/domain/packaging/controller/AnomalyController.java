@@ -1,10 +1,12 @@
 package com.denso.pdabackend.domain.packaging.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +20,7 @@ import com.denso.pdabackend.response.StatusCode;
 import com.denso.pdabackend.response.exception.BusinessException;
 import com.denso.pdabackend.token.dto.UserDto;
 import com.denso.pdabackend.utils.JsonUtils;
+import com.denso.pdabackend.utils.StringUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +36,37 @@ public class AnomalyController {
     private final AuthenticationFacade auth;
     private final AnomalyService anomalyService;
 
+    /**
+     * 스캔된 QRCODE에 대한 이상처리 품목 조회
+     * @param info
+     * @return
+     * @throws Exception
+     */
+    @GetMapping
+	@Operation(summary = "이상처리 품목 조회", description = "이상처리 품목 조회")
+	public ResponseEntity<?> getAnomaly(AnomalyDto.Info info) throws Exception {
+
+		Map<String,Object> data = new HashMap<String,Object>();
+		
+		UserDto userInfo = auth.getUserInfo();
+        String company = userInfo.getCompany();
+        String factory = userInfo.getFactory();
+        
+        info.setSt09Company(company);
+		info.setSt09Factory(factory);
+		
+		Map<String,Object> anomalyInfo = anomalyService.getAnomaly(info);
+		data.put("anomalyInfo", anomalyInfo);
+
+		return ResponseEntityUtil.ok(data);
+	}
+    
+    /**
+     * 포장 공정 이상 처리
+     * @param params
+     * @return
+     * @throws Exception
+     */
     @PostMapping
 	@Operation(summary = "이상처리 등록", description = "이상처리 등록")
 	public ResponseEntity<?> saveAnomaly(@RequestBody Map<String,Object> params) throws Exception {
@@ -58,30 +92,35 @@ public class AnomalyController {
         	
         	for( AnomalyDto.Info info : insertList ) {
 
-        		info.setSt08Company(auth.getUserInfo().getCompany());
-    			info.setSt08Factory(auth.getUserInfo().getFactory());
-    			info.setSt08Empno(auth.getUserInfo().getEmpNo());
+        		info.setSt09Company(auth.getUserInfo().getCompany());
+    			info.setSt09Factory(auth.getUserInfo().getFactory());
+    			info.setSt09Empno(auth.getUserInfo().getEmpNo());
+    			info.setSt09Line( StringUtils.nullString(params.get("st09Line")) );
+    			info.setSt09EquipCode( StringUtils.nullString(params.get("st09EquipCode")) );
 
     			AnomalyDto.Request request = new AnomalyDto.Request();
-    			request.setSt08Company(auth.getUserInfo().getCompany());
-    			request.setSt08Factory(auth.getUserInfo().getFactory());
-    			request.setSt08Dat(info.getSt08Dat());
-    			request.setSt08Seq(info.getSt08Seq());
+    			request.setSt09Company(auth.getUserInfo().getCompany());
+    			request.setSt09Factory(auth.getUserInfo().getFactory());
+    			request.setSt09Dat(info.getSt09Dat());
+    			request.setSt09Qrcode(info.getSt09Qrcode());
     			
     			Map<String, Object> seqMap = anomalyService.getSeq(request);
-    			request.setSt08Seq(  Integer.parseInt(String.valueOf(seqMap.get("st08Seq")))  );
+    			request.setSt09Seq(  Integer.parseInt(String.valueOf(seqMap.get("st09Seq")))  );
 
-    			// 같은 납품확인서로 2개이상 입고하는 경우를 없애야함
-    			Map<String, Object> resultMap = anomalyService.getAnomalyInfo(request);
+    			// 이미 등록된 이상처리 데이터인지 확인.
+    			Map<String, Object> resultMap = anomalyService.getDuplicationAnomalyInfo(request);
     			if (resultMap != null) {
-    				return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "이미 이상등록 된 제품이 있습니다.");
+    				return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "이미 이상 등록 된 제품이 있습니다.");
     			}
     			
-    			info.setSt08Seq(  Integer.parseInt(String.valueOf(seqMap.get("st08Seq")))  );
+    			// Info에 SEQ 입력.
+    			info.setSt09Seq(  Integer.parseInt(String.valueOf(seqMap.get("st09Seq")))  );
 
     		}
         	
         }
+        
+        // 포장 공정 이상처리 등록
         anomalyService.insertOfAnomaly(insertList);
 
 		return ResponseEntityUtil.created("이상처리가 등록되었습니다.");

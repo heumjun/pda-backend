@@ -35,7 +35,6 @@ public class LotFaultDto {
     	private String st08Dist;
     	private int st08LotSeq;
     	private String st08Qrcode;
-    	
     	private String st08Line;
     	private String st08EquipCode;
     	

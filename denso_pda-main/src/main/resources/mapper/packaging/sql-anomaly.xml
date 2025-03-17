@@ -3,70 +3,89 @@
 	
 <mapper namespace="com.denso.pdabackend.domain.packaging.mapper.AnomalyMapper">
 	
+	<select id="getAnomaly" parameterType="com.denso.pdabackend.domain.packaging.dto.AnomalyDto$Info"
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-anomaly.xml] AnomalyMapper.getAnomaly **/
+		SELECT MP02.MP02_CODE AS ST09_CODE
+			 , CM08.CM08_NAME AS ST09_NAME
+			 , MP02.MP02_LOT AS ST09_LOT
+			 , MP02.MP02_LOT_SEQ AS ST09_LOT_SEQ
+			 , CM08.CM08_GBN AS ST09_PGBN
+			 , MP02.MP02_PCB_QR AS ST09_QRCODE
+		FROM TB_MP_02 MP02
+			,TB_CM_08 CM08
+		WHERE 1=1
+		AND MP02.MP02_COMPANY 	= CM08.CM08_COMPANY 
+		AND MP02.MP02_FACTORY 	= CM08.CM08_FACTORY 
+		AND MP02.MP02_CODE  	= CM08.CM08_CODE
+		AND MP02.MP02_COMPANY 	= #{st09Company}
+		AND MP02.MP02_FACTORY 	= #{st09Factory}
+		AND MP02.MP02_PCB_QR 	= #{st09Qrcode}
+	</select>
+	
 	<select id="getSeq" parameterType="com.denso.pdabackend.domain.packaging.dto.AnomalyDto$Request"
 		resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-anomaly.xml] AnomalyMapper.getSeq **/
-		SELECT COALESCE(MAX(ST08_SEQ)+1,1) AS ST08_SEQ
-          FROM TB_ST_08
-          WHERE ST08_COMPANY = #{st08Company}
-            AND ST08_FACTORY = #{st08Factory}
-            AND TO_CHAR(ST08_DAT, 'YYYYMMDD') = TO_CHAR(TO_DATE(#{st08Dat}, 'YYYYMMDDHH24MI'), 'YYYYMMDD')
+		SELECT COALESCE(MAX(ST09_SEQ)+1,1) AS ST09_SEQ
+          FROM TB_ST_09
+          WHERE ST09_COMPANY = #{st09Company}
+            AND ST09_FACTORY = #{st09Factory}
+            AND TO_CHAR(ST09_DAT, 'YYYYMMDD') = TO_CHAR(TO_DATE(#{st09Dat}, 'YYYYMMDDHH24MI'), 'YYYYMMDD')
 	</select>
 	
-	<select id="getAnomalyInfo" parameterType="com.denso.pdabackend.domain.packaging.dto.AnomalyDto$Request"
+	<select id="getDuplicationAnomalyInfo" parameterType="com.denso.pdabackend.domain.packaging.dto.AnomalyDto$Request"
 		resultType="com.denso.pdabackend.response.ResultMap">
-		/** [sql-anomaly.xml] AnomalyMapper.getAnomalyInfo **/
-		SELECT * FROM TB_ST_08
+		/** [sql-anomaly.xml] AnomalyMapper.getDuplicationAnomalyInfo **/
+		SELECT * 
+		FROM TB_ST_09
 		WHERE 1=1
-		AND ST08_COMPANY = #{st08Company}
-		AND ST08_FACTORY = #{st08Factory}
-		AND ST08_NO		 = CONCAT(TO_CHAR(TO_DATE(#{st08Dat}, 'YYMMDDHH24MI'), 'YYYYMMDD'), LPAD(#{st08Seq}, 5, '0'))
+		AND ST09_COMPANY 	= #{st09Company}
+		AND ST09_FACTORY 	= #{st09Factory}
+		AND ST09_QRCODE 	= #{st09Qrcode}
 	</select>
 	
     <!-- 출고이력 등록 -->
     <insert id="insertOfAnomaly" parameterType="com.denso.pdabackend.domain.packaging.dto.AnomalyDto$Info">
     	/** [sql-anomaly.xml] AnomalyMapper.insertOfAnomaly **/
-        INSERT INTO TB_ST_08
+        INSERT INTO TB_ST_09
 		(
-			  ST08_COMPANY
-			, ST08_FACTORY
-			, ST08_NO
-			, ST08_DAT
-			, ST08_SEQ
-			, ST08_GBN
-			, ST08_PGBN
-			, ST08_CODE
-			, ST08_UNT
-			, ST08_LOT
-			, ST08_RMK
-			, ST08_STOK
-			, ST08_INDTE
-			, ST08_EMPNO
-			, ST08_QTY
-			, ST08_DIST
-			, ST08_LOT_SEQ
-			, ST08_QRCODE
+			  ST09_COMPANY
+			, ST09_FACTORY
+			, ST09_NO
+			, ST09_DAT
+			, ST09_SEQ
+			, ST09_GBN
+			, ST09_CODE
+			, ST09_UNT
+			, ST09_LOT
+			, ST09_RMK
+			, ST09_LINE
+			, ST09_QTY
+			, ST09_LOT_SEQ
+			, ST09_QRCODE
+			, ST09_EQUIP_CODE
+			, ST09_INDTE
+			, ST09_EMPNO
 		)
 		VALUES
 		(
-			  #{st08Company}
-			, #{st08Factory}
-			, CONCAT(TO_CHAR(TO_DATE(#{st08Dat}, 'YYMMDDHH24MI'), 'YYYYMMDD'), LPAD(#{st08Seq}, 5, '0'))
-			, TO_DATE(#{st08Dat}, 'YYMMDDHH24MI')
-			, #{st08Seq}
-			, #{st08Gbn}
+			  #{st09Company}
+			, #{st09Factory}
+			, CONCAT(TO_CHAR(TO_DATE(#{st09Dat}, 'YYMMDDHH24MI'), 'YYYYMMDD'), LPAD(#{st09Seq}, 5, '0'))
+			, TO_DATE(#{st09Dat}, 'YYMMDDHH24MI')
+			, #{st09Seq}
+			, #{st09Gbn}
+			, #{st09Code}
 			, NULL
-			, #{st08Code}
-			, NULL
-			, #{st08Lot}
-			, NULL
-			, '03'
-			, SYSDATE
-			, #{st08Empno}
+			, #{st09Lot}
+			, '[PDA]포장/실적 공정 불량처리'
+			, #{st09Line}
 			, 1
-			, '0301'
-			, #{st08LotSeq}
-			, #{st08Qrcode}
+			, #{st09LotSeq}
+			, #{st09Qrcode}
+			, #{st09EquipCode}
+			, SYSDATE
+			, #{st09Empno}
 		)
     </insert>
 	
