@@ -3,29 +3,68 @@
 	
 <mapper namespace="com.denso.pdabackend.domain.product.mapper.LotFaultMapper">
 	
+	<select id="getComboLineList" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info"
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-lotFault.xml] LotFaultMapper.getComboLineList **/
+		SELECT LINE_CODE, LINE_NM
+		FROM DNKR_LINE_CODE 
+		WHERE 1=1
+		AND CLS_CODE ='E1'
+	</select>
+	
+	<select id="getComboEquipCodeList" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info"
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-lotFault.xml] LotFaultMapper.getComboEquipCodeList **/
+		SELECT CM07_CODE, CM07_NAME 
+		FROM TB_CM_07	
+		WHERE CM07_COMPANY = #{st08Company}
+		AND CM07_FACTORY = #{st08Factory}
+	</select>
+		
+	<select id="getLotFault" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info"
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-lotFault.xml] LotFaultMapper.getFault **/
+		SELECT MP02.MP02_CODE AS ST08_CODE
+			 , CM08.CM08_NAME AS ST08_NAME
+			 , MP02.MP02_LOT AS ST08_LOT
+			 , MP02.MP02_LOT_SEQ AS ST08_LOT_SEQ
+			 , CM08.CM08_GBN AS ST08_PGBN
+			 , MP02.MP02_PCB_QR AS ST08_QRCODE
+		FROM TB_MP_02 MP02
+			,TB_CM_08 CM08
+		WHERE 1=1
+		AND MP02.MP02_COMPANY 	= CM08.CM08_COMPANY 
+		AND MP02.MP02_FACTORY 	= CM08.CM08_FACTORY 
+		AND MP02.MP02_CODE  	= CM08.CM08_CODE
+		AND MP02.MP02_COMPANY 	= #{st08Company}
+		AND MP02.MP02_FACTORY 	= #{st08Factory}
+		AND MP02.MP02_PCB_QR 	= #{st08Qrcode}
+	</select>
+	
 	<select id="getSeq" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Request"
 		resultType="com.denso.pdabackend.response.ResultMap">
-		/** [sql-lotFault.xml] FaultMapper.getSeq **/
+		/** [sql-lotFault.xml] LotFaultMapper.getSeq **/
 		SELECT COALESCE(MAX(ST08_SEQ)+1,1) AS ST08_SEQ
           FROM TB_ST_08
           WHERE ST08_COMPANY = #{st08Company}
             AND ST08_FACTORY = #{st08Factory}
-            AND TO_CHAR(ST08_DAT, 'YYYYMMDD') = TO_CHAR(TO_DATE(#{st08Dat}, 'YYYYMMDDHH24MI'), 'YYYYMMDD')
+            AND TO_CHAR(ST08_DAT, 'YYYYMMDD') = TO_CHAR(TO_DATE(#{st08Dat}, 'YYMMDDHH24MI'), 'YYYYMMDD')
 	</select>
 	
-	<select id="getFaultInfo" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Request"
+	<select id="getDuplicationLotFaultInfo" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info"
 		resultType="com.denso.pdabackend.response.ResultMap">
-		/** [sql-lotFault.xml] FaultMapper.getFaultInfo **/
-		SELECT * FROM TB_ST_08
+		/** [sql-lotFault.xml] LotFaultMapper.getDuplicationLotFaultInfo **/
+		SELECT * 
+		FROM TB_ST_08
 		WHERE 1=1
-		AND ST08_COMPANY = #{st08Company}
-		AND ST08_FACTORY = #{st08Factory}
-		AND ST08_NO		 = CONCAT(TO_CHAR(TO_DATE(#{st08Dat}, 'YYMMDDHH24MI'), 'YYYYMMDD'), LPAD(#{st08Seq}, 5, '0'))
+		AND ST08_COMPANY 	= #{st08Company}
+		AND ST08_FACTORY 	= #{st08Factory}
+		AND ST08_QRCODE 	= #{st08Qrcode}
 	</select>	
-	
-    <!-- PCB 불량처리 등록 -->
-    <insert id="insertOfFault" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info">
-    	/** [sql-lotFault.xml] FaultMapper.insertOfFault **/
+
+    <!-- 제조 불량처리 등록 -->
+    <insert id="insertOfLotFault" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info">
+    	/** [sql-lotFault.xml] LotFaultMapper.insertOfLotFault **/
         INSERT INTO TB_ST_08
 		(
 			  ST08_COMPANY
@@ -39,13 +78,13 @@
 			, ST08_UNT
 			, ST08_LOT
 			, ST08_RMK
-			, ST08_STOK
 			, ST08_INDTE
 			, ST08_EMPNO
 			, ST08_QTY
-			, ST08_DIST
 			, ST08_LOT_SEQ
 			, ST08_QRCODE
+			, ST08_LINE
+			, ST08_EQUIP_CODE
 		)
 		VALUES
 		(
@@ -55,18 +94,18 @@
 			, TO_DATE(#{st08Dat}, 'YYMMDDHH24MI')
 			, #{st08Seq}
 			, #{st08Gbn}
-			, NULL
+			, #{st08Pgbn}
 			, #{st08Code}
-			, NULL
+			, #{st08Unt}
 			, #{st08Lot}
-			, NULL
-			, #{st08Stok}
+			, '[PDA]제조 공정 불량처리'
 			, SYSDATE
 			, #{st08Empno}
 			, 1
-			, #{st08Dist}
 			, #{st08LotSeq}
 			, #{st08Qrcode}
+			, #{st08Line}
+			, #{st08EquipCode}
 		)
     </insert>
 	

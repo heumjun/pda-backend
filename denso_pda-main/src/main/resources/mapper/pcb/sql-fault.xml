@@ -3,6 +3,26 @@
 	
 <mapper namespace="com.denso.pdabackend.domain.pcb.mapper.FaultMapper">
 	
+	<select id="getFault" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info"
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-fault.xml] FaultMapper.getFault **/
+		SELECT MP02.MP02_CODE AS ST08_CODE
+			 , CM08.CM08_NAME AS ST08_NAME
+			 , MP02.MP02_LOT AS ST08_LOT
+			 , MP02.MP02_LOT_SEQ AS ST08_LOT_SEQ
+			 , CM08.CM08_GBN AS ST08_PGBN
+			 , MP02.MP02_PCB_QR AS ST08_QRCODE
+		FROM TB_MP_02 MP02
+			,TB_CM_08 CM08
+		WHERE 1=1
+		AND MP02.MP02_COMPANY 	= CM08.CM08_COMPANY 
+		AND MP02.MP02_FACTORY 	= CM08.CM08_FACTORY 
+		AND MP02.MP02_CODE  	= CM08.CM08_CODE
+		AND MP02.MP02_COMPANY 	= #{st08Company}
+		AND MP02.MP02_FACTORY 	= #{st08Factory}
+		AND MP02.MP02_PCB_QR 	= #{st08Qrcode}
+	</select>
+		
 	<select id="getSeq" parameterType="com.denso.pdabackend.domain.pcb.dto.FaultDto$Request"
 		resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-fault.xml] FaultMapper.getSeq **/
@@ -13,15 +33,16 @@
             AND TO_CHAR(ST08_DAT, 'YYYYMMDD') = TO_CHAR(TO_DATE(#{st08Dat}, 'YYMMDDHH24MI'), 'YYYYMMDD')
 	</select>
 	
-	<select id="getFaultInfo" parameterType="com.denso.pdabackend.domain.pcb.dto.FaultDto$Request"
+	<select id="getDuplicationFaultInfo" parameterType="com.denso.pdabackend.domain.pcb.dto.FaultDto$Info"
 		resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-fault.xml] FaultMapper.getFaultInfo **/
-		SELECT * FROM TB_ST_08
+		SELECT * 
+		FROM TB_ST_08
 		WHERE 1=1
-		AND ST08_COMPANY = #{st08Company}
-		AND ST08_FACTORY = #{st08Factory}
-		AND ST08_NO		 = CONCAT(TO_CHAR(TO_DATE(#{st08Dat}, 'YYMMDDHH24MI'), 'YYYYMMDD'), LPAD(#{st08Seq}, 5, '0'))
-	</select>	
+		AND ST08_COMPANY 	= #{st08Company}
+		AND ST08_FACTORY 	= #{st08Factory}
+		AND ST08_QRCODE 	= #{st08Qrcode}
+	</select>
 	
     <!-- PCB 불량처리 등록 -->
     <insert id="insertOfFault" parameterType="com.denso.pdabackend.domain.pcb.dto.FaultDto$Info">
@@ -39,11 +60,9 @@
 			, ST08_UNT
 			, ST08_LOT
 			, ST08_RMK
-			, ST08_STOK
 			, ST08_INDTE
 			, ST08_EMPNO
 			, ST08_QTY
-			, ST08_DIST
 			, ST08_LOT_SEQ
 			, ST08_QRCODE
 		)
@@ -55,27 +74,15 @@
 			, TO_DATE(#{st08Dat}, 'YYMMDDHH24MI')
 			, #{st08Seq}
 			, #{st08Gbn}
-			, NULL
+			, #{st08Pgbn}
 			, #{st08Code}
-			, NULL
-			, (SELECT ST02_LOT 
-				FROM TB_ST_02 
-				WHERE ST02_COMPANY = #{st08Company}
-				AND ST02_FACTORY = #{st08Factory} 
-				AND ST02_QRCODE = #{st08Qrcode} 
-			  )
-			, NULL
-			, #{st08Stok}
+			, #{st08Unt}
+			, #{st08Lot}
+			, '[PDA]PCB 공정 불량처리'
 			, SYSDATE
 			, #{st08Empno}
 			, 1
-			, #{st08Dist}
-			, (SELECT ST02_LOT_SEQ 
-				FROM TB_ST_02 
-				WHERE ST02_COMPANY = #{st08Company}
-				AND ST02_FACTORY = #{st08Factory} 
-				AND ST02_QRCODE = #{st08Qrcode} 
-			  )
+			, #{st08LotSeq}
 			, #{st08Qrcode}
 		)
     </insert>

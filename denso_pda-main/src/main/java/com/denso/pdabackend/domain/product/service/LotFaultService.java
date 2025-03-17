@@ -17,19 +17,52 @@ public class LotFaultService {
 
 	private final LotFaultMapper lotFaultMapper;
 	
+	/*
+	 * 라인코드 선택을 위한 콤보박스
+	 */
+	public List<Map<String, Object>> getComboLineList(Request request) {
+		return lotFaultMapper.getComboLineList(request);
+	}
+	
+	/*
+	 * 설비코드 선택을 위한 콤보박스
+	 */
+	public List<Map<String, Object>> getComboEquipCodeList(Request request) {
+		return lotFaultMapper.getComboEquipCodeList(request);
+	}
+	
+	/*
+	 * 불량처리 입고품목 조회
+	 */
+	public Map<String, Object> getLotFault(Info info) {
+		return lotFaultMapper.getLotFault(info);
+	}
+	
+	/*
+	 * seq 취득
+	 */
 	public Map<String, Object> getSeq(Request request) {
 		return lotFaultMapper.getSeq(request);
 	}
 
-	public Map<String, Object> getLotFaultInfo(Request request) {
-		return lotFaultMapper.getLotFaultInfo(request);
+	/*
+	 * 이미 등록된 불량처리 데이터인지 확인.
+	 */
+	public Map<String, Object> getDuplicationLotFaultInfo(Request request) {
+		return lotFaultMapper.getDuplicationLotFaultInfo(request);
 	}
 	
-	public boolean insertOfFault(List<Info> insertList) {
+	/*
+	 * 제조(생산) 공정 불량처리 등록
+	 */
+	public boolean insertOfLotFault(List<Info> insertList) {
 		
 		insertList.forEach(item -> {
 			try {
+				
+				// 제조(생산) 불량처리 등록
 				lotFaultMapper.insertOfLotFault(item);	
+				
 			} catch(Exception e) {
 				e.printStackTrace();
 			}

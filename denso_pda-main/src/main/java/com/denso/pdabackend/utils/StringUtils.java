@@ -435,4 +435,14 @@ public final class StringUtils {
 
 	private StringUtils() {
 	}
+	
+	public static String nullString(Object obj) {
+		
+		String ret = "";
+
+		ret = obj == null ? "" : obj.toString();
+
+		return ret;
+	}
+	
 }

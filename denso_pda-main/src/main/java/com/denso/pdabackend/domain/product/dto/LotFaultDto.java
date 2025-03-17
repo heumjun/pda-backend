@@ -1,7 +1,6 @@
 package com.denso.pdabackend.domain.product.dto;
 
 import com.denso.pdabackend.common.CommonDto;
-import com.denso.pdabackend.domain.codeManage.dto.TrainerDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,6 +36,9 @@ public class LotFaultDto {
     	private int st08LotSeq;
     	private String st08Qrcode;
     	
+    	private String st08Line;
+    	private String st08EquipCode;
+    	
     }
     
     @Data
@@ -49,6 +51,7 @@ public class LotFaultDto {
         private String st08Factory;
         private String st08Dat;
         private int st08Seq;
+        private String st08Qrcode;
     }
 
 }

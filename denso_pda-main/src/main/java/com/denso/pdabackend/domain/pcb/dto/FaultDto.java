@@ -1,7 +1,6 @@
 package com.denso.pdabackend.domain.pcb.dto;
 
 import com.denso.pdabackend.common.CommonDto;
-import com.denso.pdabackend.domain.codeManage.dto.TrainerDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,6 +48,8 @@ public class FaultDto {
         private String st08Factory;
         private String st08Dat;
         private int st08Seq;
+        private String st08Qrcode;
+
     }
 
 }
