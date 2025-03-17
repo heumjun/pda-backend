@@ -1,71 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.denso.pdabackend.domain.smd.mapper.PartsInputMapper">
+<mapper namespace="com.denso.pdabackend.domain.mfr.mapper.MfrPartsInputMapper">
 	<!-- 부품 투입 Barcode를 읽었을 시 로드되는 정보 -->
-	<select id="getPartsInputRequestInfo" parameterType="com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto$Request"
+	<select id="getPartsInputRequestInfo" parameterType="com.denso.pdabackend.domain.mfr.dto.MfrPartsInputRequestDto$Request"
 		resultType="com.denso.pdabackend.response.ResultMap">
-		/** [sql-partsInput.xml] PartsInputMapper.getPartsInputRequestInfo **/
-		SELECT ST02.ST02_COMPANY
-			 , ST02.ST02_FACTORY
-			 , ST02.ST02_NO
-			 , ST02.ST02_DAT
-			 , ST02.ST02_SEQ
-			 , ST02.ST02_QNO
-			 , ST02.ST02_CODE
-			 , CM08.CM08_DGBN
-			 , CM08.CM08_NAME
-			 , CM08.CM08_GBN
-			 , ST02.ST02_LOT
-			 , ST02.ST02_GBN
-			 , ST02.ST02_CUS
-			 , ST02.ST02_PURNO
-			 , ST02.ST02_IPUNT
-			 , ST02.ST02_OPUNT
-			 , ST02.ST02_CURRENCY
-			 , ST02.ST02_IPQTY
-			 , ST02.ST02_QTY
-			 , ST02.ST02_COST
-			 , ST02.ST02_AMT
-			 , ST02.ST02_VAT
-			 , ST02.ST02_RMK
-			 , ST02.ST02_STOK
-			 , ST02.ST02_FIELD
-			 , ST02.ST02_RFID
-			 , ST02.ST02_INDTE
-			 , ST02.ST02_EMPNO
-			 , ST02.ST02_WANYN
-			 , ST02.ST02_PURNO2
-			 , ST02.ST02_PKNO
-			 , ST02.ST02_DTL_NO
-			 , ST02.ST02_QRCODE
-			 , ST02.ST02_STATUS
-			 , ST02.ST02_PNO
-			 , ST02.ST02_DIST
-			 , ST02.ST02_LOT_SEQ
-			 , ST02.ST02_RENO
-			 , ST02.ST02_LINE
-			 , ST02.ST02_MOQ
-			 , ST02.ST02_REQUEST_NO
-			 , ST03.ST03_LOT
-		FROM TB_ST_02 ST02
-		LEFT JOIN TB_CM_08 CM08 ON ST02.ST02_COMPANY = CM08.CM08_COMPANY
-				AND ST02.ST02_FACTORY = CM08.CM08_FACTORY
-				AND ST02.ST02_CODE = CM08.CM08_CODE
+		/** [sql-mfrPartsInput.xml] MfrPartsInputMapper.getPartsInputRequestInfo **/
+		SELECT
+			ST01.ST01_COMPANY
+			,ST01.ST01_FACTORY
+			,ST01.ST01_GBN
+			,ST01.ST01_LOT
+			,ST01.ST01_CODE
+			,ST01.ST01_STOK
+			,ST01.ST01_DISTRICT
+			,ST01.ST01_FIELD
+			,ST01.ST01_UNT
+			,ST01.ST01_QTY
+			,ST01.ST01_LOT_SEQ
+			,CM08.CM08_DGBN
+			,CM08.CM08_NAME
+			,CM08.CM08_GBN
+			,CM08.CM08_CUS
+			,CM08.CM08_MOQ
+			,ST03.ST03_LOT
+			,#{st01Qrcode} as ST01_QRCODE
+		FROM TB_ST_01 ST01
+		LEFT JOIN TB_CM_08 CM08
+		ON ST01.ST01_COMPANY = CM08.CM08_COMPANY
+		AND ST01.ST01_FACTORY = CM08.CM08_FACTORY
+		AND ST01.ST01_CODE = CM08.CM08_CODE
 		LEFT JOIN TB_ST_03 ST03
-		ON ST02.ST02_COMPANY = ST03.ST03_COMPANY
-		AND ST02.ST02_FACTORY = ST03.ST03_FACTORY
-		AND ST02.ST02_LOT = ST03.ST03_LOT
-		AND ST02.ST02_LOT_SEQ = ST03.ST03_LOT_SEQ
-		AND ST03.ST03_GBN = 'PT'
-		WHERE ST02.ST02_COMPANY = #{company}
-		AND ST02.ST02_FACTORY = #{factory}
-		AND ST02.ST02_QRCODE = #{st02Qrcode}
-		AND ST02.ST02_GBN = 'OC'
+		ON ST01.ST01_COMPANY = ST03.ST03_COMPANY
+		AND ST01.ST01_FACTORY = ST03.ST03_FACTORY
+		AND ST01.ST01_LOT = ST03.ST03_LOT
+		AND ST01.ST01_LOT_SEQ = ST03.ST03_LOT_SEQ
+		AND ST03.ST03_GBN = 'MT'
+		WHERE ST01.ST01_COMPANY = #{company}
+		AND ST01.ST01_FACTORY = #{factory}
+		AND ST01.ST01_LOT = #{st01Lot}
+		AND ST01.ST01_LOT_SEQ = #{st01LotSeq}
+		AND ST01.ST01_CODE = #{st01Code}
 	</select>
 
 	<update id="updateOfPdStock" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Info">
-		/** [sql-partsInput.xml] PartsInputMapper.updateOfPdStock **/
+		/** [sql-mfrPartsInput.xml] MfrPartsInputMapper.updateOfPdStock **/
 		UPDATE TB_ST_01
 		<if test="operator == 'minus'"> -- 재고 차감 (출고등록/입고삭제)
 			SET ST01_QTY = ST01_QTY - #{outQty}
@@ -84,8 +63,8 @@
 		</if>
 	</update>
 
-	<insert id="insertOfSmdOutStock" parameterType="com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto$Info">
-		/** [sql-partsInput.xml] PartsInputMapper.updateOfSmdOutStock **/
+	<insert id="insertOfSmdOutStock" parameterType="com.denso.pdabackend.domain.mfr.dto.MfrPartsInputRequestDto$Request">
+		/** [sql-mfrPartsInput.xml] MfrPartsInputMapper.updateOfSmdOutStock **/
 		INSERT INTO TB_ST_03
 		(
 			ST03_COMPANY
@@ -123,35 +102,35 @@
 			,(TO_CHAR(SYSDATE,'YYYYMMDD') || (SELECT LPAD(NVL(MAX(ST03.ST03_SEQ),0)+1,5,0) FROM TB_ST_03 ST03 WHERE TO_CHAR(SYSDATE,'YYYYMMDD') = SUBSTR(ST03.ST03_NO,0,8)))
 			,TO_CHAR(SYSDATE,'YYYY-MM-DD')
 			,(SELECT NVL(MAX(ST03.ST03_SEQ),0)+1 FROM TB_ST_03 ST03 WHERE TO_CHAR(SYSDATE,'YYYYMMDD') = SUBSTR(ST03.ST03_NO,0,8))
-			,#{st02Code}
-			,#{st02Lot}
-			,'PT'
+			,#{st01Code}
+			,#{st01Lot}
+			,'MT'
 			,#{mf02Pcc}<!-- 지시서의 PCC가 만들어저야 들어갈 수 있음 -->
 			,''
-			,#{st02Ipunt}
-			,#{st02Ipqty}
+			,#{st01Unt}
+			,#{st01Qty}
 			,''
-			,#{st02Stok}
+			,#{st01Stok}
 			,SYSDATE
-			,#{st02Empno}
+			,#{empno}
 			,''
-			,#{st02Qrcode}
-			,''
-			,''
+			,#{st01Qrcode}
 			,''
 			,''
-			,#{st02Dist}
 			,''
-			,#{st02Cus}
-			,#{st02LotSeq}
-			,#{st02Line}
-			,#{st02Moq}
+			,''
+			,#{st01Distric}
+			,''
+			,#{cm08Cus}<!-- st01에서는 알 수 없으므로 cm08값 가지고옴 -->
+			,#{st01LotSeq}
+			,''<!-- 라인정보는 st01에서는 알 수 없음 -->
+			,#{cm08Moq}<!-- st01에서는 알 수 없으므로 cm08값 가지고옴 -->
 			,#{mf02No}
 		)
 	</insert>
 
 	<insert id="createMfOrder" parameterType="map">
-		/** [sql-partsInput.xml] PartsInputMapper.createMfOrder **/
+		/** [sql-mfrPartsInput.xml] MfrPartsInputMapper.createMfOrder **/
 		<selectKey keyProperty="mf01Pcc" resultType="String" order="BEFORE">
 			SELECT (TO_CHAR(SYSDATE,'YYYYMMDD') || (SELECT LPAD(NVL(MAX(MF01.MF01_SEQ),0)+1,5,0) FROM TB_MF_01 MF01 WHERE TO_CHAR(SYSDATE,'YYYYMMDD') = SUBSTR(MF01.MF01_PCC,0,8))) FROM DUAL
 		</selectKey>
@@ -198,8 +177,8 @@
 			, 'N'
 		)
 	</insert>
-	<insert id="createMfOrderDetail" parameterType="com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto$Info">
-		/** [sql-partsInput.xml] PartsInputMapper.createMfOrderDetail **/
+	<insert id="createMfOrderDetail" parameterType="com.denso.pdabackend.domain.mfr.dto.MfrPartsInputRequestDto$Request">
+		/** [sql-mfrPartsInput.xml] MfrPartsInputMapper.createMfOrderDetail **/
 		<selectKey keyProperty="mf02No" resultType="String" order="BEFORE">
 			SELECT (#{mf02Pcc} || (SELECT LPAD(NVL(MAX(MF02.MF02_SEQ),0)+1,5,0) FROM TB_MF_02 MF02 WHERE #{mf02Pcc} = SUBSTR(MF02.MF02_PCC,0,13))) FROM DUAL
 		</selectKey>
@@ -224,19 +203,19 @@
 			, #{mf02Pcc}
 			, #{mf02No}
 			, SUBSTR(#{mf02No},14,18)
-			, #{st02Code}
+			, #{st01Code}
 			, ''
-			, #{st02Ipqty}
-			, #{st02Ipunt}
+			, #{st01Qty}
+			, #{st01Unt}
 			, SYSDATE
-			, #{st02LotSeq}
+			, #{st01LotSeq}
 		)
 	</insert>
 
-	<select id="getCompMfList"	parameterType="com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto$Request"	resultType="com.denso.pdabackend.response.ResultMap">
+	<select id="getCompMfList"	parameterType="com.denso.pdabackend.domain.mfr.dto.MfrPartsInputRequestDto$Request"	resultType="com.denso.pdabackend.response.ResultMap">
 		SELECT CM08.*, (CM08.CM08_NAME || '[' || CM08.CM08_CODE || ']') AS MF_DISP
 		FROM TB_CM_08 CM08
-		WHERE CM08.CM08_SMD = #{cm08Smd}
+		WHERE CM08.CM08_MF = 'Y'
 	</select>
 
 </mapper>

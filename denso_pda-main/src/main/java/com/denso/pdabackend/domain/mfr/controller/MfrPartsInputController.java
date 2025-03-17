@@ -1,4 +1,4 @@
-package com.denso.pdabackend.domain.smd.controller;
+package com.denso.pdabackend.domain.mfr.controller;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.denso.pdabackend.common.AuthenticationFacade;
-import com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto;
-import com.denso.pdabackend.domain.smd.service.PartsInputService;
+import com.denso.pdabackend.domain.mfr.dto.MfrPartsInputRequestDto;
+import com.denso.pdabackend.domain.mfr.service.MfrPartsInputService;
 import com.denso.pdabackend.response.ResponseEntityUtil;
 import com.denso.pdabackend.response.StatusCode;
 import com.denso.pdabackend.response.exception.BusinessException;
@@ -29,15 +29,15 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("smd/partsInput")
-public class PartsInputController {
+@RequestMapping("mfr/partsInput")
+public class MfrPartsInputController {
 
 	private final AuthenticationFacade auth;
-    private final PartsInputService partsInputService;
+    private final MfrPartsInputService mfrPartsInputService;
 
     @GetMapping("/getPartsInputRequestInfo")
     @Operation(summary = "부품투입 QR READ", description = "부품투입 QR READ")
-    public ResponseEntity<?> getPartsInputRequestInfo(PartsInputRequestDto.Request request) throws Exception{
+    public ResponseEntity<?> getPartsInputRequestInfo(MfrPartsInputRequestDto.Request request) throws Exception{
 
         Map<String,Object> data = new HashMap<String,Object>();
 
@@ -56,7 +56,7 @@ public class PartsInputController {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 조회할 수 없습니다.");
         }
 
-        Map<String, Object> selectInfo =  partsInputService.getPartsInputRequestInfo(request);
+        Map<String, Object> selectInfo =  mfrPartsInputService.getPartsInputRequestInfo(request);
 
         if(selectInfo == null || ObjectUtils.isEmpty(selectInfo)) {
             return ResponseEntityUtil.error(StatusCode.NOT_FOUND,"유효한 부품식별표 QR이 아닙니다.");
@@ -74,7 +74,7 @@ public class PartsInputController {
 
     @GetMapping("/getCompMfList")
     @Operation(summary = "완제품 목록", description = "완제품 목록 콤보박스용")
-    public ResponseEntity<?> getCompMfList(PartsInputRequestDto.Request request) throws Exception{
+    public ResponseEntity<?> getCompMfList(MfrPartsInputRequestDto.Request request) throws Exception{
 
         Map<String,Object> data = new HashMap<String,Object>();
 
@@ -93,7 +93,7 @@ public class PartsInputController {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 조회할 수 없습니다.");
         }
 
-        List<Map<String, Object>> selectList =  partsInputService.getCompMfList(request);
+        List<Map<String, Object>> selectList =  mfrPartsInputService.getCompMfList(request);
 
         data.put("compMfList", selectList);
 
@@ -107,8 +107,8 @@ public class PartsInputController {
 
 		log.debug("{}", params);
 
-		List<PartsInputRequestDto.Info> insertList = JsonUtils.deserialize(params.get("insertList"), new TypeReference<List<PartsInputRequestDto.Info>>() {});
-		List<PartsInputRequestDto.Info> updateList = JsonUtils.deserialize(params.get("updateList"), new TypeReference<List<PartsInputRequestDto.Info>>() {});
+		List<MfrPartsInputRequestDto.Info> insertList = JsonUtils.deserialize(params.get("insertList"), new TypeReference<List<MfrPartsInputRequestDto.Info>>() {});
+		List<MfrPartsInputRequestDto.Info> updateList = JsonUtils.deserialize(params.get("updateList"), new TypeReference<List<MfrPartsInputRequestDto.Info>>() {});
 
 		if(ObjectUtils.isEmpty(insertList) && ObjectUtils.isEmpty(updateList)) throw new BusinessException("저장할 내역이 없습니다.");
 
@@ -138,23 +138,25 @@ public class PartsInputController {
         Map<String,Object> insertParam = new HashMap<String,Object>();
         if(insertList != null){
 
-            for(PartsInputRequestDto.Info info : insertList){
+            for(MfrPartsInputRequestDto.Info info : insertList){
                 info.setCompany(company);
                 info.setFactory(factory);
-                info.setSt02Empno(empNo);
+                info.setEmpno(empNo);
 
-                PartsInputRequestDto.Request request = new PartsInputRequestDto.Request();
+                MfrPartsInputRequestDto.Request request = new MfrPartsInputRequestDto.Request();
                 request.setCompany(company);
                 request.setFactory(factory);
-                request.setSt02Qrcode(info.getSt02Qrcode());
+                request.setSt01Code(info.getSt01Code());
+                request.setSt01Lot(info.getSt01Lot());
+                request.setSt01LotSeq(info.getSt01LotSeq());
 
                 // 같은 출고요청서 2개이상 출고하는 경우를 없애야함
-                Map<String, Object> resultMap = partsInputService.getPartsInputRequestInfo(request);
+                Map<String, Object> resultMap = mfrPartsInputService.getPartsInputRequestInfo(request);
                 if (resultMap == null) {
                     return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "유효하지 않은 부품이 있습니다.");
                 }
 
-                if(Integer.parseInt(String.valueOf(resultMap.get("st02Ipqty"))) == 0) {
+                if(Integer.parseInt(String.valueOf(resultMap.get("st01Qty"))) == 0) {
                 	return ResponseEntityUtil.error(StatusCode.NOT_FOUND,"부품투입된 항목입니다.");
                 }
             }
@@ -168,7 +170,7 @@ public class PartsInputController {
 
         insertParam.put("insertList", insertList);
 
-        partsInputService.insertOfPartsInputHistory(insertParam);
+        mfrPartsInputService.insertOfPartsInputHistory(insertParam);
 
 		return ResponseEntityUtil.created("부품투입이 등록되었습니다.");
 	}
