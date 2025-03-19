@@ -20,6 +20,7 @@ import com.denso.pdabackend.response.StatusCode;
 import com.denso.pdabackend.response.exception.BusinessException;
 import com.denso.pdabackend.token.dto.UserDto;
 import com.denso.pdabackend.utils.JsonUtils;
+import com.denso.pdabackend.utils.StringUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -142,6 +143,7 @@ public class PartsInputController {
                 info.setCompany(company);
                 info.setFactory(factory);
                 info.setSt02Empno(empNo);
+                info.setSt02Line( StringUtils.nullString(params.get("compMfLine")) );
 
                 PartsInputRequestDto.Request request = new PartsInputRequestDto.Request();
                 request.setCompany(company);
