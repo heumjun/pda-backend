@@ -20,6 +20,7 @@ import com.denso.pdabackend.response.StatusCode;
 import com.denso.pdabackend.response.exception.BusinessException;
 import com.denso.pdabackend.token.dto.UserDto;
 import com.denso.pdabackend.utils.JsonUtils;
+import com.denso.pdabackend.utils.StringUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -95,6 +96,8 @@ public class FaultController {
         		info.setSt08Company(company);
     			info.setSt08Factory(factory);
     			info.setSt08Empno(empno);
+    			info.setSt08Line( StringUtils.nullString(params.get("st08Line")) );
+    			info.setSt08EquipCode( StringUtils.nullString(params.get("st08EquipCode")) );
 
     			// seq 취득
     			FaultDto.Request request = new FaultDto.Request();

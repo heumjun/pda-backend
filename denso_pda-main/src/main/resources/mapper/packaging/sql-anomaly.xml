@@ -71,14 +71,14 @@
 		(
 			  #{st09Company}
 			, #{st09Factory}
-			, CONCAT(TO_CHAR(TO_DATE(#{st09Dat}, 'YYMMDDHH24MI'), 'YYYYMMDD'), LPAD(#{st09Seq}, 5, '0'))
-			, TO_DATE(#{st09Dat}, 'YYMMDDHH24MI')
+			, CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'), LPAD(#{st09Seq}, 5, '0'))
+			, SYSDATE
 			, #{st09Seq}
 			, #{st09Gbn}
 			, #{st09Code}
 			, NULL
 			, #{st09Lot}
-			, '[PDA]포장/실적 공정 불량처리'
+			, '[PDA]포장/실적 공정 이상관리'
 			, #{st09Line}
 			, 1
 			, #{st09LotSeq}

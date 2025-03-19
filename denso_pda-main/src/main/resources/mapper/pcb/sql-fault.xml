@@ -65,13 +65,15 @@
 			, ST08_QTY
 			, ST08_LOT_SEQ
 			, ST08_QRCODE
+			, ST08_LINE
+			, ST08_EQUIP_CODE
 		)
 		VALUES
 		(
 			  #{st08Company}
 			, #{st08Factory}
-			, CONCAT(TO_CHAR(TO_DATE(#{st08Dat}, 'YYMMDDHH24MI'), 'YYYYMMDD'), LPAD(#{st08Seq}, 5, '0'))
-			, TO_DATE(#{st08Dat}, 'YYMMDDHH24MI')
+			, CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'), LPAD(#{st08Seq}, 5, '0'))
+			, SYSDATE
 			, #{st08Seq}
 			, #{st08Gbn}
 			, #{st08Pgbn}
@@ -84,6 +86,8 @@
 			, 1
 			, #{st08LotSeq}
 			, #{st08Qrcode}
+			, #{st08Line}
+			, #{st08EquipCode}
 		)
     </insert>
 	

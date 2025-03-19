@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.material.mapper.MaterialsMoveMapper">
+	
+	<select id="getMaterialsMove" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsMoveDto$Request" 
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-materialsMove.xml] MaterialsMoveMapper.getMaterialsMove **/
+		SELECT ST02.ST02_CODE AS ST02_CODE
+			 , CM08.CM08_NAME AS ST02_NAME
+			 , ST02.ST02_QRCODE AS ST02_QRCODE
+			 , ST02.ST02_IPQTY AS ST02_QTY
+			 , ST02.ST02_STOK AS ST02_STOK
+			 , ST02.ST02_DIST AS ST02_DIST
+			 , ST02.ST02_STOK AS ST02_CUR_STOK
+			 , ST02.ST02_DIST AS ST02_CUR_DIST
+			 , ST02.ST02_LOT 
+			 , ST02.ST02_LOT_SEQ 
+			 , ST02.ST02_IPUNT
+			 , ST02.ST02_IPQTY
+			 , ST02.ST02_CUS
+			 , ST02.ST02_DAT
+		FROM TB_ST_02 ST02
+			,TB_CM_08 CM08
+		WHERE 1=1 
+		AND ST02.ST02_COMPANY 	= CM08.CM08_COMPANY 
+		AND ST02.ST02_FACTORY 	= CM08.CM08_FACTORY 
+		AND ST02.ST02_CODE 	  	= CM08.CM08_CODE
+		AND ST02.ST02_COMPANY 	= #{st02Company}
+		AND ST02.ST02_FACTORY 	= #{st02Factory}
+		AND ST02.ST02_QRCODE 	= #{st02Qrcode}
+    </select>
+    
+	<insert id="insertOfOutputHistory" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsMoveDto$Info">
+    	/** [sql-materialsMove.xml] MaterialsMoveMapper.insertOfOutputHistory **/
+        <selectKey resultType="int" keyProperty="st02Seq" order="BEFORE">
+            SELECT COALESCE(MAX(ST03_SEQ)+1,1) AS ST02_SEQ
+            FROM TB_ST_03
+            WHERE ST03_COMPANY = #{st02Company}
+              AND ST03_FACTORY = #{st02Factory}
+              AND TO_CHAR(ST03_DAT, 'YYYY-MM-DD') = #{st02Dat}
+        </selectKey>
+
+        INSERT INTO TB_ST_03 (
+            ST03_COMPANY
+            , ST03_FACTORY
+            , ST03_NO
+            , ST03_DAT
+            , ST03_CUS
+            , ST03_SEQ
+            , ST03_CODE
+            , ST03_LOT
+            , ST03_GBN
+            , ST03_UNT
+            , ST03_QTY
+            , ST03_RMK
+            , ST03_STOK
+            , ST03_DIST
+            , ST03_INDTE
+            , ST03_EMPNO
+            , ST03_DGBN
+            , ST03_QR
+            , ST03_OUTPUT_NO
+            , ST03_OUTPUT_DTL_NO
+            , ST03_PCC
+            , ST03_RENO
+            , ST03_RTNO
+            , ST03_LINE
+            , ST03_LOT_SEQ
+        ) VALUES (
+              #{st02Company}
+            , #{st02Factory}
+            , CONCAT(REPLACE(#{st02Dat},'-',''), LPAD(#{st02Seq},5,'0'))
+            , #{st02Dat}
+            , #{st02Cus}
+            , #{st02Seq}
+            , #{st02Code}
+            , CASE WHEN #{st02Lot} = '' THEN CONCAT(REPLACE(#{st02Dat},'-',''), LPAD(#{st02Seq},5,'0')) ELSE #{st02Lot} END
+            , #{st02Gbn}
+            , #{st02Ipunt}
+            , #{st02Ipqty}
+            , #{st02Rmk}
+            , #{st02CurStok}
+            , #{st02CurDist}
+            , SYSDATE
+            , #{st02Empno}
+            , NULL
+            , #{st02Qrcode}
+            , NULL <!-- #{st02OutputNo} -->
+            , NULL <!-- CASE WHEN #{st02OutputDtlNo} IS NULL THEN CONCAT(#{st02OutputNo}, LPAD(#{st02Seq},5,'0')) ELSE #{st02OutputDtlNo} END -->
+            , NULL
+            , NULL
+            , NULL
+            , NULL
+            , #{st02LotSeq}
+        )
+    </insert>  
+    
+    <insert id="insertOfInputHistory" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsMoveDto$Info">
+    	/** [sql-materialsMove.xml] MaterialsMoveMapper.insertOfInputHistory **/
+    	
+    	<selectKey resultType="int" keyProperty="st02Seq" order="BEFORE">
+	    	SELECT COALESCE(MAX(st02_seq)+1,1) AS st02_seq
+	        FROM tb_st_02
+	        WHERE st02_company = #{st02Company}
+	        AND st02_factory = #{st02Factory}
+	        AND TO_CHAR(st02_dat, 'YYYY-MM-DD') = #{st02Dat}
+        </selectKey>
+    	
+        INSERT INTO TB_ST_02 (
+            ST02_COMPANY,
+            ST02_FACTORY,
+            ST02_NO,
+            ST02_DAT,
+            ST02_SEQ,
+            ST02_CODE,
+            ST02_LOT,
+            ST02_LOT_SEQ,
+            ST02_GBN,
+            ST02_CUS,
+            ST02_PNO,
+            ST02_PURNO,
+            ST02_IPUNT,
+            ST02_IPQTY,
+            ST02_QRCODE,
+            ST02_STATUS,
+            ST02_STOK,
+            ST02_DIST,
+            ST02_OPUNT,
+            ST02_QTY,
+            ST02_INDTE,
+            ST02_EMPNO,
+            ST02_MOQ
+        ) VALUES (
+            #{st02Company},
+            #{st02Factory},
+            CONCAT(REPLACE(#{st02Dat},'-',''),lpad(#{st02Seq},5,'0')),
+            #{st02Dat},
+            #{st02Seq},
+            #{st02Code},
+            #{st02Lot},
+            #{st02LotSeq},
+            #{st02Gbn},
+            #{st02Cus},
+            #{st02Pno},
+            CONCAT(#{st02Pno},lpad(#{st02Seq},5,'0')),
+            #{st02Ipunt},
+            #{st02Ipqty},
+            #{st02Qrcode},
+            #{st02Status},
+            #{st02Stok},
+            #{st02Dist},
+            '',
+            0,
+            SYSDATE,
+            #{st02Empno},
+            #{st02Moq}
+        )
+    </insert>
+
+</mapper> 

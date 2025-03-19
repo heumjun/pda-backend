@@ -73,7 +73,7 @@ public class WarehousingController {
 
 			info.setCompany(auth.getUserInfo().getCompany());
 			info.setFactory(auth.getUserInfo().getFactory());
-			info.setSt02Empno(0);
+			info.setSt02Empno(auth.getUserInfo().getEmpNo());
 
 			InputHistorySearchDto.Request request = new InputHistorySearchDto.Request();
 			request.setCompany(auth.getUserInfo().getCompany());

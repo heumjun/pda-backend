@@ -90,8 +90,8 @@
 		(
 			  #{st08Company}
 			, #{st08Factory}
-			, CONCAT(TO_CHAR(TO_DATE(#{st08Dat}, 'YYMMDDHH24MI'), 'YYYYMMDD'), LPAD(#{st08Seq}, 5, '0'))
-			, TO_DATE(#{st08Dat}, 'YYMMDDHH24MI')
+			, CONCAT(TO_CHAR(TO_DATE(SYSDATE, 'YYMMDDHH24MI'), 'YYYYMMDD'), LPAD(#{st08Seq}, 5, '0'))
+			, TO_DATE(SYSDATE, 'YYMMDDHH24MI')
 			, #{st08Seq}
 			, #{st08Gbn}
 			, #{st08Pgbn}

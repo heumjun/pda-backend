@@ -172,7 +172,7 @@ public class MfrPartsInputController {
 
         mfrPartsInputService.insertOfPartsInputHistory(insertParam);
 
-		return ResponseEntityUtil.created("부품투입이 등록되었습니다.");
+		return ResponseEntityUtil.created("부품투입 등록이 완료되었습니다");
 	}
 
 }

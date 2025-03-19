@@ -137,6 +137,7 @@ public class OutputController {
 
         String company = userInfo.getCompany();
         String factory = userInfo.getFactory();
+        int empno = userInfo.getEmpNo();
         
         if (company == null) {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 수정할 수 없습니다.");
@@ -151,7 +152,7 @@ public class OutputController {
             for(OutputSearchDto.Info info : insertList){
                 info.setCompany(company);
                 info.setFactory(factory);
-                info.setSt03Empno(0);
+                info.setSt03Empno(empno);
 
                 OutputSearchDto.Request request = new OutputSearchDto.Request();
                 request.setCompany(company);

@@ -23,7 +23,6 @@ import com.denso.pdabackend.utils.JsonUtils;
 import com.denso.pdabackend.utils.StringUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 
-import io.netty.util.internal.StringUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

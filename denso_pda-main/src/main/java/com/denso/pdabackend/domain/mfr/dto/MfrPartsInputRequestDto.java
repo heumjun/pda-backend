@@ -17,7 +17,7 @@ public class MfrPartsInputRequestDto {
         private String st01Lot;
         private String st01Code;
         private String st01Stok;
-        private String st01Distric;
+        private String st01District;
         private String st01Field;
         private String st01Unt;
         private String st01Qty;
