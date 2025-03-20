@@ -15,9 +15,9 @@ public interface RecycleMapper {
 
 	Map<String, Object> getMp02Info(RecycleDto.Request request) throws BusinessException;
 
-	int duplicationRecycle(Info item) throws BusinessException;
+	Map<String, Object> duplicationRecycle(Info item) throws BusinessException;
 	
-	void updateRecycle(Info item) throws BusinessException;
+	void cntPlusRecycle(Info item) throws BusinessException;
 	
 	void insertRecycle(Info item) throws BusinessException;
 

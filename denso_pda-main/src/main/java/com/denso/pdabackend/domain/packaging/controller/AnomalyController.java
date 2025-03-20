@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.denso.pdabackend.common.AuthenticationFacade;
 import com.denso.pdabackend.domain.packaging.dto.AnomalyDto;
 import com.denso.pdabackend.domain.packaging.service.AnomalyService;
+import com.denso.pdabackend.domain.product.dto.LotFaultDto;
 import com.denso.pdabackend.response.ResponseEntityUtil;
 import com.denso.pdabackend.response.StatusCode;
 import com.denso.pdabackend.response.exception.BusinessException;
@@ -95,6 +96,7 @@ public class AnomalyController {
         		info.setSt09Company(auth.getUserInfo().getCompany());
     			info.setSt09Factory(auth.getUserInfo().getFactory());
     			info.setSt09Empno(auth.getUserInfo().getEmpNo());
+    			info.setSt09Dept( StringUtils.nullString(params.get("st09Dept")) );
     			info.setSt09Line( StringUtils.nullString(params.get("st09Line")) );
     			info.setSt09EquipCode( StringUtils.nullString(params.get("st09EquipCode")) );
 
@@ -125,4 +127,39 @@ public class AnomalyController {
 
 		return ResponseEntityUtil.created("이상처리가 등록되었습니다.");
 	}
+    
+    /**
+     * 부서코드 리스트
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/getComboDeptCodeList")
+    @Operation(summary = "부서 목록", description = "부서 목록")
+    public ResponseEntity<?> getComboDeptList(AnomalyDto.Request request) throws Exception{
+
+        Map<String,Object> data = new HashMap<String,Object>();
+
+        UserDto userInfo = auth.getUserInfo();
+        String company = userInfo.getCompany();
+        String factory = userInfo.getFactory();
+        
+        if (company == null) {
+            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 수정할 수 없습니다.");
+        }
+
+        if (factory == null) {
+            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 수정할 수 없습니다.");
+        }
+        
+        request.setSt09Company(auth.getUserInfo().getCompany());
+		request.setSt09Factory(auth.getUserInfo().getFactory());
+        
+        List<Map<String, Object>> comboDeptCodeList = anomalyService.comboDeptCodeList(request);
+
+        data.put("comboDeptCodeList", comboDeptCodeList);
+
+        return ResponseEntityUtil.ok(data);
+
+    }
 }

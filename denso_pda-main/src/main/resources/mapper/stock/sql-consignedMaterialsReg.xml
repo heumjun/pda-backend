@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.stock.mapper.ConsignedMaterialsRegMapper">
+	
+	<select id="consignedMaterialsRegDetailList" parameterType="com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsRegDto$Request"
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-sql-consignedMaterialsReg.xml] ConsignedMaterialsRegMapper.consignedMaterialsRegDetailList **/
+		SELECT MF16.MF16_COMPANY
+			 , MF16.MF16_FACTORY
+			 , MF16.MF16_HNO
+			 , MF16.MF16_NO
+			 , MF16.MF16_SEQ
+			 , MF16.MF16_CODE
+			 , MF16.MF16_QTY
+			 , MF16.MF16_GBN
+			 , TO_CHAR(MF16.MF16_INDTE, 'YYYY-MM-DD HH24:MI:SS') AS MF16_INDTE
+			 , MF16.MF16_EMPNO
+			 , MF16.MF16_UPDTE
+			 , MF16.MF16_UPD_EMPNO
+			 , CM08.CM08_NAME
+			 , CM08.CM08_OPUNT
+			 , CM08.CM08_GBN
+		     , (SELECT CM05_NAME
+				FROM TB_CM_05
+				WHERE CM05_COMPANY = CM08.CM08_COMPANY
+				AND CM05_FACTORY = CM08.CM08_FACTORY
+				AND CM05_VALUE = CM08.CM08_OPUNT
+				AND CM05_CODE = 'C005'
+		       ) AS CM08_OPUNT_NAME
+		FROM TB_MF_16 MF16
+		INNER JOIN TB_MF_15 MF15 ON MF16.MF16_COMPANY = MF15.MF15_COMPANY
+		AND MF16.MF16_FACTORY = MF15.MF15_FACTORY
+		AND MF16.MF16_HNO = MF15.MF15_NO
+		INNER JOIN TB_CM_08 CM08 ON MF16.MF16_COMPANY = CM08.CM08_COMPANY
+		AND MF16.MF16_FACTORY = CM08.CM08_FACTORY
+		AND MF16.MF16_CODE = CM08.CM08_CODE
+		WHERE MF16.MF16_COMPANY = #{mf15Company}
+		AND MF16.MF16_FACTORY = #{mf15Factory}
+		AND MF16.MF16_HNO = #{mf15No}
+		ORDER BY MF16.MF16_COMPANY,MF16.MF16_FACTORY,MF16.MF16_HNO,MF16.MF16_NO DESC
+	</select>
+	
+</mapper> 

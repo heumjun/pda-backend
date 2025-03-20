@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.stock.mapper.ConsignedMaterialsReqMapper">
+	
+	<select id="getConsignedMaterialsReqSearch" parameterType="com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsReqDto$Request"
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-sql-consignedMaterialsReq.xml] ConsignedMaterialsReqMapper.getConsignedMaterialsReqSearch **/
+		SELECT MF15.MF15_COMPANY
+			 , MF15.MF15_FACTORY
+			 , MF15.MF15_NO
+			 , TO_CHAR(MF15.MF15_INDTE, 'YYYY-MM-DD') AS MF15_DAT
+			 , TO_CHAR(MF15.MF15_INDTE, 'HH24:MI') AS MF15_TIME
+			 , MF15.MF15_SEQ
+			 , MF15.MF15_CUS
+			 , CM01.CM01_NAME AS MF15_CUS_NAME
+			 , MF15.MF15_INDTE
+			 , MF15.MF15_EMPNO
+		FROM TB_MF_15 MF15
+		INNER JOIN TB_CM_01 CM01 ON MF15.MF15_COMPANY = CM01.CM01_COMPANY
+		AND MF15.MF15_FACTORY = CM01.CM01_FACTORY
+		AND MF15.MF15_CUS = CM01.CM01_CODE
+		WHERE MF15.MF15_COMPANY = #{mf15Company}
+		AND MF15.MF15_FACTORY = #{mf15Factory}
+		ORDER BY MF15.MF15_NO, MF15.MF15_DAT, MF15.MF15_CUS
+	</select>
+	
+</mapper> 

@@ -50,22 +50,14 @@ public class OutputController {
 
         UserDto userInfo = auth.getUserInfo();
         
-        System.out.println("userInfo >> " + userInfo);
-        
         String company = userInfo.getCompany();
         String factory = userInfo.getFactory();
         int empNo = userInfo.getEmpNo();
         String empName = userInfo.getEmpName();
-        
-        System.out.println(empNo);
-        System.out.println(empName);
 
         request.setCompany(company);
         request.setFactory(factory);
         
-        request.setCompany(userInfo.getCompany());
-        request.setFactory(userInfo.getFactory());
-
         if (company == null) {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 조회할 수 없습니다.");
         }

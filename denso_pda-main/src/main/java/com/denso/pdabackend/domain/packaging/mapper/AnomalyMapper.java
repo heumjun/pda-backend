@@ -1,5 +1,6 @@
 package com.denso.pdabackend.domain.packaging.mapper;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -29,5 +30,10 @@ public interface AnomalyMapper {
 	 * 포장 공정 이상처리 등록
 	 */
 	boolean insertOfAnomaly(Info item);
+
+	/*
+	 * 부서 목록
+	 */
+	List<Map<String, Object>> comboDeptCodeList(Request request);
 
 }

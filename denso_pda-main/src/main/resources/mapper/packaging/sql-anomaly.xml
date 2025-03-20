@@ -12,6 +12,7 @@
 			 , MP02.MP02_LOT_SEQ AS ST09_LOT_SEQ
 			 , CM08.CM08_GBN AS ST09_PGBN
 			 , MP02.MP02_PCB_QR AS ST09_QRCODE
+			 , CM08.CM08_IPUNT AS ST09_UNT
 		FROM TB_MP_02 MP02
 			,TB_CM_08 CM08
 		WHERE 1=1
@@ -30,7 +31,7 @@
           FROM TB_ST_09
           WHERE ST09_COMPANY = #{st09Company}
             AND ST09_FACTORY = #{st09Factory}
-            AND TO_CHAR(ST09_DAT, 'YYYYMMDD') = TO_CHAR(TO_DATE(#{st09Dat}, 'YYYYMMDDHH24MI'), 'YYYYMMDD')
+            AND TO_CHAR(ST09_DAT, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
 	</select>
 	
 	<select id="getDuplicationAnomalyInfo" parameterType="com.denso.pdabackend.domain.packaging.dto.AnomalyDto$Request"
@@ -66,6 +67,7 @@
 			, ST09_EQUIP_CODE
 			, ST09_INDTE
 			, ST09_EMPNO
+			, ST09_DEPT
 		)
 		VALUES
 		(
@@ -76,7 +78,7 @@
 			, #{st09Seq}
 			, #{st09Gbn}
 			, #{st09Code}
-			, NULL
+			, #{st09Unt}
 			, #{st09Lot}
 			, '[PDA]포장/실적 공정 이상관리'
 			, #{st09Line}
@@ -86,7 +88,21 @@
 			, #{st09EquipCode}
 			, SYSDATE
 			, #{st09Empno}
+			, #{st09Dept}
 		)
     </insert>
+    
+    <select id="comboDeptCodeList" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info"
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-anomaly.xml] AnomalyMapper.comboDeptCodeList **/
+		SELECT CM03_CODE, CM03_NAME 
+		FROM TB_CM_03 CM03
+		WHERE 1=1
+		AND CM03.CM03_COMPANY = #{st09Company}
+		AND CM03.CM03_FACTORY = #{st09Factory}
+		AND CM03_LOCK = 'Y'
+	</select>
+    
+    
 	
 </mapper> 

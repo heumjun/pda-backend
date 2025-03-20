@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.denso.pdabackend.domain.packaging.dto.RecycleDto.Info;
 import com.denso.pdabackend.domain.packaging.mapper.RecycleMapper;
 import com.denso.pdabackend.response.exception.BusinessException;
+import com.denso.pdabackend.utils.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,11 +30,12 @@ public class RecycleService {
 		// 재투입 등록
 		insertList.forEach(item -> {
 			
-			int duplCnt = recycleMapper.duplicationRecycle(item);
+			Map<String, Object> duplMap = recycleMapper.duplicationRecycle(item);
 			
-			if ( duplCnt > 0 ) {
-				// 품목 CNT + 1업데이트
-				recycleMapper.updateRecycle(item);
+			if ( duplMap != null ) {
+				item.setSt12Cnt( Integer.parseInt(StringUtils.nullString(duplMap.get("st12Cnt"))) );
+				// 품목 CNT + 1해서 인서트
+				recycleMapper.cntPlusRecycle(item);
 			} else {
 				// 신규
 				recycleMapper.insertRecycle(item);

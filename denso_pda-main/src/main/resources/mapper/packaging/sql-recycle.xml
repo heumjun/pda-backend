@@ -33,9 +33,9 @@
 	</select>
 	
 	<select id="duplicationRecycle" parameterType="com.denso.pdabackend.domain.packaging.dto.RecycleDto$Info"
-		resultType="int">
+		resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-recycle.xml] RecycleMapper.duplicationRecycle **/
-		SELECT COUNT(*) 
+		SELECT MAX(ST12_CNT) AS ST12_CNT
 		FROM TB_ST_12
 		WHERE 1=1
 		AND ST12_COMPANY = #{st12Company}
@@ -43,13 +43,38 @@
 		AND ST12_MF_NO = #{st12No}
 	</select>
 	
-	<update id="updateRecycle" parameterType="com.denso.pdabackend.domain.packaging.dto.RecycleDto$Info">
-		UPDATE TB_ST_12
-		SET ST12_CNT = ST12_CNT + 1
-		WHERE 1=1
-		AND ST12_COMPANY = #{st12Company}
-		AND ST12_FACTORY = #{st12Factory}
-		AND ST12_MF_NO = #{st12No}
+	<update id="cntPlusRecycle" parameterType="com.denso.pdabackend.domain.packaging.dto.RecycleDto$Info">
+		/** [sql-recycle.xml] RecycleMapper.cntPlusRecycle **/
+		INSERT INTO TB_ST_12
+		(
+			  ST12_COMPANY
+			, ST12_FACTORY
+			, ST12_MF_NO
+			, ST12_CNT
+			, ST12_LOT_SEQ
+			, ST12_CODE
+			, ST12_PCC
+			, ST12_QR
+			, ST12_LINE_CODE
+			, ST12_EQUIP_CODE
+			, ST12_INDTE
+			, ST12_EMPNO
+		)
+		VALUES
+		(
+			  #{st12Company}
+			, #{st12Factory}
+			, #{st12No}
+			, #{st12Cnt} + 1
+			, #{st12LotSeq}
+			, #{st12Code}
+			, #{st12Pcc}
+			, #{st12Qr}
+			, #{st12LineCode}
+			, #{st12EquipCode}
+			, SYSDATE
+			, #{st12Empno}
+		)
 	</update>
 	
     <insert id="insertRecycle" parameterType="com.denso.pdabackend.domain.packaging.dto.RecycleDto$Info">

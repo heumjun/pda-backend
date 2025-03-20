@@ -19,6 +19,7 @@ public class RecycleDto {
     	private String st12Company;
     	private String st12Factory;
     	private String st12No;
+    	private int st12Cnt;
     	private String st12LotSeq;
     	private String st12Code;
     	private String st12Pcc;

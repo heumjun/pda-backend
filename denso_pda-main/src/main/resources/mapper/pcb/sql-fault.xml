@@ -12,6 +12,7 @@
 			 , MP02.MP02_LOT_SEQ AS ST08_LOT_SEQ
 			 , CM08.CM08_GBN AS ST08_PGBN
 			 , MP02.MP02_PCB_QR AS ST08_QRCODE
+			 , CM08.CM08_IPUNT AS ST08_UNT
 		FROM TB_MP_02 MP02
 			,TB_CM_08 CM08
 		WHERE 1=1
@@ -30,7 +31,7 @@
           FROM TB_ST_08
           WHERE ST08_COMPANY = #{st08Company}
             AND ST08_FACTORY = #{st08Factory}
-            AND TO_CHAR(ST08_DAT, 'YYYYMMDD') = TO_CHAR(TO_DATE(#{st08Dat}, 'YYMMDDHH24MI'), 'YYYYMMDD')
+            AND TO_CHAR(ST08_DAT, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
 	</select>
 	
 	<select id="getDuplicationFaultInfo" parameterType="com.denso.pdabackend.domain.pcb.dto.FaultDto$Info"

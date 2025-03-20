@@ -55,4 +55,8 @@ public class AnomalyService {
 		return true;
 	}
 
+	public List<Map<String, Object>> comboDeptCodeList(Request request) {
+		return anomalyMapper.comboDeptCodeList(request);
+	}
+
 }

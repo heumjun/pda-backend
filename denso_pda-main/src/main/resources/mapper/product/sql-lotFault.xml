@@ -48,7 +48,7 @@
           FROM TB_ST_08
           WHERE ST08_COMPANY = #{st08Company}
             AND ST08_FACTORY = #{st08Factory}
-            AND TO_CHAR(ST08_DAT, 'YYYYMMDD') = TO_CHAR(TO_DATE(#{st08Dat}, 'YYMMDDHH24MI'), 'YYYYMMDD')
+            AND TO_CHAR(ST08_DAT, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
 	</select>
 	
 	<select id="getDuplicationLotFaultInfo" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info"
@@ -90,8 +90,8 @@
 		(
 			  #{st08Company}
 			, #{st08Factory}
-			, CONCAT(TO_CHAR(TO_DATE(SYSDATE, 'YYMMDDHH24MI'), 'YYYYMMDD'), LPAD(#{st08Seq}, 5, '0'))
-			, TO_DATE(SYSDATE, 'YYMMDDHH24MI')
+			, CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'), LPAD(#{st08Seq}, 5, '0'))
+			, SYSDATE
 			, #{st08Seq}
 			, #{st08Gbn}
 			, #{st08Pgbn}

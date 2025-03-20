@@ -35,6 +35,7 @@ public class AnomalyDto {
     	private String st09Qrcode;
     	private String st09Line;
     	private String st09EquipCode;
+    	private String st09Dept;
     	
     }
     

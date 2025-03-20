@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.denso.pdabackend.common.AuthenticationFacade;
-import com.denso.pdabackend.domain.packaging.dto.AnomalyDto;
 import com.denso.pdabackend.domain.packaging.dto.RecycleDto;
 import com.denso.pdabackend.domain.packaging.service.RecycleService;
 import com.denso.pdabackend.response.ResponseEntityUtil;

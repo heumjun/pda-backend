@@ -15,6 +15,7 @@ import com.denso.pdabackend.domain.smd.mapper.PartsInputMapper;
 import com.denso.pdabackend.domain.warehousing.dto.StockDto;
 import com.denso.pdabackend.response.ResponseEntityUtil;
 import com.denso.pdabackend.response.StatusCode;
+import com.denso.pdabackend.utils.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,6 @@ public class PartsInputService {
      * @return
      */
 	public boolean insertOfPartsInputHistory(Map<String, Object> insertParam) {
-		// TODO Auto-generated method stub
 
 		// 생산지시서 마스터 생성 필요 tb_mf_01
 		partsInputMapper.createMfOrder(insertParam);
@@ -64,6 +64,10 @@ public class PartsInputService {
                 // 생산 지시서 디테일 생성 -- tb_mf_01 ?
                 item.setMf02Pcc((String)insertParam.get("mf01Pcc"));
                 partsInputMapper.createMfOrderDetail(item);
+                
+                
+                System.out.println(">>> " + item.getSt02Line());
+                
                 partsInputMapper.insertOfSmdOutStock(item);
             }catch(Exception e){
                 e.printStackTrace();

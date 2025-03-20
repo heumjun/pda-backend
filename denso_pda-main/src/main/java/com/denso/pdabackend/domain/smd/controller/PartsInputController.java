@@ -143,6 +143,7 @@ public class PartsInputController {
                 info.setCompany(company);
                 info.setFactory(factory);
                 info.setSt02Empno(empNo);
+                System.out.println(">>> " + StringUtils.nullString(params.get("compMfLine")));
                 info.setSt02Line( StringUtils.nullString(params.get("compMfLine")) );
 
                 PartsInputRequestDto.Request request = new PartsInputRequestDto.Request();
