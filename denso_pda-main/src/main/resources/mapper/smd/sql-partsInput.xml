@@ -236,7 +236,10 @@
 	<select id="getCompMfList"	parameterType="com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto$Request"	resultType="com.denso.pdabackend.response.ResultMap">
 		SELECT CM08.*, (CM08.CM08_NAME || '[' || CM08.CM08_CODE || ']') AS MF_DISP
 		FROM TB_CM_08 CM08
-		WHERE CM08.CM08_SMD = #{cm08Smd}
+		WHERE 1=1 
+		AND CM08.CM08_COMPANY = #{company}
+		AND CM08.CM08_FACTORY = #{factory}
+		AND CM08.CM08_SMD = #{cm08Smd}
 	</select>
 
 </mapper>

@@ -16,6 +16,7 @@
 		AND MF17.MF17_COMPANY = CM08.CM08_COMPANY 
 		AND MF17.MF17_FACTORY = CM08.CM08_FACTORY
 		AND MF17.MF17_CODE    = CM08.CM08_CODE
+		AND MF17.MF17_ARRAY   = 1
 		AND MF17.MF17_COMPANY = #{st12Company}
 		AND MF17.MF17_FACTORY = #{st12Factory}
 		AND MF17.MF17_QR = #{st12Qr}
@@ -29,7 +30,8 @@
 		WHERE 1=1
 		AND MP02_COMPANY = #{st12Company}
 		AND MP02_FACTORY = #{st12Factory}
-		AND MP02_PCB_QR = #{st12Qr}
+		AND MP02_PCB_QR  = #{st12Qr}
+		AND MP02_ARRAY	 = 1
 	</select>
 	
 	<select id="duplicationRecycle" parameterType="com.denso.pdabackend.domain.packaging.dto.RecycleDto$Info"

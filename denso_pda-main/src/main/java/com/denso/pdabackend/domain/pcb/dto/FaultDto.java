@@ -37,6 +37,7 @@ public class FaultDto {
     	private String st08Qrcode;
     	private String st08Line;
     	private String st08EquipCode;
+    	private String st08Array;
     	
     }
     
