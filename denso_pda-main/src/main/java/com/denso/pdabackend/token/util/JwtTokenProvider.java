@@ -117,6 +117,16 @@ public class JwtTokenProvider {
 							.parseClaimsJws(token)
 							.getBody()
 							.get("empName").toString();
+		String deptCode = Jwts.parser()
+							.setSigningKey(secretKey)
+							.parseClaimsJws(token)
+							.getBody()
+							.get("deptCode").toString();
+		String deptName = Jwts.parser()
+							.setSigningKey(secretKey)
+							.parseClaimsJws(token)
+							.getBody()
+							.get("deptName").toString();
 		
 		userInfo.setUserId(userId);
 		userInfo.setCompany(company);
@@ -125,6 +135,8 @@ public class JwtTokenProvider {
 		userInfo.setFactoryName(factoryName);
 		userInfo.setEmpNo(empNo);
 		userInfo.setEmpName(empName);
+		userInfo.setDeptCode(deptCode);
+		userInfo.setDeptName(deptName);
 		
 		return userInfo;
     }
@@ -194,10 +206,10 @@ public class JwtTokenProvider {
     	claims.put("factoryName", userDto.getFactoryName());	
     	claims.put("empNo", userDto.getEmpNo());
     	claims.put("empName", userDto.getEmpName());
+    	claims.put("deptCode", userDto.getDeptCode());
+    	claims.put("deptName", userDto.getDeptName());
     	
     	Date now = new Date();
-    	
-    	System.out.println("AAAAAAAAAAAAAAAAAA");
     	
     	return Jwts.builder()
     			.setHeaderParam("typ", "JWT")  //header

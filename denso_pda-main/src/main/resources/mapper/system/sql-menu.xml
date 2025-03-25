@@ -6,8 +6,36 @@
     <select id="getMenuList" parameterType="com.denso.pdabackend.domain.system.dto.MenuDto$MenuRequest"
         resultType="com.denso.pdabackend.response.ResultMap">
         
+        SELECT PDA_CODE               		AS code,
+		     PDA_NAME                 		AS name,
+		     PDA_UPCODE               		AS upcode,
+		     (SELECT A.PDA_NAME
+		   	 FROM TB_PDA_MENU A
+		   	 WHERE A.PDA_CODE = T.PDA_UPCODE) AS upcode_name,
+		     PDA_SEQ                  		AS seq,
+		     PDA_URI                  		AS uri,
+		     PDA_LINK                 		AS link,
+		     PDA_ICON_GBN             		AS icon_gbn,
+		     PDA_ICON                 		AS icon,
+		     PDA_NAME                 		AS fullpath,
+		     LEVEL 							AS "level"
+		FROM (
+				SELECT *
+				FROM TB_PDA_MENU TPM
+					,TB_PDA_DEPT_MENU PTDM
+				WHERE TPM.PDA_LOCK = 'N'
+				AND TPM.PDA_CODE = PTDM.CODE 
+				AND TPM.PDA_LOCK = 'N'
+				AND PTDM.COMPANY = #{company}
+				AND PTDM.FACTORY = #{factory}
+				AND PTDM.DEPT = #{dept}
+		) T
+		START WITH T.PDA_CODE = 1
+		CONNECT BY T.PDA_UPCODE = PRIOR T.PDA_CODE
+		ORDER SIBLINGS BY T.PDA_SEQ
         
-        WITH RECURSIVE tree AS (
+        
+        <!-- WITH RECURSIVE tree AS (
             SELECT men_code,
                 men_upcd,
                 men_name,
@@ -50,7 +78,7 @@
         <if test="!lock">
             and nvl(men_lock,'N') = 'N'
         </if>
-        order by fullorder
+        order by fullorder -->
     
     </select>
 
