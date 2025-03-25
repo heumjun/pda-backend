@@ -133,7 +133,7 @@
             #{company}
             , #{factory}
             , CONCAT(REPLACE(#{st03Dat},'-',''), LPAD(#{st03Seq},5,'0'))
-            , #{st03Dat}
+            , TO_DATE(#{st03Dat}, 'YYYY-MM-DD')
             , #{st03Cus}
             , #{st03Seq}
             , #{cm08Code}
