@@ -104,9 +104,10 @@ public class OutputController {
         request.setMf13No(String.valueOf(request.getMf13No()));
         List<Map<String, Object>> selectInfo =  outputService.getOutputRequestSel(request);
 
-        if(selectInfo.size() < 1) {
-            return ResponseEntityUtil.error(StatusCode.NOT_FOUND,"출고요청서가 존재하지 않습니다.");
-        }
+		/*
+		 * if(selectInfo.size() < 1) { return
+		 * ResponseEntityUtil.error(StatusCode.NOT_FOUND,"출고요청서가 존재하지 않습니다."); }
+		 */
 
         data.put("outputRegisterList", selectInfo);
 
