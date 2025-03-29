@@ -11,6 +11,7 @@ import com.denso.pdabackend.domain.smd.dto.SmdInputRequestDto.Info;
 import com.denso.pdabackend.domain.smd.mapper.SmdInputMapper;
 import com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto;
 import com.denso.pdabackend.domain.warehousing.dto.StockDto;
+import com.denso.pdabackend.utils.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -57,28 +58,29 @@ public class SmdInputService {
                     hashMap.put("factory", item.getFactory());
                     hashMap.put("st02Dat", item.getMf13Dat());
                     Map<String, Object> seq = smdInputMapper.getSeq(hashMap);
-                    String st02Seq = String.valueOf(seq.get("st02Seq"));
+                    int st02Seq = Integer.parseInt( StringUtils.nullString(seq.get("st02Seq")) );
 
                     // tb_st_02 테이블에 insert
                     // 입고 테이블 등록 - tb_st_02 테이블
                     InputHistorySearchDto.Info inputInfo = new InputHistorySearchDto.Info();
                     inputInfo.setCompany(item.getCompany());                                // 회사
                     inputInfo.setFactory(item.getFactory());                                // 공장
-                    inputInfo.setSt02Dat(item.getMf13Dat());                                // 입고일자 -> 출고요청완료일자
-                    inputInfo.setSt02Seq(Integer.parseInt(st02Seq));                      // seq -> seq
+                    //inputInfo.setSt02Dat(item.getMf13Dat());                                // 입고일자 -> 출고요청완료일자
+                    
+                    inputInfo.setSt02Seq(st02Seq);                      // seq -> seq
                     inputInfo.setCm08Code(item.getSt02Code());                              // 품번 -> 품번
                     inputInfo.setSt02Lot(item.getSt02Lot());                                // LOT -> LOT
                     inputInfo.setSt02LotSeq(Integer.parseInt(item.getSt02LotSeq()));        // LOT_SEQ -> LOT_SEQ
                     inputInfo.setSt02Gbn("OC");                                             // 입고 구분
                     inputInfo.setSt02Cus("");                                               // 제조사 -> 라인에서 오는 항목은 어떻게 처리?
-                    inputInfo.setSt02Line(item.getMf13Line());                              // 라인
+                    inputInfo.setSt02Line(item.getMf13LineCode());                              // 라인
                     inputInfo.setSt02Pno("");                                               // 발주번호 존재하지않음
                     inputInfo.setSt02Purno("");                                             // 발주상세번호 존재하지 않음.
                     inputInfo.setSt02Ipunt(item.getSt02Ipunt());                            // 입고단위 -> 출고단위
                     inputInfo.setSt02Ipqty(item.getSt02Ipqty());                            // 입고수량 -> 출고수량
-                    inputInfo.setSt02Moq(1);              									// 실제수량 Moq
+                    inputInfo.setSt02Moq(Integer.parseInt(item.getSt02Moq())); 								// 실제수량 Moq
                     inputInfo.setSt02Qrcode(item.getSt02Qrcode());                          // QR코드
-                    inputInfo.setSt02Status("S");                                           // 유무검사상태
+                    inputInfo.setSt02Status("S");                                        	// 유무검사상태
                     inputInfo.setSt02Stok(item.getSt02Stok());                              // 창고
                     inputInfo.setSt02Dist(item.getSt02Dist());                              // 구역
                     inputInfo.setSt02RequestNo(item.getSt02RequestNo());                    // 출고완료번호

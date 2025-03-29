@@ -14,6 +14,7 @@
              , MF13_DAT_TIME
              , MF13_LINE_CODE
              , LINE_NM AS MF13_LINE_NM
+             , MF13_COMP_GBN
         FROM TB_MF_13 mf13
         LEFT JOIN DNKR_LINE_CODE line on mf13.MF13_COMPANY = line.COMPANY AND mf13.MF13_FACTORY = line.FACTORY AND mf13.MF13_LINE_CODE = line.LINE_CODE
         LEFT JOIN TB_ST_03 st03 on mf13.MF13_COMPANY = st03.ST03_COMPANY AND mf13.MF13_FACTORY = st03.ST03_FACTORY AND mf13.MF13_NO = st03.ST03_OUTPUT_NO
@@ -22,7 +23,7 @@
           	<if test="mf13No != null and !mf13No.equalsIgnoreCase('')" >
 	            AND MF13_NO = #{mf13No}
 			</if>
-          AND MF13_COMP_GBN = 'N'
+          <!-- AND MF13_COMP_GBN = 'N' -->
           AND ST03_OUTPUT_NO IS NULL
         ORDER BY MF13_DAT DESC, MF13_NO DESC
     </select>

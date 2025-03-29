@@ -1,19 +1,15 @@
 package com.denso.pdabackend.domain.smd.controller;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.denso.pdabackend.common.AuthenticationFacade;
-import com.denso.pdabackend.domain.smd.dto.PartsInputRequestDto;
 import com.denso.pdabackend.domain.smd.dto.SmdInputRequestDto;
 import com.denso.pdabackend.domain.smd.service.SmdInputService;
 import com.denso.pdabackend.response.ResponseEntityUtil;
