@@ -72,7 +72,7 @@ public class ConsignedMaterialsRegController {
     	
     	log.debug("{}", params);
 		
-		List<AnomalyDto.Info> insertList = JsonUtils.deserialize(params.get("insertList"), new TypeReference<List<AnomalyDto.Info>>() {});
+		List<ConsignedMaterialsRegDto.Info> insertList = JsonUtils.deserialize(params.get("insertList"), new TypeReference<List<ConsignedMaterialsRegDto.Info>>() {});
 		if( ObjectUtils.isEmpty(insertList) ) throw new BusinessException("저장할 내역이 없습니다.");
 		
 		UserDto userInfo = auth.getUserInfo();
@@ -87,33 +87,19 @@ public class ConsignedMaterialsRegController {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 수정할 수 없습니다.");
         }
 
-		// 공통정보 세팅 - 등록
-		/*
-		 * if(consignedMaterialsReqSaveHead != null) { for
-		 * (ConsignedMaterialsReqDto.MasterInfo info : consignedMaterialsReqSaveHead) {
-		 * info.setMf15Company(company); info.setMf15Factory(factory);
-		 * info.setMf15Empno(userInfo.getEmpNo()); // 등록자
-		 * //info.setMf15UpdEmpno(userInfo.getEmpNo()); // 수정자
-		 * 
-		 * info.setInputMode(inputMode); // 수정자 } }
-		 * 
-		 * // 공통정보 세팅 - 등록 if(consignedMaterialsReqSaveAddedInfo != null) { for
-		 * (ConsignedMaterialsReqDto.Info info : consignedMaterialsReqSaveAddedInfo) {
-		 * info.setMf16Company(company); info.setMf16Factory(factory);
-		 * info.setMf16Empno(userInfo.getEmpNo()); // 등록자
-		 * info.setMf16UpdEmpno(userInfo.getEmpNo()); // 수정자 } }
-		 * 
-		 * // 공통정보 세팅 - 수정 if(consignedMaterialsReqSaveEditedInfo != null) { for
-		 * (ConsignedMaterialsReqDto.Info info : consignedMaterialsReqSaveEditedInfo) {
-		 * info.setMf16Company(company); info.setMf16Factory(factory);
-		 * info.setMf16Empno(userInfo.getEmpNo()); // 등록자
-		 * info.setMf16UpdEmpno(userInfo.getEmpNo()); // 수정자 } }
-		 * 
-		 * if(!consignedMaterialsReqService.saveConsignedMaterialsReq(
-		 * consignedMaterialsReqSaveAddedInfo , consignedMaterialsReqSaveHead,
-		 * consignedMaterialsReqSaveEditedInfo)) { return
-		 * ResponseEntityUtil.error(StatusCode.NO_CONTENT, "사급요청 등록에 실패하였습니다."); }
-		 */
+        // 공통정보 세팅 - 등록
+ 		if(insertList != null) {
+ 			for (ConsignedMaterialsRegDto.Info info : insertList) {
+ 				info.setMf16Company(company);
+ 				info.setMf16Factory(factory);
+ 				info.setMf16Empno(userInfo.getEmpNo()); // 등록자
+ 				info.setMf16UpdEmpno(userInfo.getEmpNo()); // 수정자
+ 			}
+ 		}
+		
+		if(!consignedMaterialsRegService.saveConsignedMaterialsReq(insertList)) {
+			return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "사급요청 등록에 실패하였습니다.");
+		}
 
 		return ResponseEntityUtil.created("사급요청이 등록되었습니다.");
 

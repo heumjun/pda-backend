@@ -56,7 +56,7 @@ public class SmdInputService {
                     Map<String, Object> hashMap = new HashMap<String, Object>();
                     hashMap.put("company", item.getCompany());
                     hashMap.put("factory", item.getFactory());
-                    hashMap.put("st02Dat", item.getMf13Dat());
+                    //hashMap.put("st02Dat", item.getMf13Dat());
                     Map<String, Object> seq = smdInputMapper.getSeq(hashMap);
                     int st02Seq = Integer.parseInt( StringUtils.nullString(seq.get("st02Seq")) );
 

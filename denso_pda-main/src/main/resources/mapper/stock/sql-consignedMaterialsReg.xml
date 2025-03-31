@@ -5,7 +5,7 @@
 	
 	<select id="consignedMaterialsRegDetailList" parameterType="com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsRegDto$Request"
 		resultType="com.denso.pdabackend.response.ResultMap">
-		/** [sql-sql-consignedMaterialsReg.xml] ConsignedMaterialsRegMapper.consignedMaterialsRegDetailList **/
+		/** [sql-consignedMaterialsReg.xml] ConsignedMaterialsRegMapper.consignedMaterialsRegDetailList **/
 		SELECT MF16.MF16_COMPANY
 			 , MF16.MF16_FACTORY
 			 , MF16.MF16_HNO
@@ -40,5 +40,70 @@
 		AND MF16.MF16_HNO = #{mf15No}
 		ORDER BY MF16.MF16_COMPANY,MF16.MF16_FACTORY,MF16.MF16_HNO,MF16.MF16_NO DESC
 	</select>
+	
+	<!-- 사급 상세 등록 -->
+	<insert id="saveConsignedMaterialsReqDetail" parameterType="com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsRegDto$Info">
+		/** [sql-consignedMaterialsReg.xml] ConsignedMaterialsRegMapper.saveConsignedMaterialsReqDetail **/
+		<selectKey resultType="int" keyProperty="mf16Seq" order="BEFORE">
+			select /* saveConsignedMaterialsReqDetail - 사급 상세 등록 - 순번 */
+				NVL(MAX(mf16_seq)+1, 1) as mf16Seq
+			from tb_mf_16
+			where mf16_indte BETWEEN TO_DATE(TO_CHAR(SYSDATE, 'YYYYMMDD')) AND TO_DATE(TO_CHAR(SYSDATE, 'YYYYMMDD')) + 0.99999
+			and mf16_company = #{mf16Company}
+			and mf16_factory = #{mf16Factory}
+		</selectKey>
+
+		/* saveConsignedMaterialsReqDetail - 사급 상세 등록 */
+		merge into tb_mf_16 t1
+		using dual
+		on (
+			mf16_company = #{mf16Company}
+			and mf16_factory = #{mf16Factory}
+			and mf16_no = #{mf16No}
+		    and mf16_code = #{mf16Code}
+		)
+		when matched then
+		update set
+			mf16_qty =  #{mf16Qty},
+			mf16_gbn =  #{mf16Gbn},
+			mf16_upd_empno =  #{mf16UpdEmpno},
+			mf16_updte = SYSDATE
+		when not matched then
+		insert
+		(
+			mf16_company      /* 회사 */
+			, mf16_factory    /* 공장 */
+			, mf16_hno        /* 사급지시서번호 */
+			, mf16_no         /* 사급지시서상세번호 */
+			, mf16_seq        /* 상세순번 */
+			, mf16_code       /* 품목코드 */
+			, mf16_qty        /* 지시수량 */
+			, mf16_gbn        /* 구분(유상, 무상) */
+			, mf16_indte      /* 등록일자 */
+			, mf16_empno      /* 등록자사번 */
+		    , st03_no      /* 출고번호 */
+		)
+		values
+		(
+			#{mf16Company}   /* 회사 */
+			, #{mf16Factory}  /* 공장 */
+		    , #{mf16Hno}  /* 사급지시서번호 */
+			, <choose>
+				<when test="mf16No !=null and !mf16No.equalsIgnoreCase('')">
+					#{mf16No}
+				</when>
+				<otherwise>
+					CONCAT(#{mf16Hno}, lpad(#{mf16Seq},5,'0'))
+				</otherwise>
+			</choose>          /* 사급지시서상세번호 */
+			, #{mf16Seq}       /* 상세순번 */
+			, #{mf16Code}      /* 반품구분 */
+			, #{mf16Qty}       /* 반품수량 */
+			, #{mf16Gbn}       /* 제품코드 */
+			, SYSDATE          /* 등록일자 */
+			, #{mf16Empno}     /* 등록자사번 */
+			, #{st03No}     /* 등록자사번 */
+		)
+	</insert>
 	
 </mapper> 

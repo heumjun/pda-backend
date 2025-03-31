@@ -22,7 +22,7 @@
         FROM TB_ST_02
         WHERE ST02_COMPANY = #{company}
           AND ST02_FACTORY = #{factory}
-          AND ST02_DAT = #{st02Dat}
+          AND TO_CHAR(ST02_DAT, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
     </select>
     
     <update id="updateOfStok" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Info">
@@ -92,7 +92,7 @@
             #{company},
             #{factory},
             CONCAT(REPLACE(#{st02Dat},'-',''),lpad(#{st02Seq},5,'0')),
-            #{st02Dat},
+            SYSDATE,
             #{st02Seq},
             #{cm08Code},
             #{st02Lot},
@@ -112,7 +112,7 @@
             #{st02Dist},
             '',
             0,
-            sysdate,
+            SYSDATE,
             #{st02Empno}
         )
     </insert>
