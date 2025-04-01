@@ -9,6 +9,8 @@
 		SELECT LINE_CODE, LINE_NM
 		FROM DNKR_LINE_CODE 
 		WHERE 1=1
+		AND COMPANY = #{st08Company}
+		AND FACTORY = #{st08Factory}
 		AND CLS_CODE ='E1'
 	</select>
 	

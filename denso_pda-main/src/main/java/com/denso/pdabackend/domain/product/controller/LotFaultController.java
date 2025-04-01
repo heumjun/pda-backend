@@ -48,6 +48,13 @@ public class LotFaultController {
 
         Map<String,Object> data = new HashMap<String,Object>();
 
+        UserDto userInfo = auth.getUserInfo();
+        String company = userInfo.getCompany();
+        String factory = userInfo.getFactory();
+        
+        request.setSt08Company(company);
+        request.setSt08Factory(factory);
+        
         List<Map<String, Object>> comboLineList = lotFaultService.getComboLineList(request);
 
         data.put("comboLineList", comboLineList);
