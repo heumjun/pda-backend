@@ -24,7 +24,7 @@ public interface SmdInputMapper {
 
 	boolean insertOfInputHistory(Info inputInfo);
 
-	List<Map<String, Object>> getOutputGbn(Request request);
+	int getOutputGbn(Request request);
 
 	Map<String, Object> getLotInfo(OutputSearchDto.Request params);
 

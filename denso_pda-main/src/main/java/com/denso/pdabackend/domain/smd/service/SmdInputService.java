@@ -97,7 +97,7 @@ public class SmdInputService {
 		return true;
 	}
 
-	public List<Map<String, Object>> getOutputGbn(Request request) {
+	public int getOutputGbn(Request request) {
 		return smdInputMapper.getOutputGbn(request);
 	}
 

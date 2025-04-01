@@ -58,9 +58,9 @@ public class SmdInputController {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 조회할 수 없습니다.");
         }
 
-        List<Map<String, Object>> selectInfo =  smdInputService.getOutputGbn(request);
+        int selectCnt =  smdInputService.getOutputGbn(request);
 
-        data.put("otInfo", selectInfo);
+        data.put("selectCnt", selectCnt);
 
         return ResponseEntityUtil.ok(data);
 

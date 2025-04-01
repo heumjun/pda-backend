@@ -4,9 +4,9 @@
 <mapper namespace="com.denso.pdabackend.domain.smd.mapper.SmdInputMapper">
 	
 	<select id="getOutputGbn" parameterType="com.denso.pdabackend.domain.smd.dto.SmdInputRequestDto$Request"
-		resultType="com.denso.pdabackend.response.ResultMap">
+		resultType="int">
         /** sql-smdInput.xml] SmdInputMapper.getOutputGbn **/    
-        SELECT * FROM TB_ST_03 WHERE ST03_OUTPUT_NO = #{mf13No}
+        SELECT COUNT(*) FROM TB_ST_03 WHERE ST03_OUTPUT_NO = #{mf13No}
     </select>
 
 	<!-- 출고완료요청 수정 -->
@@ -125,7 +125,7 @@
     
     <select id="getLotInfo" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Request"
             resultType="com.denso.pdabackend.response.ResultMap">
-		/** sql-smdInput.xml] SmdInputMapper.getOutputGbn **/
+		/** sql-smdInput.xml] SmdInputMapper.getLotInfo **/
         SELECT *
         FROM TB_ST_01 st01
         LEFT JOIN TB_ST_02 st02 ON st01.ST01_COMPANY = st02.ST02_COMPANY AND st01.ST01_FACTORY = st02.ST02_FACTORY AND st01.ST01_LOT_SEQ = st02.ST02_LOT_SEQ
