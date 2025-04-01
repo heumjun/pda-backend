@@ -136,7 +136,7 @@
             #{company}
             , #{factory}
             , CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'), LPAD(#{st03Seq}, 5, '0'))
-            , SYSDATE
+            , TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'), 'YYYY-MM-DD')
             , #{st03Cus}
             , #{st03Seq}
             , #{cm08Code}
