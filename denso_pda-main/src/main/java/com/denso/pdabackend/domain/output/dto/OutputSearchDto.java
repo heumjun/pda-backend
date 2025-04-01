@@ -45,6 +45,8 @@ public class OutputSearchDto {
         private String st03Reno;        // 반납요청서번호
         private String st03Rtno;        // 반품요청서번호
         private int st03LotSeq;         // LOT SEQ
+        private int st03Moq;         // LOT SEQ
+        private String st03MstNo;         // LOT SEQ
         private int oriOutqty;          // 기존 출고수량
 
         private String pst03No;             // update 인지 insert 확인용
@@ -81,6 +83,7 @@ public class OutputSearchDto {
         private String mf13DatFr;          // 출고요청시작일
         private String mf13DatTo;          // 출고요청종료일
         
+        private String stok;
 
     }
     

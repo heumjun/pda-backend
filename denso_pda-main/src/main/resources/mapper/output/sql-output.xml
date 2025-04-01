@@ -116,6 +116,7 @@
             , ST03_GBN
             , ST03_UNT
             , ST03_QTY
+            , ST03_MOQ
             , ST03_RMK
             , ST03_STOK
             , ST03_DIST
@@ -130,11 +131,12 @@
             , ST03_RTNO
             , ST03_LINE
             , ST03_LOT_SEQ
+            , ST03_MST_NO
         ) VALUES (
             #{company}
             , #{factory}
-            , CONCAT(REPLACE(#{st03Dat},'-',''), LPAD(#{st03Seq},5,'0'))
-            , TO_DATE(#{st03Dat}, 'YYYY-MM-DD')
+            , CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'), LPAD(#{st03Seq}, 5, '0'))
+            , SYSDATE
             , #{st03Cus}
             , #{st03Seq}
             , #{cm08Code}
@@ -143,6 +145,7 @@
             , #{st03Gbn}
             , #{st03Unt}
             , #{st03Qty}
+            , #{st03Moq}
             , #{st03Rmk}
             , #{st03Stok}
             , #{st03Dist}
@@ -158,6 +161,7 @@
             , #{st03Rtno}
             , #{st03Line}
             , #{st03LotSeq}
+            , #{st03OutputNo}
         )
     </insert>
     
