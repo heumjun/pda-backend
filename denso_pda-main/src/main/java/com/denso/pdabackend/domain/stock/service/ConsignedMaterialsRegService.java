@@ -9,9 +9,8 @@ import org.springframework.stereotype.Service;
 import com.denso.pdabackend.domain.restore.dto.ProductDto;
 import com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsRegDto;
 import com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsRegDto.Info;
+import com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsRegDto.Request;
 import com.denso.pdabackend.domain.stock.mapper.ConsignedMaterialsRegMapper;
-import com.denso.pdabackend.response.ResponseEntityUtil;
-import com.denso.pdabackend.response.StatusCode;
 import com.denso.pdabackend.response.exception.BusinessException;
 
 import lombok.RequiredArgsConstructor;
@@ -21,8 +20,8 @@ import lombok.RequiredArgsConstructor;
 public class ConsignedMaterialsRegService {
 
 	private final ConsignedMaterialsRegMapper consignedMaterialsRegMapper;
-
-	public List<Map<String, Object>> consignedMaterialsRegDetailList(ConsignedMaterialsRegDto.Request request) {
+	
+	public List<Map<String, Object>> consignedMaterialsRegDetailList(Request request) {
 		return consignedMaterialsRegMapper.consignedMaterialsRegDetailList(request);
 	}
 
@@ -84,6 +83,5 @@ public class ConsignedMaterialsRegService {
 		
 		return true;
 	}
-	
-	
+
 }

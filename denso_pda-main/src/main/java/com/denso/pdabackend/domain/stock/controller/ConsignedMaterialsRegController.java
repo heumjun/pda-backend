@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.denso.pdabackend.common.AuthenticationFacade;
-import com.denso.pdabackend.domain.packaging.dto.AnomalyDto;
 import com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsRegDto;
-import com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsReqDto;
 import com.denso.pdabackend.domain.stock.service.ConsignedMaterialsRegService;
 import com.denso.pdabackend.response.ResponseEntityUtil;
 import com.denso.pdabackend.response.StatusCode;
@@ -47,8 +45,8 @@ public class ConsignedMaterialsRegController {
 		String company = userInfo.getCompany();
 		String factory = userInfo.getFactory();
 
-		request.setMf15Company(company);
-		request.setMf15Factory(factory);
+		request.setCompany(company);
+		request.setFactory(factory);
 
 		if (company == null) {
 			return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 조회할 수 없습니다.");
@@ -58,11 +56,12 @@ public class ConsignedMaterialsRegController {
 			return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 조회할 수 없습니다.");
 		}
 
-		List<Map<String,Object>> consignedMaterialsRegDetailList = consignedMaterialsRegService.consignedMaterialsRegDetailList(request);
+		List<Map<String,Object>> consignedMaterialsHistDetailAllList = consignedMaterialsRegService.consignedMaterialsRegDetailList(request);
 
-		data.put("consignedMaterialsRegDetailList", consignedMaterialsRegDetailList);
+		data.put("consignedMaterialsHistDetailAllList", consignedMaterialsHistDetailAllList);
 
 		return ResponseEntityUtil.ok(data);
+		
 
 	}
     

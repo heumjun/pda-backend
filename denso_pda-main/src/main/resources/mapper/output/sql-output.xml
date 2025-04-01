@@ -23,7 +23,7 @@
           	<if test="mf13No != null and !mf13No.equalsIgnoreCase('')" >
 	            AND MF13_NO = #{mf13No}
 			</if>
-          <!-- AND MF13_COMP_GBN = 'N' -->
+          AND MF13_COMP_GBN = 'N'
           AND ST03_OUTPUT_NO IS NULL
         ORDER BY MF13_DAT DESC, MF13_NO DESC
     </select>

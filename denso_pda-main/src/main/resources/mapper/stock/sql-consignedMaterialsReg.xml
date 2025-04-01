@@ -6,39 +6,140 @@
 	<select id="consignedMaterialsRegDetailList" parameterType="com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsRegDto$Request"
 		resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-consignedMaterialsReg.xml] ConsignedMaterialsRegMapper.consignedMaterialsRegDetailList **/
-		SELECT MF16.MF16_COMPANY
-			 , MF16.MF16_FACTORY
-			 , MF16.MF16_HNO
-			 , MF16.MF16_NO
-			 , MF16.MF16_SEQ
-			 , MF16.MF16_CODE
-			 , MF16.MF16_QTY
-			 , MF16.MF16_GBN
-			 , TO_CHAR(MF16.MF16_INDTE, 'YYYY-MM-DD HH24:MI:SS') AS MF16_INDTE
-			 , MF16.MF16_EMPNO
-			 , MF16.MF16_UPDTE
-			 , MF16.MF16_UPD_EMPNO
-			 , CM08.CM08_NAME
-			 , CM08.CM08_OPUNT
-			 , CM08.CM08_GBN
-		     , (SELECT CM05_NAME
-				FROM TB_CM_05
-				WHERE CM05_COMPANY = CM08.CM08_COMPANY
-				AND CM05_FACTORY = CM08.CM08_FACTORY
-				AND CM05_VALUE = CM08.CM08_OPUNT
-				AND CM05_CODE = 'C005'
-		       ) AS CM08_OPUNT_NAME
-		FROM TB_MF_16 MF16
-		INNER JOIN TB_MF_15 MF15 ON MF16.MF16_COMPANY = MF15.MF15_COMPANY
-		AND MF16.MF16_FACTORY = MF15.MF15_FACTORY
-		AND MF16.MF16_HNO = MF15.MF15_NO
-		INNER JOIN TB_CM_08 CM08 ON MF16.MF16_COMPANY = CM08.CM08_COMPANY
-		AND MF16.MF16_FACTORY = CM08.CM08_FACTORY
-		AND MF16.MF16_CODE = CM08.CM08_CODE
-		WHERE MF16.MF16_COMPANY = #{mf15Company}
-		AND MF16.MF16_FACTORY = #{mf15Factory}
-		AND MF16.MF16_HNO = #{mf15No}
-		ORDER BY MF16.MF16_COMPANY,MF16.MF16_FACTORY,MF16.MF16_HNO,MF16.MF16_NO DESC
+		WITH t1 AS (
+			SELECT
+				a.MF16_COMPANY     /* 회사 */
+				, a.MF16_FACTORY     /* 공장 */
+				, a.MF16_HNO         /* 사급요청서번호 */
+				, a.MF16_NO          /* 사급상세번호 */
+				, a.MF16_SEQ         /* 상세순번 */
+				, a.MF16_CODE        /* 품목코드 */
+				, a.MF16_QTY         /* 요청일자 */
+				, a.MF16_GBN         /* 구분 */
+				, a.MF16_INDTE       /* 등록일자 */
+				, a.MF16_EMPNO       /* 등록자사번 */
+				, a.MF16_UPDTE       /* 수정일자 */
+				, a.MF16_UPD_EMPNO   /* 수정자사번 */
+				, b.ST03_NO          /* 출고번호 */
+				, b.ST03_LOT         /* LOT번호 */
+				, b.ST03_LOT_SEQ     /* LOT시퀀스 */
+				, b.ST03_QTY         /* 출고수량 */
+				, TO_CHAR(b.ST03_DAT, 'YYYY-MM-DD HH24:MI') as ST03_DAT  /* 출고일자 */
+				, d.CM08_NAME        /* 품목명 */
+				, d.CM08_OPUNT       /* 출고단위 */
+				, d.CM08_GBN       /* 품목구분 */
+				, d.CM08_DGBN       /* 라벨정보구분 */
+				, d.CM08_MOQ
+				, e.st01_company
+				, e.st01_factory
+				, e.ST01_LOT         /* LOT번호 */
+				, e.ST01_LOT_SEQ     /* LOT시퀀스 */
+				, b.ST03_MOQ         /* MOQ */
+				, e.ST01_UNT         /* 단위 */
+				, e.ST01_STOK        /* 창고 */
+				, e.ST01_DISTRICT    /* 구역 */
+				, b.st03_qr      /* QR번호 */
+				, TRUNC(a.MF16_QTY/d.CM08_MOQ) AS row_cnt
+				, (CASE WHEN MOD(a.MF16_QTY,NVL(d.CM08_MOQ, 0)) = 0 THEN 1 ELSE 0 END) AS mod_yn
+				, sum(e.st01_qty) as st01_qty  /* 재고량 */
+			FROM TB_MF_16 a /* 사급상세 테이블 */
+			INNER JOIN TB_MF_15 c /* 사급 테이블 */
+				ON a.MF16_COMPANY = c.MF15_COMPANY /* 회사조인 */
+				AND a.MF16_FACTORY = c.MF15_FACTORY /* 공장조인 */
+				AND a.MF16_HNO = c.MF15_NO /* 사급요청서번호 조인 */
+			LEFT JOIN TB_ST_03 b /* 출고 테이블 */
+				ON a.MF16_COMPANY = b.ST03_COMPANY /* 회사조인 */
+				AND a.MF16_FACTORY = b.ST03_FACTORY /* 공장조인 */
+				AND a.ST03_NO = b.ST03_NO /* 출고번호 조인 */
+				AND b.ST03_GBN = 'SB' /* 사급 */
+			INNER JOIN TB_CM_08 d /* 품목 테이블 */
+				ON a.MF16_COMPANY = d.CM08_COMPANY /* 회사조인 */
+				AND a.MF16_FACTORY = d.CM08_FACTORY /* 공장조인 */
+				AND a.MF16_CODE = d.CM08_CODE /* 품목코드 조인 */
+			LEFT JOIN TB_ST_01 e /* 재고 테이블 */
+				ON b.ST03_COMPANY = e.ST01_COMPANY /* 회사조인 */
+				AND b.ST03_FACTORY = e.ST01_FACTORY /* 공장조인 */
+				AND b.ST03_CODE = e.ST01_CODE /* 품목코드 조인 */
+				AND b.ST03_LOT = e.ST01_LOT /* LOT 조인 */
+				AND b.ST03_LOT_SEQ = e.ST01_LOT_SEQ /* LOT시퀀스 조인 */
+			WHERE 1 = 1
+				AND A.MF16_COMPANY = #{company}
+				AND A.MF16_FACTORY = #{factory}
+				AND A.MF16_HNO = #{mf15No}
+			GROUP
+				BY a.MF16_COMPANY
+				, a.MF16_FACTORY
+				, a.MF16_HNO
+				, a.MF16_NO
+				, a.MF16_SEQ
+				, a.MF16_CODE
+				, a.MF16_QTY
+				, a.MF16_GBN
+				, a.MF16_INDTE
+				, a.MF16_EMPNO
+				, a.MF16_UPDTE
+				, a.MF16_UPD_EMPNO
+				, b.ST03_NO
+				, b.ST03_LOT         /* LOT번호 */
+				, b.ST03_LOT_SEQ     /* LOT시퀀스 */
+				, b.ST03_QTY
+				, b.ST03_DAT
+				, d.CM08_NAME
+				, d.CM08_OPUNT       /* 출고단위 */
+				, d.CM08_GBN       /* 품목구분 */
+				, d.CM08_DGBN       /* 라벨정보구분 */
+				, d.CM08_MOQ
+				, e.st01_company
+				, e.st01_factory
+				, e.ST01_LOT
+				, e.ST01_LOT_SEQ     /* LOT시퀀스 */
+				, b.ST03_MOQ         /* MOQ */
+				, e.ST01_UNT
+				, e.ST01_STOK
+				, e.ST01_DISTRICT
+				, b.st03_qr
+		)
+		SELECT /* searchConsignedMaterialsHistDetailAllList - 사급이력상세 모든(사급요청,사급등록) 리스트 조회  */
+			T1.MF16_COMPANY     /* 회사 */
+			, T1.MF16_FACTORY     /* 공장 */
+			, T1.MF16_HNO         /* 사급요청서번호 */
+			, T1.MF16_NO          /* 사급상세번호 */
+			, T1.MF16_SEQ         /* 상세순번 */
+			, T1.MF16_CODE        /* 품목코드 */
+			, T1.MF16_QTY         /* 요청수량 */
+			, T1.MF16_GBN         /* 구분 */
+			, T1.MF16_INDTE       /* 등록일자 */
+			, T1.MF16_EMPNO       /* 등록자사번 */
+			, T1.MF16_UPDTE       /* 수정일자 */
+			, T1.MF16_UPD_EMPNO   /* 수정자사번 */
+			, T1.ST03_NO          /* 출고번호 */
+			, T1.ST03_LOT         /* LOT번호 */
+			, T1.ST03_LOT_SEQ     /* LOT시퀀스 */
+			, NVL(T1.ST03_QTY, 1) AS ST03_QTY         /* 출고수량 */
+			, T1.ST03_DAT         /* 출고일자 */
+			, T1.CM08_NAME        /* 품목명 */
+			, T1.CM08_OPUNT       /* 출고단위 */
+			, T1.CM08_GBN       /* 품목구분 */
+			, T1.CM08_DGBN       /* 라벨정보구분 */
+			, T1.CM08_MOQ
+			, T1.ST01_LOT         /* LOT번호 */
+			, T1.ST01_LOT_SEQ         /* LOT시퀀스 */
+			, NVL(T1.ST03_MOQ, 0) AS ST03_MOQ          /* MOQ */
+			, T1.ST01_UNT         /* 단위 */
+			, T1.ST01_STOK        /* 창고 */
+			, T1.ST01_DISTRICT    /* 구역 */
+			, T1.st03_qr as ST02_QRCODE      /* QR번호 */
+			, NVL(T1.st01_qty, 0) as st01_qty  /* 재고량 */
+			, T1.row_cnt
+		FROM T1
+			, (SELECT LEVEL num FROM dual CONNECT BY LEVEL <![CDATA[<=]]> 10000) T2
+		WHERE T1.mod_yn = 1
+			AND T2.num BETWEEN 1 AND T1.row_cnt
+		ORDER
+			BY T1.MF16_COMPANY
+			, T1.MF16_FACTORY
+			, T1.MF16_HNO
+			, T1.MF16_NO
 	</select>
 	
 	<!-- 사급 상세 등록 -->

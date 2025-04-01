@@ -80,6 +80,7 @@ public class OutputSearchDto {
         private String mf13No;             // 출고요청서번호
         private String mf13DatFr;          // 출고요청시작일
         private String mf13DatTo;          // 출고요청종료일
+        
 
     }
     

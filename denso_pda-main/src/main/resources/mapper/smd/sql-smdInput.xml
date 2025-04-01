@@ -2,6 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.denso.pdabackend.domain.smd.mapper.SmdInputMapper">
+	
+	<select id="getOutputGbn" parameterType="com.denso.pdabackend.domain.smd.dto.SmdInputRequestDto$Request"
+		resultType="com.denso.pdabackend.response.ResultMap">
+        /** sql-smdInput.xml] SmdInputMapper.getOutputGbn **/    
+        SELECT * FROM TB_ST_03 WHERE ST03_OUTPUT_NO = #{mf13No}
+    </select>
 
 	<!-- 출고완료요청 수정 -->
     <update id="updateOfOutputRequestComp" parameterType="com.denso.pdabackend.domain.smd.dto.SmdInputRequestDto">
@@ -91,7 +97,7 @@
         ) VALUES (
             #{company},
             #{factory},
-            CONCAT(REPLACE(#{st02Dat},'-',''),lpad(#{st02Seq},5,'0')),
+            CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'), LPAD(#{st02Seq}, 5, '0')),
             SYSDATE,
             #{st02Seq},
             #{cm08Code},
@@ -116,6 +122,19 @@
             #{st02Empno}
         )
     </insert>
+    
+    <select id="getLotInfo" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+		/** sql-smdInput.xml] SmdInputMapper.getOutputGbn **/
+        SELECT *
+        FROM TB_ST_01 st01
+        LEFT JOIN TB_ST_02 st02 ON st01.ST01_COMPANY = st02.ST02_COMPANY AND st01.ST01_FACTORY = st02.ST02_FACTORY AND st01.ST01_LOT_SEQ = st02.ST02_LOT_SEQ
+        WHERE ST01_COMPANY = #{company}
+          AND ST01_FACTORY = #{factory}
+          AND ST01_CODE = #{st03Code}
+          AND ST01_LOT = #{st03Lot}
+          AND ST01_LOT_SEQ = #{st03LotSeq}
+    </select>
     
 
 </mapper>
