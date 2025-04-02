@@ -10,6 +10,7 @@ import com.denso.pdabackend.domain.material.dto.MaterialsMoveDto.Info;
 import com.denso.pdabackend.domain.material.dto.MaterialsMoveDto.Request;
 import com.denso.pdabackend.domain.material.mapper.MaterialsMoveMapper;
 import com.denso.pdabackend.domain.output.mapper.OutputMapper;
+import com.denso.pdabackend.domain.smd.mapper.SmdInputMapper;
 import com.denso.pdabackend.domain.warehousing.dto.StockDto;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class MaterialsMoveService {
     
     private final OutputMapper outputMapper;
+    private final SmdInputMapper smdInputMapper;
     private final MaterialsMoveMapper materialsMoveMapper;
 
 	public Map<String, Object> getMaterialsMove(Map<String,Object> params) throws Exception {
@@ -84,6 +86,10 @@ public class MaterialsMoveService {
                 stockInfo.setUnt(item.getSt02Ipunt()); // 출고단위 = 재고단위
                 stockInfo.setLotSeq(String.valueOf(item.getSt02LotSeq())); // lotSEQ
                 outputMapper.updateOfPdStock(stockInfo);
+                
+                stockInfo.setStock(item.getStok()); // 보관창고
+                stockInfo.setSt01District(item.getDist()); // 보관창고
+                smdInputMapper.updateOfStok(stockInfo);
 
                 // 출고 테이블 등록
                 materialsMoveMapper.insertOfInputHistory(item);
