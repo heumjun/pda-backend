@@ -31,7 +31,7 @@
 		<if test="st02Qrcode != null and !st02Qrcode.equalsIgnoreCase('')" >
 			AND ST02.ST02_QRCODE = #{st02Qrcode}
 		</if>
-		<if test="st02LotSeq != null and !st02LotSeq.equalsIgnoreCase('')" >
+		<if test="st02LotSeq != null" >
 			AND ST02.ST02_LOT_SEQ = #{st02LotSeq}
 		</if>
     </select>

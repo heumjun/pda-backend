@@ -67,6 +67,7 @@ public class MaterialsMoveDto {
         private int st02Empno;
         private int st02Seq;
     	private String st02Qrcode;
+    	private int st02LotSeq;
     }
     
 }
