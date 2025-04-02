@@ -28,7 +28,12 @@
 		AND ST02.ST02_CODE 	  	= CM08.CM08_CODE
 		AND ST02.ST02_COMPANY 	= #{st02Company}
 		AND ST02.ST02_FACTORY 	= #{st02Factory}
-		AND ST02.ST02_QRCODE 	= #{st02Qrcode}
+		<if test="st02Qrcode != null and !st02Qrcode.equalsIgnoreCase('')" >
+			AND ST02.ST02_QRCODE = #{st02Qrcode}
+		</if>
+		<if test="st02LotSeq != null and !st02LotSeq.equalsIgnoreCase('')" >
+			AND ST02.ST02_LOT_SEQ = #{st02LotSeq}
+		</if>
     </select>
     
 	<insert id="insertOfOutputHistory" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsMoveDto$Info">
