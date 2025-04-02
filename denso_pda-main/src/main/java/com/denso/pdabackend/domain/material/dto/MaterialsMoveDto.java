@@ -52,6 +52,7 @@ public class MaterialsMoveDto {
         private String st02Line;
         private int st02Moq;
         private String st02RequestNo;
+        private String st02DefLot;
         
         private String stok;
         private String dist;

@@ -95,7 +95,6 @@ public class MaterialsMoveController {
         		info.setSt02Company(company);
     			info.setSt02Factory(factory);
     			info.setSt02Empno(empno);
-    			info.setSt02Qrcode(StringUtils.nullString(params.get("st02Qrcode")));
     			
     			info.setStok( StringUtils.nullString(params.get("stok")) );
     			info.setDist( StringUtils.nullString(params.get("dist")) );
@@ -103,7 +102,6 @@ public class MaterialsMoveController {
     			MaterialsMoveDto.Request request = new MaterialsMoveDto.Request();
     			request.setSt02Company(auth.getUserInfo().getCompany());
     			request.setSt02Factory(auth.getUserInfo().getFactory());
-    			request.setSt02Qrcode( StringUtils.nullString(params.get("st02Qrcode")) );
     			
     			// 이미 등록된 이상처리 데이터인지 확인.
     			// 기존의 입고 테이블에 회사, 공장, no, 창고, 구역을 이용한 중복 확인

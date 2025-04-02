@@ -19,6 +19,8 @@
 			 , ST02.ST02_IPQTY
 			 , ST02.ST02_CUS
 			 , ST02.ST02_DAT
+			 , ST02.ST02_MOQ
+			 , ST02.ST02_DEF_LOT
 		FROM TB_ST_02 ST02
 			,TB_CM_08 CM08
 		WHERE 1=1 
@@ -71,6 +73,7 @@
             , ST03_RTNO
             , ST03_LINE
             , ST03_LOT_SEQ
+            , ST03_MOQ
         ) VALUES (
               #{st02Company}
             , #{st02Factory}
@@ -97,6 +100,7 @@
             , NULL
             , NULL
             , #{st02LotSeq}
+            , #{st02Moq}
         )
     </insert>  
     
@@ -134,7 +138,8 @@
             ST02_QTY,
             ST02_INDTE,
             ST02_EMPNO,
-            ST02_MOQ
+            ST02_MOQ,
+            ST02_DEF_LOT
         ) VALUES (
             #{st02Company},
             #{st02Factory},
@@ -158,7 +163,8 @@
             1,
             SYSDATE,
             #{st02Empno},
-            #{st02Moq}
+            #{st02Moq},
+            #{st02DefLot}
         )
     </insert>
 
