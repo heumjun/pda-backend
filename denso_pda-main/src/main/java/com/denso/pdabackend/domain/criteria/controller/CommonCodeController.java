@@ -4,12 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,10 +14,7 @@ import com.denso.pdabackend.domain.criteria.dto.CommonCodeDto;
 import com.denso.pdabackend.domain.criteria.dto.CommonCodeDto.Request;
 import com.denso.pdabackend.domain.criteria.service.CommonCodeService;
 import com.denso.pdabackend.response.ResponseEntityUtil;
-import com.denso.pdabackend.response.StatusCode;
 import com.denso.pdabackend.token.dto.UserDto;
-import com.denso.pdabackend.utils.JsonUtils;
-import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

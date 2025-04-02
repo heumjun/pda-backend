@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.stock.mapper.ConsignedMaterialsOutputMapper">
+	
+	<select id="getComboCusList" parameterType="com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsRegDto$Request"
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-consignedMaterialsReg.xml] ConsignedMaterialsOutputMapper.getComboCusList **/
+		SELECT * 
+		FROM TB_CM_01
+		WHERE 1=1
+		AND CM01_COMPANY = #{company}
+		AND CM01_FACTORY = #{factory}
+		AND CM01_LOCK = 'Y'
+	</select>	
+	
+</mapper> 
