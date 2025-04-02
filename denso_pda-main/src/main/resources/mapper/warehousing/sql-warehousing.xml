@@ -196,8 +196,8 @@
         ) VALUES (
             #{company},
             #{factory},
-            CONCAT(REPLACE(#{st02Dat},'-',''),lpad(#{st02Seq},5,'0')),
-            #{st02Dat},
+            CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'), lpad(#{st02Seq},5,'0')),
+            TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'), 'YYYY-MM-DD'),
             #{st02Seq},
             #{cm08Code},
             #{st02Lot},
@@ -267,7 +267,7 @@
             , #{qa07Lot}
             , #{qa07LotSeq}
             , #{qa07Status}
-            , sysdate
+            , SYSDATE
             , #{qa07Empno}
         )
     </insert>

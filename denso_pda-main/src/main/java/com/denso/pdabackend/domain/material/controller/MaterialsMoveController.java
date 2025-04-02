@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.denso.pdabackend.common.AuthenticationFacade;
 import com.denso.pdabackend.domain.material.dto.MaterialsMoveDto;
 import com.denso.pdabackend.domain.material.service.MaterialsMoveService;
-import com.denso.pdabackend.domain.output.dto.OutputSearchDto;
-import com.denso.pdabackend.domain.packaging.dto.AnomalyDto;
 import com.denso.pdabackend.response.ResponseEntityUtil;
 import com.denso.pdabackend.response.StatusCode;
 import com.denso.pdabackend.response.exception.BusinessException;
@@ -47,7 +45,6 @@ public class MaterialsMoveController {
 		
 		String company = userInfo.getCompany();
         String factory = userInfo.getFactory();
-        int empno = userInfo.getEmpNo();
 		
 		if (company == null) {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 조회할 수 없습니다.");
@@ -104,11 +101,13 @@ public class MaterialsMoveController {
     			info.setSt02Factory(factory);
     			info.setSt02Empno(empno);
     			info.setSt02Qrcode(StringUtils.nullString(params.get("st02Qrcode")));
+    			
+    			info.setStok( StringUtils.nullString(params.get("stok")) );
+    			info.setDist( StringUtils.nullString(params.get("dist")) );
 
     			MaterialsMoveDto.Request request = new MaterialsMoveDto.Request();
     			request.setSt02Company(auth.getUserInfo().getCompany());
     			request.setSt02Factory(auth.getUserInfo().getFactory());
-    			//request.setSt02Dat(info.getSt02Dat());
     			request.setSt02Qrcode( StringUtils.nullString(params.get("st02Qrcode")) );
     			
     			// 이미 등록된 이상처리 데이터인지 확인.

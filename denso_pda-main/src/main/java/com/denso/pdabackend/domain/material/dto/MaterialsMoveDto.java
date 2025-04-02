@@ -52,6 +52,9 @@ public class MaterialsMoveDto {
         private String st02Line;
         private int st02Moq;
         private String st02RequestNo;
+        
+        private String stok;
+        private String dist;
     }
 
     @Data

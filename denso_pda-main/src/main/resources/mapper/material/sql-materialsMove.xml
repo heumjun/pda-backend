@@ -38,7 +38,7 @@
             FROM TB_ST_03
             WHERE ST03_COMPANY = #{st02Company}
               AND ST03_FACTORY = #{st02Factory}
-              AND TO_CHAR(ST03_DAT, 'YYYY-MM-DD') = #{st02Dat}
+              AND TO_CHAR(ST03_DAT, 'YYYY-MM-DD') = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
         </selectKey>
 
         INSERT INTO TB_ST_03 (
@@ -70,18 +70,18 @@
         ) VALUES (
               #{st02Company}
             , #{st02Factory}
-            , CONCAT(REPLACE(#{st02Dat},'-',''), LPAD(#{st02Seq},5,'0'))
-            , #{st02Dat}
+            , CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'), LPAD(#{st02Seq},5,'0'))
+            , TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'), 'YYYY-MM-DD')
             , #{st02Cus}
             , #{st02Seq}
             , #{st02Code}
-            , CASE WHEN #{st02Lot} = '' THEN CONCAT(REPLACE(#{st02Dat},'-',''), LPAD(#{st02Seq},5,'0')) ELSE #{st02Lot} END
+            , CASE WHEN #{st02Lot} = '' THEN CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'), LPAD(#{st02Seq},5,'0')) ELSE #{st02Lot} END
             , #{st02Gbn}
             , #{st02Ipunt}
             , #{st02Ipqty}
             , #{st02Rmk}
-            , #{st02CurStok}
-            , #{st02CurDist}
+            , #{st02Stok}
+            , #{st02Dist}
             , SYSDATE
             , #{st02Empno}
             , NULL
@@ -104,7 +104,7 @@
 	        FROM tb_st_02
 	        WHERE st02_company = #{st02Company}
 	        AND st02_factory = #{st02Factory}
-	        AND TO_CHAR(st02_dat, 'YYYY-MM-DD') = #{st02Dat}
+	        AND TO_CHAR(st02_dat, 'YYYY-MM-DD') = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
         </selectKey>
     	
         INSERT INTO TB_ST_02 (
@@ -134,8 +134,8 @@
         ) VALUES (
             #{st02Company},
             #{st02Factory},
-            CONCAT(REPLACE(#{st02Dat},'-',''),lpad(#{st02Seq},5,'0')),
-            #{st02Dat},
+            CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'),lpad(#{st02Seq},5,'0')),
+            TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'), 'YYYY-MM-DD'),
             #{st02Seq},
             #{st02Code},
             #{st02Lot},
@@ -148,10 +148,10 @@
             #{st02Ipqty},
             #{st02Qrcode},
             #{st02Status},
-            #{st02Stok},
-            #{st02Dist},
+            #{stok},
+            #{dist},
             '',
-            0,
+            1,
             SYSDATE,
             #{st02Empno},
             #{st02Moq}

@@ -98,7 +98,7 @@
             #{company},
             #{factory},
             CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'), LPAD(#{st02Seq}, 5, '0')),
-            SYSDATE,
+            TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'), 'YYYY-MM-DD'),
             #{st02Seq},
             #{cm08Code},
             #{st02Lot},

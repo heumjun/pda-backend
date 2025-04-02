@@ -77,7 +77,7 @@
 			  #{st08Company}
 			, #{st08Factory}
 			, CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'), LPAD(#{st08Seq}, 5, '0'))
-			, SYSDATE
+			, TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'), 'YYYY-MM-DD')
 			, #{st08Seq}
 			, #{st08Gbn}
 			, #{st08Pgbn}

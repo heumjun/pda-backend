@@ -1,6 +1,5 @@
 package com.denso.pdabackend.domain.material.service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,9 +10,7 @@ import com.denso.pdabackend.domain.material.dto.MaterialsMoveDto.Info;
 import com.denso.pdabackend.domain.material.dto.MaterialsMoveDto.Request;
 import com.denso.pdabackend.domain.material.mapper.MaterialsMoveMapper;
 import com.denso.pdabackend.domain.output.mapper.OutputMapper;
-import com.denso.pdabackend.domain.warehousing.dto.InspectionConfDto;
 import com.denso.pdabackend.domain.warehousing.dto.StockDto;
-import com.denso.pdabackend.utils.MapUtils;
 
 import lombok.RequiredArgsConstructor;
 
