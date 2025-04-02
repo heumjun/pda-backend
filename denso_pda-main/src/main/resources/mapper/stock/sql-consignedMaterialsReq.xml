@@ -22,6 +22,9 @@
 		AND MF15.MF15_CUS = CM01.CM01_CODE
 		WHERE MF15.MF15_COMPANY = #{mf15Company}
 		AND MF15.MF15_FACTORY = #{mf15Factory}
+		<if test="mf15No != null and !mf15No.equalsIgnoreCase('')" >
+			AND MF15.MF15_NO = #{mf15No}
+		</if>
 		ORDER BY MF15.MF15_NO DESC, MF15.MF15_DAT DESC, MF15.MF15_CUS DESC
 	</select>
 	

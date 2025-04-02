@@ -24,6 +24,7 @@ public class ConsignedMaterialsReqDto {
     	
         private String mf15Company;
         private String mf15Factory;
+        private String mf15No;
 
     }
 
