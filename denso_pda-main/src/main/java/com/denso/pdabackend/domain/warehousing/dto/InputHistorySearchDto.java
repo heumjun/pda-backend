@@ -67,6 +67,8 @@ public class InputHistorySearchDto {
 
         // 입고이력조회 - head
         private String pst02No;
+        
+        private String st02DefLot;
 	}
 
 	@Data

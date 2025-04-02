@@ -89,7 +89,7 @@
     <update id="updateOfInputHistory" parameterType="com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto">
     	/** [sql-warehousing.xml] WarehousingMapper.updateOfInputHistory **/
         UPDATE tb_st_02
-        SET st02_dat = #{st02Dat},
+        SET st02_dat = TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'), 'YYYY-MM-DD'),
             st02_cus = #{st02Cus},
             st02_gbn = #{st02Gbn},
             st02_qrcode = #{st02Qrcode},
@@ -144,7 +144,7 @@
 	         st01_factory,
 	         st01_gbn,
 	         st01_lot,
-	          st01_lot_seq,
+	         st01_lot_seq,
 	         st01_code,
 	         st01_stok,
 	         st01_district,
@@ -180,43 +180,61 @@
             st02_lot_seq,
             st02_gbn,
             st02_cus,
+            st02_line,
             st02_pno,
             st02_purno,
+            st02_request_no,
             st02_ipunt,
             st02_ipqty,
+            st02_moq,
             st02_qrcode,
             st02_status,
             st02_stok,
             st02_dist,
             st02_opunt,
             st02_qty,
+	        <if test="st02PreLot != null and !st02PreLot.equalsIgnoreCase('')" >
+	            st02_pre_lot,
+	        </if>
+	        <if test="st02PreLotSeq != null and st02PreLotSeq != '' and st02PreLotSeq != 0" >
+	            st02_pre_lot_seq,
+	        </if>
+            st02_def_lot,
             st02_indte,
-            st02_empno,
-            st02_moq
+            st02_empno
         ) VALUES (
             #{company},
             #{factory},
-            CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'), lpad(#{st02Seq},5,'0')),
+            CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'), LPAD(#{st02Seq},5,'0')),
             TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'), 'YYYY-MM-DD'),
             #{st02Seq},
             #{cm08Code},
             #{st02Lot},
             #{st02LotSeq},
-            'PU',
+            #{st02Gbn},
             #{st02Cus},
+            #{st02Line},
             #{st02Pno},
-            CONCAT(#{st02Pno},lpad(#{st02Seq},5,'0')),
+            CASE WHEN #{st02Pno} = '' THEN '' ELSE CONCAT(#{st02Pno},lpad(#{st02Seq},5,'0')) END,
+            #{st02RequestNo},
             #{st02Ipunt},
             #{st02Ipqty},
+            #{st02Moq},
             #{st02Qrcode},
             #{st02Status},
             #{st02Stok},
             #{st02Dist},
             '',
             0,
-            sysdate,
-            #{st02Empno},
-            #{st02Moq}
+	        <if test="st02PreLot != null and !st02PreLot.equalsIgnoreCase('')" >
+	            #{st02PreLot},
+	        </if>
+	        <if test="st02PreLotSeq != null and st02PreLotSeq != '' and st02PreLotSeq != 0" >
+	            #{st02PreLotSeq},
+	        </if>
+            #{st02DefLot},
+            sysdate + 1/(24*60*60),
+            #{st02Empno}
         )
     </insert>
     
