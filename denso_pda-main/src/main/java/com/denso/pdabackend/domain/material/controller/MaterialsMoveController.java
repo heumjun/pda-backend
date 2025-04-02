@@ -37,9 +37,9 @@ public class MaterialsMoveController {
 	
 	private final MaterialsMoveService materialsMoveService; 
 	
-	@GetMapping
+	@PostMapping("getMaterialsMove")
 	@Operation(summary = "재고이동 정보", description = "재고이동 정보")
-	public ResponseEntity<?> getMaterialsMove(MaterialsMoveDto.Request request) throws Exception {
+	public ResponseEntity<?> getMaterialsMove(@RequestBody Map<String,Object> params) throws Exception {
 
 		UserDto userInfo = auth.getUserInfo();
 		
@@ -54,15 +54,12 @@ public class MaterialsMoveController {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 조회할 수 없습니다.");
         }
 		
-		Map<String,Object> data = new HashMap<String,Object>();
+		params.put("company", company);
+		params.put("factory", factory);
 		
-		request.setSt02Company(company);
-		request.setSt02Factory(factory);
-		
-		Map<String,Object> materialsMove =  materialsMoveService.getMaterialsMove(request);
-		data.put("materialsMove", materialsMove);
+		Map<String,Object> materialsMove =  materialsMoveService.getMaterialsMove(params);
 
-		return ResponseEntityUtil.ok(data);
+		return ResponseEntityUtil.ok(materialsMove);
 	}
 	
 	/**

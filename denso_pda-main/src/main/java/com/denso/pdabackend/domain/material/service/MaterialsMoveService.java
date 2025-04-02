@@ -21,8 +21,8 @@ public class MaterialsMoveService {
     private final OutputMapper outputMapper;
     private final MaterialsMoveMapper materialsMoveMapper;
 
-	public Map<String, Object> getMaterialsMove(Request request) throws Exception {
-		return materialsMoveMapper.getMaterialsMove(request);
+	public Map<String, Object> getMaterialsMove(Map<String,Object> params) throws Exception {
+		return materialsMoveMapper.getMaterialsMove(params);
 	}
 
 	public Map<String, Object> getSeq(Request request) throws Exception {

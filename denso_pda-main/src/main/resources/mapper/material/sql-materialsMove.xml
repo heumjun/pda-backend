@@ -3,8 +3,7 @@
 	
 <mapper namespace="com.denso.pdabackend.domain.material.mapper.MaterialsMoveMapper">
 	
-	<select id="getMaterialsMove" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsMoveDto$Request" 
-		resultType="com.denso.pdabackend.response.ResultMap">
+	<select id="getMaterialsMove" parameterType="java.util.Map" resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-materialsMove.xml] MaterialsMoveMapper.getMaterialsMove **/
 		SELECT ST02.ST02_CODE AS ST02_CODE
 			 , CM08.CM08_NAME AS ST02_NAME
@@ -26,12 +25,12 @@
 		AND ST02.ST02_COMPANY 	= CM08.CM08_COMPANY 
 		AND ST02.ST02_FACTORY 	= CM08.CM08_FACTORY 
 		AND ST02.ST02_CODE 	  	= CM08.CM08_CODE
-		AND ST02.ST02_COMPANY 	= #{st02Company}
-		AND ST02.ST02_FACTORY 	= #{st02Factory}
+		AND ST02.ST02_COMPANY 	= #{company}
+		AND ST02.ST02_FACTORY 	= #{factory}
 		<if test="st02Qrcode != null and !st02Qrcode.equalsIgnoreCase('')" >
 			AND ST02.ST02_QRCODE = #{st02Qrcode}
 		</if>
-		<if test="st02LotSeq != null" >
+		<if test="st02LotSeq != null and !st02LotSeq.equalsIgnoreCase('')" >
 			AND ST02.ST02_LOT_SEQ = #{st02LotSeq}
 		</if>
     </select>

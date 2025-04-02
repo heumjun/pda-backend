@@ -10,7 +10,7 @@ import com.denso.pdabackend.domain.material.dto.MaterialsMoveDto.Request;
 @Mapper
 public interface MaterialsMoveMapper {
 
-	Map<String, Object> getMaterialsMove(Request request) throws Exception;
+	Map<String, Object> getMaterialsMove(Map<String,Object> params) throws Exception;
 
 	Map<String, Object> getSeq(Request request) throws Exception;
 
