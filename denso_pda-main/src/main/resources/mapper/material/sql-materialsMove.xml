@@ -35,6 +35,8 @@
 		<if test="st02LotSeq != null and !st02LotSeq.equalsIgnoreCase('')" >
 			AND ST02.ST02_LOT_SEQ = #{st02LotSeq}
 		</if>
+		AND ROWNUM = 1
+		ORDER BY ST02.ST02_NO DESC
     </select>
     
 	<insert id="insertOfOutputHistory" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsMoveDto$Info">
