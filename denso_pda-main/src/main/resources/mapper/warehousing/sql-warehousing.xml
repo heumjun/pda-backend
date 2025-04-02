@@ -206,7 +206,7 @@
             'PU',
             #{st02Cus},
             #{st02Pno},
-            CONCAT(#{st02Pno},lpad(#{st02Seq},5,'0')),
+            CASE WHEN #{st02Pno} = '' THEN '' ELSE CONCAT(#{st02Pno},lpad(#{st02Seq},5,'0')) END,
             #{st02Ipunt},
             #{st02Ipqty},
             #{st02Qrcode},
@@ -215,9 +215,9 @@
             #{st02Dist},
             '',
             0,
-            sysdate,
+            SYSDATE,
             #{st02Empno},
-            #{st02Moq}
+            #{st02Moq},
             #{st02DefLot}
         )
     </insert>

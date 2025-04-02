@@ -90,7 +90,7 @@ public class WarehousingService {
 		String formatedNow = now.format(formatter);
 		
 		insertList.forEach(item -> {
-
+			
 			try{
 				// seq 가져오기
 				HashMap hashMap = new HashMap();
@@ -138,6 +138,7 @@ public class WarehousingService {
 				// 재고 테이블 업데이트(+)
 				warehousingMapper.insertOfLotStock(stockInfo);
 				// 입고 테이블 등록
+				
 				warehousingMapper.insertOfInputHistory(item);
 
 				// 유무검사 여부가 Y인 경우 tb_qa_05 테이블의 기간을 확인하여 기간안에 들어간 경우
