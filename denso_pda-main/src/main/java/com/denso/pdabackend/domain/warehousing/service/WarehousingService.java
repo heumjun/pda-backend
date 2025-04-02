@@ -1,5 +1,7 @@
 package com.denso.pdabackend.domain.warehousing.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,6 +82,13 @@ public class WarehousingService {
 
 	public boolean insertOfInputHistory(List<InputHistorySearchDto.Info> insertList) {
 
+		// 현재 날짜 구하기        
+		LocalDate now = LocalDate.now();         
+		// 포맷 정의        
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");         
+		// 포맷 적용        
+		String formatedNow = now.format(formatter);
+		
 		insertList.forEach(item -> {
 
 			try{
@@ -89,7 +98,6 @@ public class WarehousingService {
 				hashMap.put("factory", item.getFactory());
 				hashMap.put("st02Pno", item.getSt02Pno());
 				hashMap.put("cm08Code",item.getCm08Code());
-				hashMap.put("st02Dat", item.getSt02Dat());
 
 				Map<String, Object> seq = warehousingMapper.getSeq(hashMap);
 				String st02Seq = String.valueOf(seq.get("st02Seq"));
@@ -100,7 +108,7 @@ public class WarehousingService {
 				if(item.getSt02Lot() != null){
 					lot = item.getSt02Lot();
 				} else {
-					lot = item.getCm08Gbn().substring(0,2) + item.getCm08Dgbn().substring(0,4) + item.getSt02Dat().replace("-","");
+					lot = item.getCm08Gbn().substring(0,2) + item.getCm08Dgbn().substring(0,4) + formatedNow;
 				}
 
 				// 재고 테이블 등록 - tb_st_01 테이블
@@ -146,7 +154,7 @@ public class WarehousingService {
 						inspectionConf.setQa05No(String.valueOf(chk.get("qa05No")));
 						inspectionConf.setQa07Code(String.valueOf(chk.get("qa05Code")));
 						inspectionConf.setQa07Gbn("");
-						inspectionConf.setQa07Dat(String.valueOf(item.getSt02Dat()));
+						inspectionConf.setQa07Dat(formatedNow);
 						inspectionConf.setQa07Status(String.valueOf(item.getSt02Status()));
 						inspectionConf.setQa07No(null);
 						inspectionConf.setQa07Lot(lot);

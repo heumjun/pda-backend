@@ -124,7 +124,7 @@
         FROM tb_st_02
         WHERE st02_company = #{company}
           AND st02_factory = #{factory}
-          AND TO_CHAR(st02_dat, 'YYYY-MM-DD') = #{st02Dat}
+          AND TO_CHAR(st02_dat, 'YYYY-MM-DD') = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
     </select>
     
     <!-- 입고 -> 새로운 LOT SEQ 생성 -->
@@ -241,7 +241,7 @@
             from tb_qa_07
             where qa07_company = #{qa07Company}
             and qa07_factory = #{qa07Factory}
-            and qa07_dat = REPLACE(#{qa07Dat}, '-', '')
+            and TO_CHAR(qa07_dat, 'YYYY-MM-DD') = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
         </selectKey>
         INSERT INTO tb_qa_07 (
             qa07_company
