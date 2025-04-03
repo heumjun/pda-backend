@@ -5,13 +5,252 @@
 	
 	<select id="getComboCusList" parameterType="com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsRegDto$Request"
 		resultType="com.denso.pdabackend.response.ResultMap">
-		/** [sql-consignedMaterialsReg.xml] ConsignedMaterialsOutputMapper.getComboCusList **/
+		/** [sql-consignedMaterialsOutput.xml] ConsignedMaterialsOutputMapper.getComboCusList **/
 		SELECT * 
 		FROM TB_CM_01
 		WHERE 1=1
 		AND CM01_COMPANY = #{company}
 		AND CM01_FACTORY = #{factory}
 		AND CM01_LOCK = 'Y'
+		ORDER BY CM01_NAME
 	</select>	
+	
+	<select id="getConsignedMaterialsOutput" parameterType="java.util.Map" resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-consignedMaterialsOutput.xml] ConsignedMaterialsOutputMapper.getConsignedMaterialsOutput **/
+		SELECT ST02.ST02_CODE AS ST02_CODE
+			 , CM08.CM08_NAME AS ST02_NAME
+			 , ST02.ST02_QRCODE AS ST02_QRCODE
+			 , ST02.ST02_IPQTY AS ST02_QTY
+			 , ST02.ST02_STOK AS ST02_STOK
+			 , ST02.ST02_DIST AS ST02_DIST
+			 , ST02.ST02_STOK AS ST02_CUR_STOK
+			 , ST02.ST02_DIST AS ST02_CUR_DIST
+			 , ST02.ST02_LOT 
+			 , ST02.ST02_LOT_SEQ 
+			 , ST02.ST02_IPUNT
+			 , ST02.ST02_IPQTY
+			 , CM08.CM08_CUS AS ST02_CUS
+			 , CM01.CM01_NAME AS ST02_CUS_NAME
+			 , ST02.ST02_DAT
+			 , CM08.CM08_MOQ AS ST02_MOQ
+			 , ST02.ST02_DEF_LOT
+			 , CM08.CM08_DGBN AS ST02_DGBN
+		FROM TB_ST_02 ST02
+			,TB_CM_08 CM08
+			,TB_CM_01 CM01
+		WHERE 1=1 
+		AND ST02.ST02_COMPANY 	= CM08.CM08_COMPANY 
+		AND ST02.ST02_FACTORY 	= CM08.CM08_FACTORY 
+		AND ST02.ST02_CODE 	  	= CM08.CM08_CODE
+		AND CM08.CM08_COMPANY 	= CM01.CM01_COMPANY 
+		AND CM08.CM08_FACTORY 	= CM01.CM01_FACTORY 
+		AND CM08.CM08_CUS 	  	= CM01.CM01_CODE
+		AND ST02.ST02_COMPANY 	= #{company}
+		AND ST02.ST02_FACTORY 	= #{factory}
+		<if test="st02Qrcode != null and !st02Qrcode.equalsIgnoreCase('')" >
+			AND ST02.ST02_QRCODE = #{st02Qrcode}
+		</if>
+		<if test="st02LotSeq != null and !st02LotSeq.equalsIgnoreCase('')" >
+			AND ST02.ST02_LOT_SEQ = #{st02LotSeq}
+		</if>
+		AND ROWNUM = 1
+		ORDER BY ST02.ST02_NO DESC
+    </select>
+    
+    <select id="createMf15No" parameterType="com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsOutputDto$Request" 
+    	resultType="com.denso.pdabackend.response.ResultMap">
+    	/** [sql-consignedMaterialsOutput.xml] ConsignedMaterialsOutputMapper.createMf15No **/
+    	SELECT NVL(MAX(MF15_SEQ)+1,1) AS MF15_SEQ
+			 , CONCAT( TO_CHAR(SYSDATE, 'YYYYMMDD'), LPAD(NVL(MAX(MF15_SEQ)+1,1),5,'0') ) AS MF15_NO
+		FROM TB_MF_15
+		WHERE MF15_COMPANY = #{company}
+		AND MF15_FACTORY = #{factory}
+		AND TO_CHAR(MF15_DAT, 'YYYY-MM-DD') = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+	</select>	
+	
+	<!-- 사급 마스터 등록 -->
+	<insert id="insertConsignedMaster" parameterType="com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsOutputDto$MasterInfo">
+		/** [sql-consignedMaterialsOutput.xml] ConsignedMaterialsOutputMapper.insertConsignedMaster **/
+		INSERT INTO TB_MF_15
+		(
+			MF15_COMPANY
+		  , MF15_FACTORY
+		  , MF15_NO
+		  , MF15_DAT
+		  , MF15_SEQ
+		  , MF15_CUS
+		  , MF15_INDTE
+		  , MF15_EMPNO
+		)
+		VALUES(
+			#{mf15Company}
+		  , #{mf15Factory}
+		  , #{mf15No}
+		  , TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'), 'YYYY-MM-DD')
+		  , #{mf15Seq}
+		  , #{mf15Cus}
+		  , SYSDATE
+		  , #{mf15EmpNo}
+		)
+	</insert>
+	
+	<!-- 품목 LOT 조회  -->
+	<select id="getProdStockList" parameterType="com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsRegDto$Lot"
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-consignedMaterialsOutput.xml] ConsignedMaterialsOutputMapper.getProdStockList **/
+		select st01_lot,
+				st02_dat,
+				st01_code,
+				cm08_name,
+				cm08_gbn,
+				cm08_dgbn,
+				st01_qty,
+				st01_unt,
+				st01_stok,
+				st01_district,
+				st01_lot_seq,
+				st02_qrcode,
+				st02_moq,
+				sum(st01.st01_qty) as st01_qty
+		from tb_st_01 st01
+		left join tb_cm_08 cm08
+			on cm08.cm08_company = st01.st01_company
+			and cm08.cm08_factory = st01.st01_factory
+			and cm08.cm08_code = st01.st01_code
+		left join tb_st_02 st02
+			on st02.st02_company = st01.st01_company
+			and st02.st02_factory = st01.st01_factory
+			and st02.st02_lot = st01.st01_lot
+			and st02.st02_lot_seq = st01.st01_lot_seq
+		where 1 = 1
+			and st01_company = #{company}
+			and st01_factory = #{factory}
+			and st01_code = #{st01Code}
+			and st01_qty  <![CDATA[>]]>  0
+		<if test="lot != null and !lot.equalsIgnoreCase('')" >
+			AND st01_lot = #{lot}
+		</if>
+		<if test="lotSeq != null and !lotSeq.equalsIgnoreCase('')" >
+			AND st01_lot_seq = #{lotSeq}
+		</if>
+		group by st01_lot,st02_dat,st01_code,cm08_name,cm08_gbn,cm08_dgbn,st01_qty,st01_unt,st01_stok,st01_district,st01_lot_seq,st02_qrcode,st02_moq
+		order by ST01_CODE, ST01_LOT, ST01_LOT_SEQ
+	</select>
+	
+	<!-- 사급 디테일 등록 -->
+	<insert id="insertConsignedDetail" parameterType="com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsOutputDto$DetailInfo">
+		/** [sql-consignedMaterialsOutput.xml] ConsignedMaterialsOutputMapper.insertConsignedDetail **/
+		<selectKey resultType="int" keyProperty="mf16Seq" order="BEFORE">
+            SELECT COALESCE(MAX(MF16_SEQ)+1,1) AS mf16_seq
+            FROM TB_MF_16
+            WHERE MF16_COMPANY = #{mf16Company}
+              AND MF16_FACTORY = #{mf16Factory}
+              AND MF16_HNO = #{mf16Hno}
+        </selectKey>
+		INSERT INTO TB_MF_16
+		(
+			MF16_COMPANY
+		  , MF16_FACTORY
+		  , MF16_HNO
+		  , MF16_NO
+		  , MF16_SEQ
+		  , MF16_CODE
+		  , MF16_QTY
+		  , MF16_GBN
+		  , MF16_INDTE
+		  , MF16_EMPNO
+		)
+		VALUES
+		(
+			#{mf16Company}
+		  , #{mf16Factory}
+		  , #{mf16Hno}
+		  , CONCAT(#{mf16Hno}, LPAD(#{mf16Seq}, 5, '0'))
+		  , #{mf16Seq}
+		  , #{mf16Code}
+		  , #{st02Moq}
+		  , 'G001' -- 이부분 다시
+		  , SYSDATE
+		  , #{mf16EmpNo}
+		)
+	</insert>
+	
+	<!-- 출고수량등록및변경 -->
+	<insert id="saveOfProductionOutput" parameterType="com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsOutputDto$DetailInfo">
+		/** [sql-consignedMaterialsOutput.xml] ConsignedMaterialsOutputMapper.saveOfProductionOutput **/
+		<selectKey resultType="com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsRegDto$Info" keyProperty="st03Seq,st03NoNew" order="BEFORE">
+			SELECT NVL(MAX(ST03_SEQ)+1,1) as st03_seq
+			     , concat(replace(TO_CHAR(SYSDATE, 'YYYY-MM-DD'),'-',''),lpad(NVL(max(st03_seq)+1,1),5,'0')) as st03_no_new
+			from tb_st_03
+			where 1 = 1
+			and TO_CHAR(ST03_INDTE, 'YYYYMMDD') = REPLACE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'), '-', '')
+			and st03_company = #{mf16Company}
+			and st03_factory = #{mf16Factory}
+		</selectKey>
+		MERGE INTO TB_ST_03 T1
+		USING DUAL
+		ON (
+			ST03_COMPANY = #{mf16Company}
+			AND ST03_FACTORY = #{mf16Factory}
+		    AND ST03_NO = #{st03No}
+		)
+		WHEN MATCHED THEN
+		UPDATE SET
+			ST03_QTY = #{mf16Qty}
+		WHEN NOT MATCHED THEN
+		INSERT
+		(
+			ST03_COMPANY,
+			ST03_FACTORY,
+			ST03_NO,
+			ST03_DAT,
+			ST03_SEQ,
+			ST03_CODE,
+			ST03_LOT,
+			ST03_LOT_SEQ,
+		    ST03_MOQ,
+		    ST03_QR,
+			ST03_GBN,
+			ST03_UNT,
+			ST03_QTY,
+			ST03_RMK,
+			ST03_STOK,
+		    ST03_DIST,
+			ST03_INDTE,
+			ST03_EMPNO,
+		    ST03_CUS,
+		    ST03_DGBN,
+		    ST03_SBNO
+		)
+		values
+		(
+			#{mf16Company},
+			#{mf16Factory},
+		    #{st03NoNew},
+			TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'), 'YYYY-MM-DD'),
+			#{st03Seq},
+			#{mf16Code},
+			#{st02Lot},
+			#{st02LotSeq},
+		    #{st02Moq},
+		    #{st02Qrcode},
+			'SB',
+			(SELECT CM08_OPUNT
+			 FROM TB_CM_08
+			 WHERE CM08_COMPANY = #{mf16Company}
+			 AND CM08_FACTORY = #{mf16Factory}
+			 AND CM08_CODE = #{mf16Code}
+			),
+			#{st02Qty},
+			'',
+			#{st02Stok},
+			#{st02Dist},
+			SYSDATE,
+			#{mf16EmpNo},
+			#{st03Cus},
+			#{st02Dgbn},
+			#{mf16Hno}
+		)
+	</insert>
 	
 </mapper> 

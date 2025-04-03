@@ -87,17 +87,7 @@ public class ConsignedMaterialsRegController {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 수정할 수 없습니다.");
         }
         
-        
-// 		if(params != null) {
-// 			for (ConsignedMaterialsRegDto.MasterInfo info : consignedMaterialsHead) {
-// 				info.setMf15Company(company);
-// 				info.setMf15Factory(factory);
-// 				info.setMf15Empno(userInfo.getEmpNo()); // 등록자
-// 				//info.setMf15UpdEmpno(userInfo.getEmpNo()); // 수정자
-// 			}
-// 		}
-        
-     // 공통정보 세팅 - 등록
+        // 공통정보 세팅 - 등록
         ConsignedMaterialsRegDto.MasterInfo masterInfo = new ConsignedMaterialsRegDto.MasterInfo();
         masterInfo.setMf15Company(company);
         masterInfo.setMf15Factory(factory);
