@@ -123,7 +123,6 @@ public class ConsignedMaterialsOutputService {
 	        }
 		
 		} catch(Exception e) {
-			e.printStackTrace();
             throw new BusinessException("사급등록에 실패하였습니다.");
         }
 		
