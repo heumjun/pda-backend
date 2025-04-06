@@ -6,7 +6,7 @@
 	<select id="getComboCusList" parameterType="com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsRegDto$Request"
 		resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-consignedMaterialsOutput.xml] ConsignedMaterialsOutputMapper.getComboCusList **/
-		SELECT * 
+		SELECT CM01_CODE, '[' || CM01_CODE  || '] ' || CM01_NAME AS CM01_NAME 
 		FROM TB_CM_01
 		WHERE 1=1
 		AND CM01_COMPANY = #{company}
@@ -30,7 +30,7 @@
 			 , ST02.ST02_IPUNT
 			 , ST02.ST02_IPQTY
 			 , CM08.CM08_CUS AS ST02_CUS
-			 , '[' || CM08.CM08_CUS  || '] ' || CM01.CM01_NAME AS ST02_CUS_NAME
+			 , CM01.CM01_NAME AS ST02_CUS_NAME
 			 , ST02.ST02_DAT
 			 , CM08.CM08_MOQ AS ST02_MOQ
 			 , ST02.ST02_DEF_LOT
