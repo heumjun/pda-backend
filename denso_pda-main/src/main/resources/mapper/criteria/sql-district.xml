@@ -19,17 +19,18 @@
             and cm16_company = #{company}
             and cm16_factory = #{factory}
         <if test="cm16Stok != null and !cm16Stok.equalsIgnoreCase('')" >
-            and cm16_stok LIKE CONCAT ('%',#{cm16Stok},'%')
+            and cm16_stok LIKE '%' || #{cm16Stok} || '%'
         </if>
         <if test="cm16Code != null and !cm16Code.equalsIgnoreCase('')" >
-            and cm16_code LIKE CONCAT ('%',#{cm16Code},'%')
+            and cm16_code LIKE '%' || #{cm16Code} || '%'
         </if>
         <if test="cm16Name != null and !cm16Name.equalsIgnoreCase('')" >
-            and cm16_name LIKE CONCAT ('%',#{cm16Name},'%')
+            and cm16_name LIKE '%' || #{cm16Name} || '%'
         </if>
         <if test="cm16Lock != null and !cm16Lock.equalsIgnoreCase('')" >
             and cm16_lock = #{cm16Lock}
         </if>
+        ORDER BY CM16.CM16_CODE
     </select>
 
     <!-- 구역관리 단건 조회 -->
