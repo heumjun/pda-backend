@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.cigma.mapper.MaterialsReleaseDmesMapper">
+
+	<!-- 출고이력 등록 시그마 연계전 LOTDB-->
+	<insert id="insertDmes18" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto$Info">
+		/** [sql-materialsRelease.xml] MaterialsReleaseDmesMapper.insertDmes18 **/
+	    INSERT INTO DMES_18 (
+	        CHLLOT
+	        , CHLRTG
+	        , CHLDTS
+	        , CHLLIN
+	        , CHLHOU
+	        , CHLPNS
+	        , CHLQYS
+	        , CHLIDS
+	    ) VALUES (
+	        CASE WHEN #{st02Lot} = '' THEN CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'), LPAD(#{st02Seq},5,'0')) ELSE #{st02Lot} END
+	        , 'I'
+	        , REPLACE(#{st03Dat},'-','')
+	        , #{line}
+	        , '1'
+	        , #{st02Code}
+	        , #{st02Moq}
+	        , 'LOTMGR'
+	    )
+	</insert>
+
+</mapper> 

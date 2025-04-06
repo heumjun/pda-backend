@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 	
-<mapper namespace="com.denso.pdabackend.domain.material.mapper.MaterialsReleaseMapper">
+<mapper namespace="com.denso.pdabackend.domain.material.mapper2.MaterialsReleaseDmesMapper">
 	
 	<select id="getMaterialsRelease" parameterType="java.util.Map" resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-materialsRelease.xml] MaterialsReleaseMapper.getMaterialsRelease **/
@@ -40,15 +40,24 @@
 		ORDER BY ST02.ST02_NO DESC
     </select>
     
+    <insert id="getSt02Seq" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto$Info">
+    	 SELECT COALESCE(MAX(ST03_SEQ)+1,1) AS ST02_SEQ
+           FROM TB_ST_03
+           WHERE ST03_COMPANY = #{st02Company}
+             AND ST03_FACTORY = #{st02Factory}
+             AND TO_CHAR(ST03_DAT, 'YYYY-MM-DD') = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+    </insert>
+    
+    
 	<insert id="insertOfOutputHistory" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto$Info">
     	/** [sql-materialsRelease.xml] MaterialsReleaseMapper.insertOfOutputHistory **/
-        <selectKey resultType="int" keyProperty="st02Seq" order="BEFORE">
+        <!-- <selectKey resultType="int" keyProperty="st02Seq" order="BEFORE">
             SELECT COALESCE(MAX(ST03_SEQ)+1,1) AS ST02_SEQ
             FROM TB_ST_03
             WHERE ST03_COMPANY = #{st02Company}
               AND ST03_FACTORY = #{st02Factory}
               AND TO_CHAR(ST03_DAT, 'YYYY-MM-DD') = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
-        </selectKey>
+        </selectKey> -->
 
         INSERT INTO TB_ST_03 (
             ST03_COMPANY

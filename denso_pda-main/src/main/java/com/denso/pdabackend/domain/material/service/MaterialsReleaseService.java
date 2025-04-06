@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import com.denso.pdabackend.domain.cigma.mapper.MaterialsReleaseDmesMapper;
 import com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto.Info;
 import com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto.Request;
 import com.denso.pdabackend.domain.material.mapper.MaterialsReleaseMapper;
@@ -22,6 +23,7 @@ public class MaterialsReleaseService {
     private final OutputMapper outputMapper;
     private final SmdInputMapper smdInputMapper;
     private final MaterialsReleaseMapper materialsReleaseMapper;
+    private final MaterialsReleaseDmesMapper materialsReleaseDmesMapper;
 
 	public Map<String, Object> getMaterialsRelease(Map<String,Object> params) throws Exception {
 		return materialsReleaseMapper.getMaterialsRelease(params);
@@ -56,7 +58,13 @@ public class MaterialsReleaseService {
                 outputMapper.updateOfPdStock(stockInfo);
 
                 // 출고 테이블 등록
+                int st02Seq = materialsReleaseMapper.getSt02Seq(item);
+                item.setSt02Seq(st02Seq);
+                
                 materialsReleaseMapper.insertOfOutputHistory(item);
+                
+                // 출고이력 등록 시그마 연계전 LOTDB
+                materialsReleaseDmesMapper.insertDmes18(item);
 
             } catch(Exception e) {
                 e.printStackTrace();

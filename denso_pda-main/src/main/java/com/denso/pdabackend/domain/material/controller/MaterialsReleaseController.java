@@ -115,7 +115,7 @@ public class MaterialsReleaseController {
         	
         	// 출고 히스토리 등록 및 재고수량 감소
 			materialsReleaseService.insertOfOutputHistory(insertList);
-        	
+			
         	// 입고 히스토리 등록 및 재고수량 증가
 			materialsReleaseService.insertOfInputHistory(insertList);
         	

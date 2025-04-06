@@ -16,8 +16,11 @@ public interface MaterialsReleaseMapper {
 
 	Map<String, Object> getDuplicationMaterialsRelease(Request request) throws Exception;
 
+	int getSt02Seq(Info item) throws Exception;
+	
 	boolean insertOfOutputHistory(Info item) throws Exception;
 
 	boolean insertOfInputHistory(Info item) throws Exception;
+
 
 }
