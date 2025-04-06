@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 	
-<mapper namespace="com.denso.pdabackend.domain.material.mapper.MaterialsMoveMapper">
+<mapper namespace="com.denso.pdabackend.domain.material.mapper.MaterialsReleaseMapper">
 	
-	<select id="getMaterialsMove" parameterType="java.util.Map" resultType="com.denso.pdabackend.response.ResultMap">
-		/** [sql-materialsMove.xml] MaterialsMoveMapper.getMaterialsMove **/
+	<select id="getMaterialsRelease" parameterType="java.util.Map" resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-materialsRelease.xml] MaterialsReleaseMapper.getMaterialsRelease **/
 		SELECT ST02.ST02_CODE AS ST02_CODE
 			 , CM08.CM08_NAME AS ST02_NAME
 			 , ST02.ST02_QRCODE AS ST02_QRCODE
@@ -40,8 +40,8 @@
 		ORDER BY ST02.ST02_NO DESC
     </select>
     
-	<insert id="insertOfOutputHistory" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsMoveDto$Info">
-    	/** [sql-materialsMove.xml] MaterialsMoveMapper.insertOfOutputHistory **/
+	<insert id="insertOfOutputHistory" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto$Info">
+    	/** [sql-materialsRelease.xml] MaterialsReleaseMapper.insertOfOutputHistory **/
         <selectKey resultType="int" keyProperty="st02Seq" order="BEFORE">
             SELECT COALESCE(MAX(ST03_SEQ)+1,1) AS ST02_SEQ
             FROM TB_ST_03
@@ -107,8 +107,8 @@
         )
     </insert>  
     
-    <insert id="insertOfInputHistory" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsMoveDto$Info">
-    	/** [sql-materialsMove.xml] MaterialsMoveMapper.insertOfInputHistory **/
+    <insert id="insertOfInputHistory" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto$Info">
+    	/** [sql-materialsRelease.xml] MaterialsReleaseMapper.insertOfInputHistory **/
     	
     	<selectKey resultType="int" keyProperty="st02Seq" order="BEFORE">
 	    	SELECT COALESCE(MAX(st02_seq)+1,1) AS st02_seq
@@ -143,6 +143,7 @@
             ST02_EMPNO,
             ST02_MOQ,
             ST02_DEF_LOT
+            ST02_LINE
         ) VALUES (
             #{st02Company},
             #{st02Factory},
@@ -168,6 +169,7 @@
             #{st02Empno},
             #{st02Moq},
             #{st02DefLot}
+            #{line}
         )
     </insert>
 
