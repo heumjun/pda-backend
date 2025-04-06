@@ -81,6 +81,7 @@
 		  , MF15_CUS
 		  , MF15_INDTE
 		  , MF15_EMPNO
+		  , MF15_REQUESTNO
 		)
 		VALUES(
 			#{mf15Company}
