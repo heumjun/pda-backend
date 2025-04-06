@@ -17,6 +17,7 @@ public class ConsignedMaterialsOutputDto {
 		private String mf15Company;   	// 회사
 		private String mf15Factory;   	// 공장
 		private String mf15No;        	// 사급지시서번호
+		private String mf15Requestno;   // 사급지시서번호
 		private int mf15Seq;      		// 순번
 		private String mf15Cus;       	// 제조사코드
 		private int mf15EmpNo;       	// 로그인 사용자

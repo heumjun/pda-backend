@@ -125,6 +125,7 @@ public class ConsignedMaterialsOutputController {
         masterInfo.setMf15EmpNo(empNo);
         masterInfo.setMf15Cus( StringUtils.nullString(params.get("cusCode")) );
         masterInfo.setMf15No( StringUtils.nullString(masterMap.get("mf15No")) );
+        masterInfo.setMf15Requestno( StringUtils.nullString(masterMap.get("mf15Requestno")) );
         masterInfo.setMf15Seq( Integer.parseInt(StringUtils.nullString(masterMap.get("mf15Seq"))) );
 
         // 사급출고 상세 정보 세팅

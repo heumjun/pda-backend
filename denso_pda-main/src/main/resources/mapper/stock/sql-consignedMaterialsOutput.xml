@@ -91,6 +91,7 @@
 		  , #{mf15Cus}
 		  , SYSDATE
 		  , #{mf15EmpNo}
+		  , #{mf15Requestno}
 		)
 	</insert>
 	
