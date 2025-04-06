@@ -18,7 +18,7 @@
 	    ) VALUES (
 	        CASE WHEN #{st02Lot} = '' THEN CONCAT(TO_CHAR(SYSDATE, 'YYYYMMDD'), LPAD(#{st02Seq},5,'0')) ELSE #{st02Lot} END
 	        , 'I'
-	        , REPLACE(#{st03Dat},'-','')
+	        , TO_CHAR(SYSDATE, 'YYYYMMDD')
 	        , #{line}
 	        , '1'
 	        , #{st02Code}

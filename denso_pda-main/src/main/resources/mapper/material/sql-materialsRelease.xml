@@ -40,13 +40,13 @@
 		ORDER BY ST02.ST02_NO DESC
     </select>
     
-    <insert id="getSt02Seq" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto$Info">
+    <select id="getSt02Seq" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto$Info" resultType="int">
     	 SELECT COALESCE(MAX(ST03_SEQ)+1,1) AS ST02_SEQ
            FROM TB_ST_03
            WHERE ST03_COMPANY = #{st02Company}
              AND ST03_FACTORY = #{st02Factory}
              AND TO_CHAR(ST03_DAT, 'YYYY-MM-DD') = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
-    </insert>
+    </select>
     
     
 	<insert id="insertOfOutputHistory" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto$Info">
@@ -151,7 +151,7 @@
             ST02_INDTE,
             ST02_EMPNO,
             ST02_MOQ,
-            ST02_DEF_LOT
+            ST02_DEF_LOT,
             ST02_LINE
         ) VALUES (
             #{st02Company},
@@ -177,7 +177,7 @@
             SYSDATE,
             #{st02Empno},
             #{st02Moq},
-            #{st02DefLot}
+            #{st02DefLot},
             #{line}
         )
     </insert>
