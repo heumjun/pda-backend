@@ -3,6 +3,30 @@
 	
 <mapper namespace="com.denso.pdabackend.domain.cigma.mapper.CigmaInterfaceMapper">
 
+	<!-- 입고이력 등록 시그마 연계전 작업중 -->
+	<insert id="insertDmes16" parameterType="com.kdatalab.mes.material.dto.InputHistorySearchDto$Info">
+		INSERT INTO DMES_16 (
+							  IPLOT
+							, IPRTG
+							, TRNDT
+							, PSPNO
+							, HOUSE
+							, INPGU
+							, TRQTY
+							, VNDNR
+		) SELECT
+			LOT_ID
+			   , 'I'
+			   , REPLACE(#{st02Dat},'-','')
+			   , MAT_ID
+			   , '1'
+			   , '11'
+			   , QTY_1
+			   , VENDOR_ID
+			   , 'LOTMGR'
+		FROM COSPLOTHIS@TOMESMA WHERE DELIVERY_NO = #{st02Pno};
+	</insert>
+
 	<!-- 출고이력 등록 시그마 연계전 LOTDB-->
 	<insert id="insertDmes18" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto$Info">
 		/** [sql-cigmaInterface.xml] CigmaInterfaceMapper.insertDmes18 **/
