@@ -1,5 +1,6 @@
 package com.denso.pdabackend.domain.warehousing.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,8 +50,17 @@ public class WarehousingController {
 		params.setCompany(auth.getUserInfo().getCompany());
 		params.setFactory(auth.getUserInfo().getFactory());
 		
-		List<Map<String,Object>> warehousingList =  warehousingService.getWarehousingList(params);
+		String completeFlag = warehousingService.completeFlag(params);
+		
+		List<Map<String,Object>> warehousingList = new ArrayList<Map<String, Object>>();
+		
+		if (completeFlag.equals("N")) {
+			warehousingList =  warehousingService.getWarehousingList(params);
+		} else {
+			warehousingList =  warehousingService.getCompleteWarehousingList(params);
+		}
 		//data.put("puInfo", puInfo); // 발주번호 및 제조사 정보를 가져오기 위해서
+		data.put("completeFlag", completeFlag);
 		data.put("warehousingList", warehousingList);
 
 		return ResponseEntityUtil.ok(data);
@@ -115,7 +125,7 @@ public class WarehousingController {
 
 	@Operation(summary = "SCM라벨 품목정보", description = "SCM라벨 품목정보")
 	@GetMapping("/stock/getInputInfo")
-	public ResponseEntity<?> getInputInfo(StockDto.Request request) throws Exception{
+	public ResponseEntity<?> getInputInfo(StockDto.Request request) throws Exception {
 
 		Map<String,Object> data = new HashMap<String,Object>();
 

@@ -26,11 +26,19 @@ public class WarehousingService {
 
 	private final WarehousingMapper warehousingMapper;
 
-	public List<Map<String, Object>> getWarehousingList(WarehousingRequest params) {
+	public String completeFlag(WarehousingRequest params) throws Exception {
+		return warehousingMapper.completeFlag(params);
+	}
+	
+	public List<Map<String, Object>> getWarehousingList(WarehousingRequest params) throws Exception {
 		return warehousingMapper.getWarehousingList(params);
 	}
+	
+	public List<Map<String, Object>> getCompleteWarehousingList(WarehousingRequest params) throws Exception {
+		return warehousingMapper.getCompleteWarehousingList(params);
+	}
 
-	public Map<String, Object> getOutputChk(Request params) {
+	public Map<String, Object> getOutputChk(Request params) throws Exception {
 		List<Map<String,Object>> list = warehousingMapper.getOutputChk(params);
 		if(list.size() > 0) {
 			return list.get(0);
@@ -38,7 +46,7 @@ public class WarehousingService {
 		return null;
 	}
 
-	public boolean updateOfInputHistory(List<Info> updateList) {
+	public boolean updateOfInputHistory(List<Info> updateList) throws Exception {
 
 		if( updateList != null ) {
 			updateList.forEach(item -> {
@@ -72,7 +80,7 @@ public class WarehousingService {
 		return true;
 	}
 
-	public Map<String, Object> getInputHistorySearchInfo(InputHistorySearchDto.Request params) {
+	public Map<String, Object> getInputHistorySearchInfo(InputHistorySearchDto.Request params) throws Exception {
 		List<Map<String,Object>> list = warehousingMapper.getInputHistorySearchInfo(params);
 		if(list.size() > 0) {
 			return list.get(0);
@@ -80,7 +88,7 @@ public class WarehousingService {
 		return null;
 	}
 
-	public boolean insertOfInputHistory(List<InputHistorySearchDto.Info> insertList) {
+	public boolean insertOfInputHistory(List<InputHistorySearchDto.Info> insertList) throws Exception {
 
 		// 현재 날짜 구하기        
 		LocalDate now = LocalDate.now();         
@@ -93,7 +101,7 @@ public class WarehousingService {
 			
 			try{
 				// seq 가져오기
-				HashMap hashMap = new HashMap();
+				HashMap<String, Object> hashMap = new HashMap<String, Object>();
 				hashMap.put("company", item.getCompany());
 				hashMap.put("factory", item.getFactory());
 				hashMap.put("st02Pno", item.getSt02Pno());
@@ -174,7 +182,7 @@ public class WarehousingService {
 		return true;
 	}
 
-	public Map<String, Object> getInputInfo(StockDto.Request params) {
+	public Map<String, Object> getInputInfo(StockDto.Request params) throws Exception {
 		List<Map<String, Object>> list = warehousingMapper.getInputInfo(params);
 		if (list.size() > 0)
 			return list.get(0);

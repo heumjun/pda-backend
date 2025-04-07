@@ -16,31 +16,35 @@ import com.denso.pdabackend.domain.warehousing.dto.WarehousingDto.WarehousingReq
 
 @Mapper
 public interface WarehousingMapper {
+	
+	String completeFlag(WarehousingRequest params) throws Exception;
 
-	List<Map<String, Object>> getWarehousingList(WarehousingRequest params);
+	List<Map<String, Object>> getCompleteWarehousingList(WarehousingRequest params) throws Exception;
 
-	void saveOfWarehousing(Warehousing info);
+	List<Map<String, Object>> getWarehousingList(WarehousingRequest params) throws Exception;
 
-	List<Map<String, Object>> getOutputChk(Request params);
+	void saveOfWarehousing(Warehousing info) throws Exception;
 
-	List<Map<String, Object>> getInputHistorySearchInfo(Request params);
+	List<Map<String, Object>> getOutputChk(Request params) throws Exception;
 
-	void updateOfPdStock(Info stockInfo);
+	List<Map<String, Object>> getInputHistorySearchInfo(Request params) throws Exception;
 
-	void updateOfInputHistory(InputHistorySearchDto.Info item);
+	void updateOfPdStock(Info stockInfo) throws Exception;
 
-	Map<String, Object> getSeq(HashMap hashMap);
+	void updateOfInputHistory(InputHistorySearchDto.Info item) throws Exception;
 
-	int getNewLotSeq(InputHistorySearchDto.Info item);
+	Map<String, Object> getSeq(HashMap hashMap) throws Exception;
 
-	void insertOfLotStock(Info stockInfo);
+	int getNewLotSeq(InputHistorySearchDto.Info item) throws Exception;
 
-	void insertOfInputHistory(InputHistorySearchDto.Info item);
+	void insertOfLotStock(Info stockInfo) throws Exception;
 
-	Map<String, Object> getAvailable(HashMap hashMap);
+	void insertOfInputHistory(InputHistorySearchDto.Info item) throws Exception;
 
-	void insertInspectionConf(InspectionConfDto.Info inspectionConf);
+	Map<String, Object> getAvailable(HashMap hashMap) throws Exception;
 
-	List<Map<String, Object>> getInputInfo(StockDto.Request params);
+	void insertInspectionConf(InspectionConfDto.Info inspectionConf) throws Exception;
+
+	List<Map<String, Object>> getInputInfo(StockDto.Request params) throws Exception;
 
 }

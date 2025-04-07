@@ -3,6 +3,49 @@
 	
 <mapper namespace="com.denso.pdabackend.domain.warehousing.mapper.WarehousingMapper">
 	
+	
+	<select id="completeFlag" parameterType="com.denso.pdabackend.domain.warehousing.dto.WarehousingDto$WarehousingRequest"
+		resultType="string">
+		/** [sql-warehousing.xml] WarehousingMapper.completeFlag **/
+		SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END AS COMPLETE_FLAG
+	    FROM TB_ST_02 ST02 
+	    WHERE 1=1
+	    AND ST02.ST02_COMPANY = #{company} 
+	    AND ST02.ST02_FACTORY = #{factory}
+	    AND ST02.ST02_PNO = #{pu01No}
+	</select>	
+	
+	<select id="getCompleteWarehousingList" parameterType="com.denso.pdabackend.domain.warehousing.dto.WarehousingDto$WarehousingRequest"
+        resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-warehousing.xml] WarehousingMapper.getCompleteWarehousingList **/
+        SELECT ST02.ST02_CODE 	AS CM08_CODE
+			 , CM08.CM08_NAME 	AS CM08_NAME
+			 , ST02.ST02_CUS 	AS PU01_CUS
+			 , CM08.CM08_GBN	AS CM08_GBN
+			 , CM08.CM08_DGBN	AS CM08_DGBN
+			 , ST02.ST02_DAT	AS PU01_DAT
+			 , ST02.ST02_LOT	AS PU02_LOT
+			 , DECODE(QA05.QA05_AVAILABLE, 'Y', 'W', 'S') AS ST02_STATUS
+			 , NVL(QA05.QA05_AVAILABLE, 'N') AS QA05_AVAILABLE
+			 , ST02.ST02_MOQ AS PU02_SBOXSU
+			 , ST02.ST02_QRCODE 
+		FROM TB_ST_02 ST02
+		LEFT JOIN TB_CM_08 CM08
+		ON ST02.ST02_CODE = CM08.CM08_CODE
+		AND ST02.ST02_COMPANY = CM08.CM08_COMPANY
+		AND ST02.ST02_FACTORY = CM08.CM08_FACTORY
+		LEFT JOIN TB_QA_05 QA05 
+		ON QA05.QA05_COMPANY = ST02.ST02_FACTORY 
+		AND QA05.QA05_FACTORY = ST02.ST02_FACTORY 
+		AND QA05.QA05_CODE = ST02.ST02_CODE
+		AND QA05.QA05_SDT &lt; TO_CHAR(SYSDATE, 'YYYYMMDD')
+		AND QA05.QA05_EDT &gt; TO_CHAR(SYSDATE, 'YYYYMMDD')   
+		WHERE 1=1
+		AND ST02.ST02_COMPANY = #{company}
+		AND ST02.ST02_FACTORY = #{factory}
+		AND ST02.ST02_PNO = #{pu01No}
+    </select>
+	
 	<select id="getWarehousingList" parameterType="com.denso.pdabackend.domain.warehousing.dto.WarehousingDto$WarehousingRequest"
         resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-warehousing.xml] WarehousingMapper.getWarehousingList **/
