@@ -71,7 +71,9 @@ public class OutputService {
                 outputMapper.insertOfOutputHistory(item);
 
                 // 출고이력 등록 시그마 연계전 LOTDB
-                cigmaInterfaceMapper.insertDmes18Output(item);
+                if(!item.getSt03Qr().substring(0,3).equals("3N1")) {
+                    cigmaInterfaceMapper.insertDmes18Output(item);
+                }
 
             }catch(Exception e){
                 // TODO Auto-generated catch block
