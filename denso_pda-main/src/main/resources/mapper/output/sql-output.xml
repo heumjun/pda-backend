@@ -10,7 +10,7 @@
     	SELECT MF13_COMPANY
              , MF13_FACTORY
              , MF13_NO
-             , MF13_DAT
+             , TO_CHAR(MF13_DAT, 'YYYY-MM-DD') as MF13_DAT
              , MF13_DAT_TIME
              , MF13_LINE_CODE
              , LINE_NM AS MF13_LINE_NM
@@ -36,7 +36,7 @@
              , MF14_FACTORY
              , MF14_HNO
              , MF13_NO
-             , MF13_DAT
+             , TO_CHAR(MF13_DAT, 'YYYY-MM-DD') as MF13_DAT
              , MF13_DAT_TIME
              , MF13_LINE_CODE
              , MF14_NO
@@ -101,7 +101,7 @@
             FROM TB_ST_03
             WHERE ST03_COMPANY = #{company}
               AND ST03_FACTORY = #{factory}
-              AND TO_CHAR(ST03_DAT, 'YYYY-MM-DD') = #{st03Dat}
+              AND TO_CHAR(ST03_DAT, 'YYYY-MM-DD') = TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'), 'YYYY-MM-DD')
         </selectKey>
 
         INSERT INTO TB_ST_03 (

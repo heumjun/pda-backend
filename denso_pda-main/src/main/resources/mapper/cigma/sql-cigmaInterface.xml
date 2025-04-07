@@ -52,7 +52,7 @@
 	</insert>
 
 	<!-- 출고이력 등록 시그마 연계전 LOTDB (파라미터 DTO가 달라서 별도로 추가)-->
-	<insert id="insertDmes18Output" parameterType="com.denso.pdabackend.domain.material.dto.OutputSearchDto$Info">
+	<insert id="insertDmes18Output" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Info">
 		/** [sql-cigmaInterface.xml] CigmaInterfaceMapper.insertDmes18Output **/
 		INSERT INTO DMES_18 (
 							  CHLLOT
