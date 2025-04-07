@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.denso.pdabackend.domain.cigma.mapper.CigmaInterfaceMapper">
+
+	<!-- 출고이력 등록 시그마 연계전 LOTDB-->
+	<insert id="insertDmes18" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto$Info">
+		/** [sql-cigmaInterface.xml] CigmaInterfaceMapper.insertDmes18 **/
+		INSERT INTO DMES_18 (
+							  CHLLOT
+							, CHLRTG
+							, CHLDTS
+							, CHLLIN
+							, CHLHOU
+							, CHLPNS
+							, CHLQYS
+							, CHLIDS
+		) VALUES (
+				   #{st02Lot}
+				 , 'I'
+				 , TO_CHAR(SYSDATE, 'YYYYMMDD')
+				 , #{line}
+				 , '1'
+				 , #{st02Code}
+				 , #{st02Moq}
+				 , 'LOTMGR'
+				 )
+	</insert>
+
+	<!-- 출고이력 등록 시그마 연계전 LOTDB (파라미터 DTO가 달라서 별도로 추가)-->
+	<insert id="insertDmes18Output" parameterType="com.denso.pdabackend.domain.material.dto.OutputSearchDto$Info">
+		/** [sql-cigmaInterface.xml] CigmaInterfaceMapper.insertDmes18Output **/
+		INSERT INTO DMES_18 (
+							  CHLLOT
+							, CHLRTG
+							, CHLDTS
+							, CHLLIN
+							, CHLHOU
+							, CHLPNS
+							, CHLQYS
+							, CHLIDS
+		) VALUES (
+				   #{st03Lot}
+				 , 'I'
+				 , TO_CHAR(SYSDATE, 'YYYYMMDD')
+				 , #{st03Line}
+				 , '1'
+				 , #{st03Code}
+				 , #{st03Moq}
+				 , 'LOTMGR'
+				 )
+	</insert>
+
+</mapper> 

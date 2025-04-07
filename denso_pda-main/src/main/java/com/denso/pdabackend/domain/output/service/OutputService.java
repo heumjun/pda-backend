@@ -3,6 +3,7 @@ package com.denso.pdabackend.domain.output.service;
 import java.util.List;
 import java.util.Map;
 
+import com.denso.pdabackend.domain.cigma.mapper.CigmaInterfaceMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class OutputService {
     
     private final OutputMapper outputMapper;
+    private final CigmaInterfaceMapper cigmaInterfaceMapper;
 
 	public List<Map<String, Object>> getOutputRequestSearch(OutputSearchDto.Request params) {
 		return outputMapper.getOutputRequestSearch(params);
@@ -67,6 +69,9 @@ public class OutputService {
 
                 // 출고 테이블 등록
                 outputMapper.insertOfOutputHistory(item);
+
+                // 출고이력 등록 시그마 연계전 LOTDB
+                cigmaInterfaceMapper.insertDmes18Output(item);
 
             }catch(Exception e){
                 // TODO Auto-generated catch block
