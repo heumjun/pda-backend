@@ -45,7 +45,7 @@
 		AND ST02.ST02_FACTORY = #{factory}
 		AND ST02.ST02_PNO = #{pu01No}
     </select>
-	
+
 	<select id="getWarehousingList" parameterType="com.denso.pdabackend.domain.warehousing.dto.WarehousingDto$WarehousingRequest"
         resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-warehousing.xml] WarehousingMapper.getWarehousingList **/
@@ -80,8 +80,8 @@
 			ON QA05.QA05_COMPANY = #{company}
 			AND QA05.QA05_FACTORY = #{factory}
 			AND QA05.QA05_CODE = A.MAT_ID
-			AND QA05.QA05_SDT <![CDATA[=<]> TO_CHAR(SYSDATE, 'YYYYMMDD')
-			AND QA05.QA05_EDT <![CDATA[=>]> TO_CHAR(SYSDATE, 'YYYYMMDD')
+			AND QA05.QA05_SDT <![CDATA[=<]]> TO_CHAR(SYSDATE, 'YYYYMMDD')
+			AND QA05.QA05_EDT <![CDATA[=>]]> TO_CHAR(SYSDATE, 'YYYYMMDD')
 	      WHERE 1=1
 	      AND A.DELIVERY_NO = #{pu01No}
 	      AND (SELECT COUNT(*) FROM TB_ST_02 ST02 WHERE ST02.ST02_PNO = A.DELIVERY_NO) = 0

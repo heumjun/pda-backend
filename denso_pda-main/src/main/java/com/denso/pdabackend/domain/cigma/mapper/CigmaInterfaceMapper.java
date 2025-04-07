@@ -3,7 +3,6 @@ package com.denso.pdabackend.domain.cigma.mapper;
 import com.denso.pdabackend.domain.output.dto.OutputSearchDto;
 import com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto;
 import org.apache.ibatis.annotations.Mapper;
-
 import com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto;
 
 @Mapper

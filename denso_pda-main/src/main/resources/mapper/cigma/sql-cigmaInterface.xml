@@ -4,7 +4,8 @@
 <mapper namespace="com.denso.pdabackend.domain.cigma.mapper.CigmaInterfaceMapper">
 
 	<!-- 입고이력 등록 시그마 연계전 작업중 -->
-	<insert id="insertDmes16" parameterType="com.kdatalab.mes.material.dto.InputHistorySearchDto$Info">
+	<insert id="insertDmes16" parameterType="com.denso.pdabackend.domain.warehousing.dto.InputHistorySearchDto">
+		/** [sql-cigmaInterface.xml] CigmaInterfaceMapper.insertDmes16 **/
 		INSERT INTO DMES_16 (
 							  IPLOT
 							, IPRTG
@@ -14,6 +15,7 @@
 							, INPGU
 							, TRQTY
 							, VNDNR
+							, TRIID
 		) SELECT
 			LOT_ID
 			   , 'I'
@@ -24,7 +26,7 @@
 			   , QTY_1
 			   , VENDOR_ID
 			   , 'LOTMGR'
-		FROM COSPLOTHIS@TOMESMA WHERE DELIVERY_NO = #{st02Pno};
+		FROM COSPLOTHIS@TOMESMA WHERE DELIVERY_NO = #{st02Pno}
 	</insert>
 
 	<!-- 출고이력 등록 시그마 연계전 LOTDB-->
