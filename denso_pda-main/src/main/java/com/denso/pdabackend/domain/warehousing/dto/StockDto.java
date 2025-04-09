@@ -121,6 +121,8 @@ public class StockDto {
 		
 		private String napLotNo;
 		private String barcode;
+
+		private String stok;
 	}
 
 }

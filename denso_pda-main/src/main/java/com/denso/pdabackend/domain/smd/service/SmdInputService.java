@@ -105,4 +105,18 @@ public class SmdInputService {
 		return smdInputMapper.getLotInfo(params);
 	}
 
+	public Map<String, Object> inspectChk(OutputSearchDto.Request params) throws Exception {
+		List<Map<String,Object>> list = smdInputMapper.inspectChk(params);
+		if(list.size()>0)
+			return list.get(0);
+		return null;
+	}
+
+	public Map<String, Object> inspectSpecChk(OutputSearchDto.Request params) throws Exception {
+		List<Map<String,Object>> list = smdInputMapper.inspectSpecChk(params);
+		if(list.size()>0)
+			return list.get(0);
+		return null;
+	}
+
 }

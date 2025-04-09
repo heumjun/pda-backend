@@ -83,6 +83,7 @@ public class SmdInputController {
 		params.setSt03Code(params.getSt03Code());
 		params.setSt03Lot(params.getSt03Lot());
 		params.setSt03LotSeq(params.getSt03LotSeq());
+        params.setStok(params.getStok());
 
 		if (company == null) {
 			return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 조회할 수 없습니다.");
@@ -92,7 +93,30 @@ public class SmdInputController {
 			return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 조회할 수 없습니다.");
 		}
 
-		Map<String,Object> getLotInfo = smdInputService.getLotInfo(params);
+        Map<String,Object> getLotInfo = smdInputService.getLotInfo(params);
+
+        // 해당 품번이 존재할 때
+        if(getLotInfo!= null) {
+
+            // 해당 품번이 수입검사대기/불량인지 체크해서 경고문 리턴해줘야함.
+            Map<String, Object> inspectChkMap = smdInputService.inspectChk(params);
+
+            // inspectChkMap이 없는 경우는 출고가능
+            // inspectChkMap의 상태가 수입검사대기인 경우 출고불가능
+            if (inspectChkMap != null) {
+                if (String.valueOf(inspectChkMap.get("qa07Status")).equals("W")) {
+                    return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "수입검사대기인 품목은 출고 불가능합니다.");
+                } else if (String.valueOf(inspectChkMap.get("qa07Status")).equals("E")) {
+
+                    // 불량인데 특채처리여부가 Y이면 출고가능하도록 설정
+                    Map<String, Object> inspectSpecChkMap = smdInputService.inspectSpecChk(params);
+                    if (inspectSpecChkMap == null) {
+                        return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "수입검사불량인 항목은 출고 불가능합니다.\n" +
+                                "특채처리여부를 확인하세요");
+                    }
+                }
+            }
+        }
 
 		data.put("lotInfo", getLotInfo);
 

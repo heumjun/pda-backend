@@ -134,6 +134,34 @@
           AND ST01_CODE = #{st03Code}
           AND ST01_LOT = #{st03Lot}
           AND ST01_LOT_SEQ = #{st03LotSeq}
+        <if test="stok != null and !stok.equalsIgnoreCase('')" >
+            AND ST01_STOK = #{stok}
+        </if>
+          AND ST01_QTY > 0
+    </select>
+
+    <!-- 출고 시 해당 품목이 수입검사체크 -->
+    <select id="inspectChk" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+        SELECT *
+        FROM TB_QA_07
+        WHERE QA07_COMPANY = #{company}
+          AND QA07_FACTORY = #{factory}
+          AND QA07_CODE = #{st03Code}
+          AND QA07_LOT = #{st03Lot}
+          AND QA07_LOT_SEQ = #{st03LotSeq}
+    </select>
+
+    <!-- 출고 시 해당 품목이 수입검사체크 -->
+    <select id="inspectSpecChk" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+        SELECT QA08_STATUS
+        FROM TB_QA_07 QA07
+                 LEFT JOIN TB_QA_08 QA08 ON QA07.QA07_COMPANY = QA08.QA08_COMPANY AND QA07.QA07_FACTORY = QA08.QA08_FACTORY AND QA07.QA07_CODE = QA08.QA08_CODE AND QA07.QA07_NO = QA08.QA07_NO
+        WHERE QA07_COMPANY = #{company}
+          AND QA07_FACTORY = #{factory}
+          AND QA07_CODE = #{st03Code}
+          AND QA07_LOT_SEQ = #{st03LotSeq}
     </select>
     
 

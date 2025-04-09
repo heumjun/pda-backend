@@ -319,10 +319,15 @@
     <select id="getInputInfo" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Request"
          resultType="com.denso.pdabackend.response.ResultMap">
 		SELECT *
-		FROM TB_ST_02
+		FROM TB_ST_02 st02
+        LEFT JOIN TB_ST_01 st01 ON st02.ST02_COMPANY = st01.ST01_COMPANY AND st02.ST02_FACTORY = st01.ST01_FACTORY AND st02.ST02_LOT_SEQ = st01.ST01_LOT_SEQ
 		WHERE ST02_COMPANY = #{company}
 		  AND ST02_FACTORY = #{factory}
 		  AND ST02_QRCODE = #{barcode}
+          <if test="stok != null and !stok.equalsIgnoreCase('')" >
+            AND ST01_STOK = #{stok}
+          </if>
+          AND ST01_QTY > 0
    </select>
 	
 </mapper> 

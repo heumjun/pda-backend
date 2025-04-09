@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.denso.pdabackend.domain.output.dto.OutputSearchDto;
+import com.denso.pdabackend.domain.smd.service.SmdInputService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +41,7 @@ public class WarehousingController {
 
 	private final AuthenticationFacade auth;
 	private final WarehousingService warehousingService;
+	private final SmdInputService smdInputService;
 	private final OutputService outputService;
 
 	@GetMapping
@@ -135,6 +138,7 @@ public class WarehousingController {
 
 		request.setCompany(company);
 		request.setFactory(factory);
+		request.setStok(request.getStok());
 
 		if (company == null) {
 			return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 조회할 수 없습니다.");
@@ -145,6 +149,36 @@ public class WarehousingController {
 		}
 
 		Map<String,Object> inputInfo = warehousingService.getInputInfo(request);
+
+		// 데이터가 존재하는 경우
+		if(inputInfo != null) {
+
+			OutputSearchDto.Request params = new OutputSearchDto.Request();
+			params.setCompany(inputInfo.get("st01Company").toString());
+			params.setFactory(inputInfo.get("st01Factory").toString());
+			params.setSt03Code(inputInfo.get("st01Code").toString());
+			params.setSt03Lot(inputInfo.get("st01Lot").toString());
+			params.setSt03LotSeq(Integer.parseInt(inputInfo.get("st01LotSeq").toString()));
+
+			// 해당 품번이 수입검사대기/불량인지 체크해서 경고문 리턴해줘야함.
+			Map<String, Object> inspectChkMap = smdInputService.inspectChk(params);
+
+			// inspectChkMap이 없는 경우는 출고가능
+			// inspectChkMap의 상태가 수입검사대기인 경우 출고불가능
+			if (inspectChkMap != null) {
+				if (String.valueOf(inspectChkMap.get("qa07Status")).equals("W")) {
+					return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "수입검사대기인 품목은 출고 불가능합니다.");
+				} else if (String.valueOf(inspectChkMap.get("qa07Status")).equals("E")) {
+
+					// 불량인데 특채처리여부가 Y이면 출고가능하도록 설정
+					Map<String, Object> inspectSpecChkMap = smdInputService.inspectSpecChk(params);
+					if (inspectSpecChkMap == null) {
+						return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "수입검사불량인 항목은 출고 불가능합니다.\n" +
+								"특채처리여부를 확인하세요");
+					}
+				}
+			}
+		}
 
 		data.put("inputInfo", inputInfo);
 
