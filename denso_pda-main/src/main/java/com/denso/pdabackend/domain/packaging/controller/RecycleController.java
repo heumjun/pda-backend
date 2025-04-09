@@ -58,13 +58,13 @@ public class RecycleController {
 		Map<String,Object> mf17Info = recycleService.getMf17Info(request);
 		
 		 if (mf17Info == null) {
-            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "문구 수정 - MF17에 데이터 존재하지 않음.");
+            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "설비 데이터에 존재하지 않는 QR입니다.");
         }
 
 		Map<String,Object> mp02Info = recycleService.getMp02Info(request);
 		
 		if (mp02Info == null) {
-            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "문구 수정 - MP02에 데이터 존재하지 않음.");
+            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "설비 데이터에 존재하지 않는 QR입니다.");
         }
 		
 		Map<String,Object> resultMap = new HashMap<String,Object>();
