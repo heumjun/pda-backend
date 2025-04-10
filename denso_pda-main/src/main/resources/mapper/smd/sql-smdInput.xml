@@ -163,6 +163,35 @@
           AND QA07_CODE = #{st03Code}
           AND QA07_LOT_SEQ = #{st03LotSeq}
     </select>
+
+    <!-- 해당 품번 선입선출 여부 확인 -->
+    <select id="firstInOutChk" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+        SELECT *
+        FROM TB_CM_08
+        WHERE CM08_COMPANY = #{company}
+          AND CM08_FACTORY = #{factory}
+          AND CM08_CODE = #{st03Code}
+    </select>
+
+    <!-- 해당 품번의 첫번째입고 값을 가져와야함. -->
+    <select id="firstInputData" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Request"
+            resultType="com.denso.pdabackend.response.ResultMap">
+        SELECT A.* FROM (
+        SELECT *
+        FROM TB_ST_01 st01
+        LEFT JOIN TB_ST_02 st02 ON st01.ST01_COMPANY = st02.ST02_COMPANY AND st01.ST01_FACTORY = st02.ST02_FACTORY AND st01.ST01_LOT_SEQ = st02.ST02_LOT_SEQ
+        WHERE ST01_COMPANY = #{company}
+        AND ST01_FACTORY = #{factory}
+        AND ST01_CODE = #{st03Code}
+        <if test="stok != null and !stok.equalsIgnoreCase('')" >
+            AND ST01_STOK = #{stok}
+        </if>
+        AND ST01_QTY > 0
+        ORDER BY ST02_DAT ) A
+        WHERE 1=1
+        AND ROWNUM = 1
+    </select>
     
 
 </mapper>

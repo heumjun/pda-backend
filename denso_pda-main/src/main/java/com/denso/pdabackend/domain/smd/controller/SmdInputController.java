@@ -1,5 +1,7 @@
 package com.denso.pdabackend.domain.smd.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +96,9 @@ public class SmdInputController {
 		}
 
         Map<String,Object> getLotInfo = smdInputService.getLotInfo(params);
+        // qr코드에 따른 데이터 가져오기 전에 선입선출 여부 확인하고, 선입선출인 경우 제대로 섭입선출되고 있는 지 확인되어야한다.
+        // 1. 해당 품번 선입선출 확인
+        Map<String, Object> getFirstInOut = smdInputService.firstInOutChk(params);
 
         // 해당 품번이 존재할 때
         if(getLotInfo!= null) {
@@ -116,9 +121,40 @@ public class SmdInputController {
                     }
                 }
             }
-        }
 
-		data.put("lotInfo", getLotInfo);
+            // 해당 품번이 선입선출에 해당하지 않는 경우
+            if(getFirstInOut.get("cm08Fifo").equals("N")){
+                if(getLotInfo != null){
+                    data.put("lotInfo", getLotInfo);
+                } else {
+                    data.put("lotInfo", null);
+                }
+                // 해당 품번이 선입선출에 해당하는 경우
+            } else {
+                // 해당 품번의 가장 먼저 입고된 일자를 가져와서 리딩한 품번의 입고일자를 비교
+                Map<String, Object> firstInputData = smdInputService.firstInputData(params);
+
+                // 리딩한 품번의 입고일자
+                String inputDate = getLotInfo.get("st02Dat").toString().substring(0,10).trim();
+                // 선입한 품번의 입고일자
+                String firstInputDate = firstInputData.get("st02Dat").toString().substring(0,10).trim();
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate inputD = LocalDate.parse(inputDate, formatter);
+                LocalDate firstD = LocalDate.parse(firstInputDate, formatter);
+
+                // firstD < inputD : 선입한 입고일자보다 리딩한 품번의 입고일자가 큰 경우 에러
+                if(inputD.isAfter(firstD)){
+                    data.put("lotInfo", "fifoError");
+//                    return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "먼저 입고된 품번의 LOT를 출고 후 진행해주십시오.");
+                } else {
+                    data.put("lotInfo", getLotInfo);
+                }
+            }
+
+        } else {
+            data.put("lotInfo", null);
+        }
 
 		return ResponseEntityUtil.ok(data);
 		

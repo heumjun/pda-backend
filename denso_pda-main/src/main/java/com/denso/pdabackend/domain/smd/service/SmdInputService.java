@@ -119,4 +119,18 @@ public class SmdInputService {
 		return null;
 	}
 
+	public Map<String, Object> firstInOutChk(OutputSearchDto.Request params) throws Exception {
+		List<Map<String,Object>> list = smdInputMapper.firstInOutChk(params);
+		if(list.size()>0)
+			return list.get(0);
+		return null;
+	}
+
+	public Map<String, Object> firstInputData(OutputSearchDto.Request params) throws Exception {
+		List<Map<String,Object>> list = smdInputMapper.firstInputData(params);
+		if(list.size()>0)
+			return list.get(0);
+		return null;
+	}
+
 }

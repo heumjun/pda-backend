@@ -1,5 +1,7 @@
 package com.denso.pdabackend.domain.warehousing.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -178,9 +180,41 @@ public class WarehousingController {
 					}
 				}
 			}
-		}
 
-		data.put("inputInfo", inputInfo);
+			request.setStok(inputInfo.get("st01Stok").toString());
+			Map<String, Object> getFirstInOut = smdInputService.firstInOutChk(params);
+			// 해당 품번이 선입선출에 해당하는 지 확인
+			if(getFirstInOut.get("cm08Fifo").equals("N")){
+				if(inputInfo != null){
+					data.put("inputInfo", inputInfo);
+				} else {
+					data.put("inputInfo", null);
+				}
+			} else {
+				// 해당 품번의 가장 먼저 입고된 일자를 가져와서 리딩한 품번의 입고일자를 비교
+				Map<String, Object> firstInputData = smdInputService.firstInputData(params);
+
+				// 리딩한 품번의 입고일자
+				String inputDate = inputInfo.get("st02Dat").toString().substring(0,10).trim();
+				// 선입한 품번의 입고일자
+				String firstInputDate = firstInputData.get("st02Dat").toString().substring(0,10).trim();
+
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+				LocalDate inputD = LocalDate.parse(inputDate, formatter);
+				LocalDate firstD = LocalDate.parse(firstInputDate, formatter);
+
+				// firstD < inputD : 선입한 입고일자보다 리딩한 품번의 입고일자가 큰 경우 에러
+				if(inputD.isAfter(firstD)){
+					data.put("inputInfo", "fifoError");
+//					return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "먼저 입고된 품번의 LOT를 출고 후 진행해주십시오.");
+				} else {
+					data.put("inputInfo", inputInfo);
+				}
+			}
+
+		} else {
+			data.put("inputInfo", null);
+		}
 
 		return ResponseEntityUtil.ok(data);
 

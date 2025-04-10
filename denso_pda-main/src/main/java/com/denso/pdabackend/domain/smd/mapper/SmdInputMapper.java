@@ -30,5 +30,7 @@ public interface SmdInputMapper {
 
 	List<Map<String, Object>> inspectChk(OutputSearchDto.Request params) throws Exception;
 	List<Map<String, Object>> inspectSpecChk(OutputSearchDto.Request params) throws Exception;
+	List<Map<String, Object>> firstInOutChk(OutputSearchDto.Request params) throws Exception;
+	List<Map<String, Object>> firstInputData(OutputSearchDto.Request params) throws Exception;
 
 }
