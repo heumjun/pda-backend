@@ -84,6 +84,12 @@ public class ConsignedMaterialsOutputController {
 		
 		params.put("company", company);
 		params.put("factory", factory);
+
+		Map<String,Object> consignedMaterialsOutputCheck =  consignedMaterialsOutputService.getConsignedMaterialsOutputCheck(params);
+
+		if (consignedMaterialsOutputCheck == null) {
+			return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "이미 사급처리된 항목입니다.");
+		}
 		
 		Map<String,Object> consignedMaterialsOutput =  consignedMaterialsOutputService.getConsignedMaterialsOutput(params);
 		

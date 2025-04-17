@@ -38,6 +38,10 @@ public class ConsignedMaterialsOutputService {
 		return consignedMaterialsOutputMapper.getConsignedMaterialsOutput(params);
 	}
 
+	public Map<String, Object> getConsignedMaterialsOutputCheck(Map<String, Object> params) throws Exception {
+		return consignedMaterialsOutputMapper.getConsignedMaterialsOutputCheck(params);
+	}
+
 	public Map<String, Object> createMf15No(ConsignedMaterialsOutputDto.Request request) throws Exception {
 		return consignedMaterialsOutputMapper.createMf15No(request);
 	}

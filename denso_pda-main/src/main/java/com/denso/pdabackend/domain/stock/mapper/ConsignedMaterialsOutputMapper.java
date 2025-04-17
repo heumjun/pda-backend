@@ -18,6 +18,8 @@ public interface ConsignedMaterialsOutputMapper {
 
 	Map<String, Object> getConsignedMaterialsOutput(Map<String, Object> params) throws Exception;
 
+	Map<String, Object> getConsignedMaterialsOutputCheck(Map<String, Object> params) throws Exception;
+
 	Map<String, Object> createMf15No(ConsignedMaterialsOutputDto.Request request) throws Exception;
 
 	boolean insertConsignedMaster(MasterInfo masterInfo) throws Exception;

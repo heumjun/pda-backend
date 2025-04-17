@@ -13,7 +13,7 @@
 		AND CM01_FACTORY = #{factory}
 		AND CM01_LOCK = 'Y'
 		ORDER BY CM01_NAME
-	</select>	
+	</select>
 	
 	<select id="getConsignedMaterialsOutput" parameterType="java.util.Map" resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-consignedMaterialsOutput.xml] ConsignedMaterialsOutputMapper.getConsignedMaterialsOutput **/
@@ -56,6 +56,24 @@
 		AND ROWNUM = 1
 		ORDER BY ST02.ST02_NO DESC
     </select>
+
+	<select id="getConsignedMaterialsOutputCheck" parameterType="java.util.Map" resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-consignedMaterialsOutput.xml] ConsignedMaterialsOutputMapper.getConsignedMaterialsOutputCheck **/
+		SELECT *
+		FROM TB_ST_03 ST03
+		WHERE 1=1
+		AND ST03_COMPANY 	= #{company}
+		AND ST03_FACTORY 	= #{factory}
+		<if test="st02Qrcode != null and !st02Qrcode.equalsIgnoreCase('')" >
+			AND ST03_QRCODE = #{st02Qrcode}
+		</if>
+		<if test="st02LotSeq != null and !st02LotSeq.equalsIgnoreCase('')" >
+			AND ST03_LOT_SEQ = #{st02LotSeq}
+		</if>
+		AND ST03_GBN = 'SB'
+		AND ROWNUM = 1
+		ORDER BY ST03_NO DESC
+	</select>
     
     <select id="createMf15No" parameterType="com.denso.pdabackend.domain.stock.dto.ConsignedMaterialsOutputDto$Request" 
     	resultType="com.denso.pdabackend.response.ResultMap">
