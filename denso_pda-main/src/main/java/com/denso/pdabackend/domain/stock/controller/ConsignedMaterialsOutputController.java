@@ -87,7 +87,7 @@ public class ConsignedMaterialsOutputController {
 
 		Map<String,Object> consignedMaterialsOutputCheck =  consignedMaterialsOutputService.getConsignedMaterialsOutputCheck(params);
 
-		if (consignedMaterialsOutputCheck == null) {
+		if (consignedMaterialsOutputCheck != null) {
 			return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "이미 사급처리된 항목입니다.");
 		}
 		
