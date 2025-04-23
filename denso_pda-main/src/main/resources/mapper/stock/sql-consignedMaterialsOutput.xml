@@ -12,6 +12,7 @@
 		AND CM01_COMPANY = #{company}
 		AND CM01_FACTORY = #{factory}
 		AND CM01_LOCK = 'Y'
+		AND CM01_SB = 'Y'
 		ORDER BY CM01_NAME
 	</select>
 	

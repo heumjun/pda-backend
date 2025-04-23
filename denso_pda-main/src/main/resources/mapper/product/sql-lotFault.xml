@@ -26,7 +26,7 @@
 		</if>
 	</select>
 		
-	<select id="getLotFault" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info"
+	<select id="getLotFaultX" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info"
 		resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-lotFault.xml] LotFaultMapper.getLotFault **/
 		SELECT MP02.MP02_CODE AS ST08_CODE
@@ -46,6 +46,29 @@
 		AND MP02.MP02_COMPANY 	= #{st08Company}
 		AND MP02.MP02_FACTORY 	= #{st08Factory}
 		AND MP02.MP02_PCB_QR 	= #{st08Qrcode}
+	</select>
+
+	<select id="getLotFault" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info"
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-lotFault.xml] LotFaultMapper.getLotFault **/
+		SELECT CM08.CM08_CODE AS ST08_CODE
+			 , CM08.CM08_NAME AS ST08_NAME
+			 , MP02.MP02_LOT AS ST08_LOT
+			 , MP02.MP02_LOT_SEQ AS ST08_LOT_SEQ
+			 , CM08.CM08_GBN AS ST08_PGBN
+			 , CASE WHEN MP02.MP02_PCB_QR IS NULL THEN
+						#{st08Qrcode} ELSE MP02.MP02_PCB_QR END AS ST08_QRCODE
+			 , CM08.CM08_ARRAY AS ST08_ARRAY
+		FROM TB_CM_08 CM08 LEFT JOIN TB_MP_02 MP02 ON
+				MP02.MP02_COMPANY 	= CM08.CM08_COMPANY
+				AND MP02.MP02_FACTORY 	= CM08.CM08_FACTORY
+				AND MP02.MP02_CODE  	= CM08.CM08_CODE
+				AND MP02.MP02_PCB_QR 	= #{st08Qrcode}
+		WHERE 1=1
+		  AND CM08.CM08_COMPANY 	= #{st08Company}
+		  AND CM08.CM08_FACTORY 	= #{st08Factory}
+		  AND REPLACE(CM08.CM08_CODE,'-') = SUBSTR(#{st08Qrcode},1,10)
+		  AND ROWNUM = 1
 	</select>
 	
 	<select id="getSeq" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Request"
@@ -72,6 +95,14 @@
     <!-- 제조 불량처리 등록 -->
     <insert id="insertOfLotFault" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info">
     	/** [sql-lotFault.xml] LotFaultMapper.insertOfLotFault **/
+		<selectKey resultType="int" keyProperty="st08Seq" order="BEFORE">
+			SELECT COALESCE(MAX(ST08_SEQ)+1,1) AS ST08_SEQ
+			FROM TB_ST_08
+			WHERE ST08_COMPANY = #{st08Company}
+			AND ST08_FACTORY = #{st08Factory}
+			AND TO_CHAR(ST08_DAT, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
+		</selectKey>
+
         INSERT INTO TB_ST_08
 		(
 			  ST08_COMPANY
