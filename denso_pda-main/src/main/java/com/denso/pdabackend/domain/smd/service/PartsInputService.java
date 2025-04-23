@@ -65,9 +65,6 @@ public class PartsInputService {
                 item.setMf02Pcc((String)insertParam.get("mf01Pcc"));
                 partsInputMapper.createMfOrderDetail(item);
                 
-                
-                System.out.println(">>> " + item.getSt02Line());
-                
                 partsInputMapper.insertOfSmdOutStock(item);
             }catch(Exception e){
                 e.printStackTrace();

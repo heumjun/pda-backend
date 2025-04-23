@@ -14,13 +14,16 @@
 		AND CLS_CODE ='E1'
 	</select>
 	
-	<select id="getComboEquipCodeList" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info"
+	<select id="getComboEquipCodeList" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Request"
 		resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-lotFault.xml] LotFaultMapper.getComboEquipCodeList **/
 		SELECT CM07_CODE, CM07_NAME 
 		FROM TB_CM_07	
 		WHERE CM07_COMPANY = #{st08Company}
 		AND CM07_FACTORY = #{st08Factory}
+		<if test="smdFlag != null and !smdFlag.equalsIgnoreCase('')" >
+			AND CM07_SMD = 'Y'
+		</if>
 	</select>
 		
 	<select id="getLotFault" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info"

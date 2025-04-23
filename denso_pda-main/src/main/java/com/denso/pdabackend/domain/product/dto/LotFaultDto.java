@@ -51,6 +51,8 @@ public class LotFaultDto {
         private String st08Dat;
         private int st08Seq;
         private String st08Qrcode;
+        
+        private String smdFlag;
     }
 
 }

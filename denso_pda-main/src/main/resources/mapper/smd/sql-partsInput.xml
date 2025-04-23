@@ -117,6 +117,7 @@
 			,ST03_LINE
 			,ST03_MOQ
 			,ST03_MST_NO
+			,ST03_EQUIP_CODE
 		) VALUES (
 			#{company}
 			,#{factory}
@@ -147,6 +148,7 @@
 			,#{st02Line}
 			,#{st02Moq}
 			,#{mf02No}
+			,#{st03EquipCode}
 		)
 	</insert>
 

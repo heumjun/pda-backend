@@ -20,6 +20,7 @@ import com.denso.pdabackend.response.StatusCode;
 import com.denso.pdabackend.response.exception.BusinessException;
 import com.denso.pdabackend.token.dto.UserDto;
 import com.denso.pdabackend.utils.JsonUtils;
+import com.denso.pdabackend.utils.StringUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -161,8 +162,9 @@ public class MfrPartsInputController {
                 }
             }
         }
-        insertParam.put("compMfCode", params.get("compMfCode"));
-        insertParam.put("compMfQty", params.get("compMfQty"));
+        insertParam.put("compMfCode", StringUtils.nullString(params.get("compMfCode")) );
+        insertParam.put("compMfQty", StringUtils.nullString(params.get("compMfQty")) );
+        insertParam.put("compMfLine", StringUtils.nullString(params.get("compMfLine")) );
 
         insertParam.put("company", company);
         insertParam.put("factory", factory);

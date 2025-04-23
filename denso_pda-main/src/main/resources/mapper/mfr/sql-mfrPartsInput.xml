@@ -154,6 +154,7 @@
 			, MF01_EMPNO
 			, MF01_MPGBN
 			, MF01_DRYGBN
+			, MF01_LINE_CODE
 		)
 		VALUES
 		(
@@ -175,6 +176,7 @@
 			, #{empNo}
 			, 'N'
 			, 'N'
+			, #{compMfLine}
 		)
 	</insert>
 	<insert id="createMfOrderDetail" parameterType="com.denso.pdabackend.domain.mfr.dto.MfrPartsInputRequestDto$Request">
