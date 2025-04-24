@@ -6,7 +6,7 @@
 	<select id="getComboLineList" parameterType="com.denso.pdabackend.domain.product.dto.LotFaultDto$Info"
 		resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-lotFault.xml] LotFaultMapper.getComboLineList **/
-		SELECT LINE_CODE, LINE_NM
+		SELECT LINE_CODE, '[' || LINE_CODE || '] ' || LINE_NM AS LINE_NM
 		FROM DNKR_LINE_CODE 
 		WHERE 1=1
 		AND COMPANY = #{st08Company}
