@@ -27,4 +27,6 @@ public interface PartsInputMapper {
 
 	void createMfOrderDetail(PartsInputRequestDto.Info item);
 
+	String getMf01Pcc(Map<String, Object> insertParam);
+
 }

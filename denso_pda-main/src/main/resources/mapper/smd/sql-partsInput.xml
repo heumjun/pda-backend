@@ -151,12 +151,13 @@
 			,#{st03EquipCode}
 		)
 	</insert>
+	
+	<select id="getMf01Pcc" parameterType="map" resultType="string">
+		SELECT (TO_CHAR(SYSDATE,'YYYYMMDD') || (SELECT LPAD(NVL(MAX(MF01.MF01_SEQ),0)+1,5,0) FROM TB_MF_01 MF01 WHERE TO_CHAR(SYSDATE,'YYYYMMDD') = SUBSTR(MF01.MF01_PCC,0,8))) FROM DUAL
+	</select>
 
 	<insert id="createMfOrder" parameterType="map">
 		/** [sql-partsInput.xml] PartsInputMapper.createMfOrder **/
-		<selectKey keyProperty="mf01Pcc" resultType="String" order="BEFORE">
-			SELECT (TO_CHAR(SYSDATE,'YYYYMMDD') || (SELECT LPAD(NVL(MAX(MF01.MF01_SEQ),0)+1,5,0) FROM TB_MF_01 MF01 WHERE TO_CHAR(SYSDATE,'YYYYMMDD') = SUBSTR(MF01.MF01_PCC,0,8))) FROM DUAL
-		</selectKey>
 		INSERT INTO TB_MF_01
 		(
 			  MF01_COMPANY

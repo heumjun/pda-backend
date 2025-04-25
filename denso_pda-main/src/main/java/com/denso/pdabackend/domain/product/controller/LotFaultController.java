@@ -90,6 +90,27 @@ public class LotFaultController {
     	
     }
     
+    @GetMapping("/getArrayList")
+    @Operation(summary = "설비코드 목록", description = "설비 목록")
+    public ResponseEntity<?> getArrayList(LotFaultDto.Request request) throws Exception{
+    	
+    	Map<String,Object> data = new HashMap<String,Object>();
+    	
+    	UserDto userInfo = auth.getUserInfo();
+        String company = userInfo.getCompany();
+        String factory = userInfo.getFactory();
+        
+        request.setSt08Company(company);
+        request.setSt08Factory(factory);
+		
+    	List<Map<String, Object>> arrayList = lotFaultService.getArrayList(request);
+    	
+    	data.put("arrayList", arrayList);
+    	
+    	return ResponseEntityUtil.ok(data);
+    	
+    }
+    
     /**
      * 스캔된 QRCODE에 대한 불량 입고 된 품목 조회
      * @param info

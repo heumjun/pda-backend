@@ -42,4 +42,6 @@ public interface LotFaultMapper {
 	 */
 	boolean insertOfLotFault(Info info);
 
+	List<Map<String, Object>> getArrayList(Request request);
+
 }

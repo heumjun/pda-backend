@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.denso.pdabackend.domain.mfr.dto.MfrPartsInputRequestDto;
 import com.denso.pdabackend.domain.mfr.mapper.MfrPartsInputMapper;
 import com.denso.pdabackend.domain.warehousing.dto.StockDto;
+import com.denso.pdabackend.utils.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,7 @@ public class MfrPartsInputService {
                 stockInfo.setOutQty(Double.parseDouble(item.getSt01Qty())); // 출고수량
                 stockInfo.setCode(item.getSt01Code()); // 품목코드
                 stockInfo.setStock(item.getSt01Stok()); // 보관창고
+                stockInfo.setSt01District( StringUtils.nullString(insertParam.get("compMfLine"))); // 보관창고
                 stockInfo.setLot(item.getSt01Lot()); // LOT번호
                 stockInfo.setGbn(item.getCm08Gbn()); // 품목구분
                 stockInfo.setUnt(item.getSt01Unt()); // 출고단위 = 재고단위

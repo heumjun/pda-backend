@@ -54,7 +54,9 @@ public class PartsInputRequestDto {
         private String cm08Gbn;         // 품목구분
 
         private String mf02Pcc;		//생산지시번호
-        private String mf02No;		//생산지시디테일번호\
+        private String mf02No;		//생산지시디테일번호
+        
+        private String mf01Pcc;		//생산지시번호
         
         private String st03EquipCode;	
         

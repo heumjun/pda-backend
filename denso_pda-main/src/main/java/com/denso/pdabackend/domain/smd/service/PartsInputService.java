@@ -39,14 +39,18 @@ public class PartsInputService {
      */
 	public boolean insertOfPartsInputHistory(Map<String, Object> insertParam) {
 
-		// 생산지시서 마스터 생성 필요 tb_mf_01
-		partsInputMapper.createMfOrder(insertParam);
-
 		log.debug("{}", insertParam);
 
 		List<PartsInputRequestDto.Info> insertList = (List<Info>) insertParam.get("insertList");
 		insertList.forEach(item ->{
             try{
+            	
+            	String mf01Pcc = partsInputMapper.getMf01Pcc(insertParam); 
+            	insertParam.put("mf01Pcc", mf01Pcc);
+            	
+            	// 생산지시서 마스터 생성 필요 tb_mf_01
+        		partsInputMapper.createMfOrder(insertParam);
+            	
                 // 재고테이블 재고 감소
                 StockDto.Info stockInfo = new StockDto.Info();
                 BeanUtils.copyProperties(item, stockInfo);
@@ -62,7 +66,7 @@ public class PartsInputService {
                 partsInputMapper.updateOfPdStock(stockInfo);
 
                 // 생산 지시서 디테일 생성 -- tb_mf_01 ?
-                item.setMf02Pcc((String)insertParam.get("mf01Pcc"));
+                item.setMf02Pcc(mf01Pcc);
                 partsInputMapper.createMfOrderDetail(item);
                 
                 partsInputMapper.insertOfSmdOutStock(item);

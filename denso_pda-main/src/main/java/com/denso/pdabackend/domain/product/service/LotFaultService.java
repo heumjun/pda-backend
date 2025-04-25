@@ -71,4 +71,8 @@ public class LotFaultService {
 		return true;
 	}
 
+	public List<Map<String, Object>> getArrayList(Request request) {
+		return lotFaultMapper.getArrayList(request);
+	}
+
 }

@@ -53,6 +53,8 @@ public class LotFaultDto {
         private String st08Qrcode;
         
         private String smdFlag;
+        private String arrayCnt;
+        
     }
 
 }

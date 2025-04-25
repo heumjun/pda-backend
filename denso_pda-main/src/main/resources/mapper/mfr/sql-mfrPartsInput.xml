@@ -56,7 +56,8 @@
 		AND ST01_COMPANY = #{company}
 		AND ST01_FACTORY = #{factory}
 		AND ST01_CODE = #{code}
-		AND ST01_STOK = #{stock}
+		AND ST01_STOK = '04'
+		AND ST01_DISTRICT = #{st01District}
 		<if test="lot != null and !lot.equalsIgnoreCase('')">
 			AND ST01_LOT = #{lot}
 			AND ST01_LOT_SEQ = #{lotSeq}
