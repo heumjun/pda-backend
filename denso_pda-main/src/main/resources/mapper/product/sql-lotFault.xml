@@ -11,13 +11,13 @@
 		WHERE 1=1
 		AND COMPANY = #{st08Company}
 		AND FACTORY = #{st08Factory}
-		<if test="viewYn != null and !viewYn.equalsIgnoreCase('')" >
+		<if test="viewYn != null and !viewYn.equalsIgnoreCase('') " >
 			AND VIEW_YN = #{viewYn}
 		</if>
-		<if test="smdLine != null and !smdLine.equalsIgnoreCase('') and mfLine == null and mfLine.equalsIgnoreCase('')" >
+		<if test="smdLine != null and !smdLine.equalsIgnoreCase('') and mfLine == null" >
 			AND SMD_LINE = #{smdLine}
 		</if>
-		<if test="mfLine != null and !mfLine.equalsIgnoreCase('') and smdLine == null and smdLine.equalsIgnoreCase('')" >
+		<if test="mfLine != null and !mfLine.equalsIgnoreCase('') and smdLine == null" >
 			AND MF_LINE =  #{mfLine}
 		</if>
 		<if test="mfLine != null and !mfLine.equalsIgnoreCase('') and smdLine != null and !smdLine.equalsIgnoreCase('')" >
