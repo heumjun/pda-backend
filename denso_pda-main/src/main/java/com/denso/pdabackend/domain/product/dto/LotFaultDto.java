@@ -54,6 +54,10 @@ public class LotFaultDto {
         
         private String smdFlag;
         private String arrayCnt;
+
+        private String viewYn;
+        private String smdLine;
+        private String mfLine;
         
     }
 

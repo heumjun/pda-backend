@@ -11,6 +11,18 @@
 		WHERE 1=1
 		AND COMPANY = #{st08Company}
 		AND FACTORY = #{st08Factory}
+		<if test="viewYn != null and !viewYn.equalsIgnoreCase('')" >
+			AND VIEW_YN = #{viewYn}
+		</if>
+		<if test="smdLine != null and !smdLine.equalsIgnoreCase('') and mfLine == null and mfLine.equalsIgnoreCase('')" >
+			AND SMD_LINE = #{smdLine}
+		</if>
+		<if test="mfLine != null and !mfLine.equalsIgnoreCase('') and smdLine == null and smdLine.equalsIgnoreCase('')" >
+			AND MF_LINE =  #{mfLine}
+		</if>
+		<if test="mfLine != null and !mfLine.equalsIgnoreCase('') and smdLine != null and !smdLine.equalsIgnoreCase('')" >
+			AND (MF_LINE =  #{mfLine} OR SMD_LINE = #{smdLine})
+		</if>
 		AND CLS_CODE ='E1'
 	</select>
 	
