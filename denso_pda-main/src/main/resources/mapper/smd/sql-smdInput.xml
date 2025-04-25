@@ -137,7 +137,6 @@
         <if test="stok != null and !stok.equalsIgnoreCase('')" >
             AND ST01_STOK = #{stok}
         </if>
-          AND ST01_QTY > 0
     </select>
 
     <!-- 출고 시 해당 품목이 수입검사체크 -->
