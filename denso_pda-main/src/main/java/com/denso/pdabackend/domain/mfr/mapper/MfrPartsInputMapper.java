@@ -14,6 +14,8 @@ public interface MfrPartsInputMapper {
 
 	Map<String, Object> getPartsInputRequestInfo(MfrPartsInputRequestDto.Request params);
 
+	boolean updateOfStok(StockDto.Info stockInfo);
+
 	boolean updateOfPdStock(StockDto.Info stockInfo);
 
 	void insertOfPartInputHistory(MfrPartsInputRequestDto.Info item);

@@ -43,6 +43,16 @@
 		AND ST01.ST01_CODE = #{st01Code}
 	</select>
 
+	<update id="updateOfStok" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Info">
+		UPDATE TB_ST_01
+		SET ST01_STOK = #{stock}
+		  , st01_district = #{st01District}
+		WHERE 1=1
+		  AND st01_company = #{company}
+		  AND st01_factory = #{factory}
+		  AND st01_lot_seq = #{lotSeq}
+	</update>
+
 	<update id="updateOfPdStock" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Info">
 		/** [sql-mfrPartsInput.xml] MfrPartsInputMapper.updateOfPdStock **/
 		UPDATE TB_ST_01

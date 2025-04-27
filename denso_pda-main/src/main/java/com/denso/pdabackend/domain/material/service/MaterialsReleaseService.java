@@ -3,6 +3,7 @@ package com.denso.pdabackend.domain.material.service;
 import java.util.List;
 import java.util.Map;
 
+import com.denso.pdabackend.utils.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -62,7 +63,7 @@ public class MaterialsReleaseService {
                 item.setSt02Seq(st02Seq);
                 
                 materialsReleaseMapper.insertOfOutputHistory(item);
-                
+
                 // 출고이력 등록 시그마 연계전 LOTDB
                 cigmaInterfaceMapper.insertDmes18(item);
 
@@ -96,7 +97,15 @@ public class MaterialsReleaseService {
                 outputMapper.updateOfPdStock(stockInfo);
                 
                 stockInfo.setStock(item.getStok()); // 보관창고
-                stockInfo.setSt01District(item.getDist()); // 보관창고
+//                stockInfo.setSt01District(item.getDist()); // 보관창고
+                // 창고 업데이트
+                if(item.getStok().equals("04")){ // 제조창고일 경우 라인으로 넣어야 함
+                    stockInfo.setSt01District(item.getLine()); // 보관창고
+                }else{
+                    stockInfo.setSt01District(item.getDist());
+                }
+                materialsReleaseMapper.updateOfStok(stockInfo);
+
                 smdInputMapper.updateOfStok(stockInfo);
 
                 // 출고 테이블 등록

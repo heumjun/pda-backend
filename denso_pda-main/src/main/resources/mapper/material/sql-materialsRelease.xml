@@ -6,7 +6,7 @@
 	<select id="getMaterialsRelease" parameterType="java.util.Map" resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-materialsRelease.xml] MaterialsReleaseMapper.getMaterialsRelease **/
 		SELECT ST02.ST02_CODE AS ST02_CODE
-			 , CM08.CM08_NAME AS ST02_NAME
+			 , '' AS ST02_NAME
 			 , ST02.ST02_QRCODE AS ST02_QRCODE
 			 , ST02.ST02_IPQTY AS ST02_QTY
 			 , ST02.ST02_STOK AS ST02_STOK
@@ -17,17 +17,13 @@
 			 , ST02.ST02_LOT_SEQ 
 			 , ST02.ST02_IPUNT
 			 , ST02.ST02_IPQTY
-			 , CM08.CM08_CUS AS ST02_CUS
+			 , '' AS ST02_CUS
 			 , ST02.ST02_DAT
 			 , ST02.ST02_MOQ
 			 , ST02.ST02_DEF_LOT
 			 , ST02.ST02_QRCODE
 		FROM TB_ST_02 ST02
-			,TB_CM_08 CM08
-		WHERE 1=1 
-		AND ST02.ST02_COMPANY 	= CM08.CM08_COMPANY 
-		AND ST02.ST02_FACTORY 	= CM08.CM08_FACTORY 
-		AND ST02.ST02_CODE 	  	= CM08.CM08_CODE
+		WHERE 1=1
 		AND ST02.ST02_COMPANY 	= #{company}
 		AND ST02.ST02_FACTORY 	= #{factory}
 		<if test="st02Qrcode != null and !st02Qrcode.equalsIgnoreCase('')" >
@@ -177,5 +173,15 @@
             #{line}
         )
     </insert>
+
+    <update id="updateOfStok" parameterType="com.denso.pdabackend.domain.warehousing.dto.StockDto$Info">
+        UPDATE TB_ST_01
+        SET ST01_STOK = #{stock}
+          , st01_district = #{st01District}
+        WHERE 1=1
+          AND st01_company = #{company}
+          AND st01_factory = #{factory}
+          AND st01_lot_seq = #{lotSeq}
+    </update>
 
 </mapper> 

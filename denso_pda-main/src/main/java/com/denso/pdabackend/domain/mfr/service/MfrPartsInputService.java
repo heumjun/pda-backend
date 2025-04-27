@@ -58,6 +58,10 @@ public class MfrPartsInputService {
                 //재고 감소
                 mfrPartsInputMapper.updateOfPdStock(stockInfo);
 
+                stockInfo.setStock(item.getSt01Stok()); // 보관창고
+                stockInfo.setSt01District(StringUtils.nullString(insertParam.get("compMfLine"))); // 보관창고
+                mfrPartsInputMapper.updateOfStok(stockInfo);
+
                 // 생산 지시서 디테일 생성 -- tb_mf_01 ?
                 item.setMf02Pcc((String)insertParam.get("mf01Pcc"));
                 mfrPartsInputMapper.createMfOrderDetail(item);
