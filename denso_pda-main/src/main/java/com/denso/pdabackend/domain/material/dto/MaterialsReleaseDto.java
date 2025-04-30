@@ -57,6 +57,9 @@ public class MaterialsReleaseDto {
         private String line;
         private String stok;
         private String dist;
+
+        private int chlseq;
+
     }
 
     @Data

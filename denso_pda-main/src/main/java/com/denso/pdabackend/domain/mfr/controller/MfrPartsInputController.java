@@ -73,6 +73,31 @@ public class MfrPartsInputController {
 
     }
 
+    @PostMapping("getMfrPartsInputInfo")
+    @Operation(summary = "바코드 리딩 정보", description = "바코드 리딩 정보")
+    public ResponseEntity<?> getMfrPartsInputInfo(@RequestBody Map<String,Object> params) throws Exception {
+
+        UserDto userInfo = auth.getUserInfo();
+
+        String company = userInfo.getCompany();
+        String factory = userInfo.getFactory();
+
+        if (company == null) {
+            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "회사정보가 존재하지 않아 조회할 수 없습니다.");
+        }
+
+        if (factory == null) {
+            return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 조회할 수 없습니다.");
+        }
+
+        params.put("company", company);
+        params.put("factory", factory);
+
+        Map<String,Object> materialsMove =  mfrPartsInputService.getMfrPartsInputInfo(params);
+
+        return ResponseEntityUtil.ok(materialsMove);
+    }
+
     @GetMapping("/getCompMfList")
     @Operation(summary = "완제품 목록", description = "완제품 목록 콤보박스용")
     public ResponseEntity<?> getCompMfList(MfrPartsInputRequestDto.Request request) throws Exception{

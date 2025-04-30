@@ -1,5 +1,6 @@
 package com.denso.pdabackend.domain.material.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,11 +52,15 @@ public class MaterialsReleaseController {
         if (factory == null) {
             return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "공장코드가 존재하지 않아 조회할 수 없습니다.");
         }
-		
+
 		params.put("company", company);
 		params.put("factory", factory);
 		
 		Map<String,Object> materialsMove =  materialsReleaseService.getMaterialsRelease(params);
+
+		if(materialsMove == null){
+			materialsMove =  materialsReleaseService.getLotBox(params);
+		}
 
 		return ResponseEntityUtil.ok(materialsMove);
 	}
@@ -110,18 +115,40 @@ public class MaterialsReleaseController {
 //    			if (resultMap != null) {
 //    				return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "이미 이상 등록 된 제품이 있습니다.");
 //    			}
-    			
+
+				// 재고에 등록된 데이터인지 확인
+				params.put("company", company);
+				params.put("factory", factory);
+				params.put("st02Qrcode", info.getSt02Qrcode());
+				Map<String,Object> resultMap =  materialsReleaseService.getMaterialsRelease(params);
+
+				List<MaterialsReleaseDto.Info> result = new ArrayList<>();
+				result.add(info);
+
+				if(resultMap != null){
+					System.out.println("not null");
+					// 출고 히스토리 등록 및 재고수량 감소
+					materialsReleaseService.insertOfOutputHistory(result);
+
+					// 입고 히스토리 등록 및 재고수량 증가
+					materialsReleaseService.insertOfInputHistory(result);
+				}
+				else{
+					System.out.println("null");
+					materialsReleaseService.insertOfOnlyOutnputHistory(result);
+				}
+
     		}
-        	
-        	// 출고 히스토리 등록 및 재고수량 감소
-			materialsReleaseService.insertOfOutputHistory(insertList);
-			
-        	// 입고 히스토리 등록 및 재고수량 증가
-			materialsReleaseService.insertOfInputHistory(insertList);
+
+//        	// 출고 히스토리 등록 및 재고수량 감소
+//			materialsReleaseService.insertOfOutputHistory(insertList);
+//
+//        	// 입고 히스토리 등록 및 재고수량 증가
+//			materialsReleaseService.insertOfInputHistory(insertList);
         	
         }
         
-		return ResponseEntityUtil.created("이상처리가 등록되었습니다.");
+		return ResponseEntityUtil.created("불출이 등록되었습니다.");
 	}
 
 }

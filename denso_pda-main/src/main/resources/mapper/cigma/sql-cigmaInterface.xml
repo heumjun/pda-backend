@@ -16,6 +16,10 @@
 							, TRQTY
 							, VNDNR
 							, TRIID
+							, IPSEQ
+							, CRTDT
+							, CRTTM
+							, CRTID
 		) SELECT
 			LOT_ID
 			   , 'I'
@@ -26,12 +30,23 @@
 			   , QTY_1
 			   , VENDOR_ID
 			   , 'LOTMGR'
+		  	   , 2
+			   , TO_NUMBER(TO_CHAR(SYSDATE,'YYYYMMDD'))
+			   , TO_NUMBER(TO_CHAR(SYSDATE,'hh24miss'))
+			   , 'LOTMGR'
 		FROM COSPLOTHIS@TOMESMA WHERE DELIVERY_NO = #{st02Pno}
 	</insert>
 
 	<!-- 출고이력 등록 시그마 연계전 LOTDB-->
 	<insert id="insertDmes18" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto$Info">
 		/** [sql-cigmaInterface.xml] CigmaInterfaceMapper.insertDmes18 **/
+		<selectKey resultType="int" keyProperty="chlseq" order="BEFORE">
+			SELECT COALESCE(MAX(CHLSEQ)+1,1) AS CHLSEQ
+			FROM DMES_18
+			WHERE CHLLOT = #{st02Lot}
+			AND CHLRTG ='I'
+		</selectKey>
+
 		INSERT INTO DMES_18 (
 							  CHLLOT
 							, CHLRTG
@@ -41,6 +56,10 @@
 							, CHLPNS
 							, CHLQYS
 							, CHLIDS
+							, CHLSEQ
+							, CRTDT
+							, CRTTM
+							, CRTID
 		) VALUES (
 				   #{st02Lot}
 				 , 'I'
@@ -50,12 +69,23 @@
 				 , #{st02Code}
 				 , #{st02Moq}
 				 , 'LOTMGR'
-				 )
+				 , #{chlseq}
+				 , TO_NUMBER(TO_CHAR(SYSDATE,'YYYYMMDD'))
+				 , TO_NUMBER(TO_CHAR(SYSDATE,'hh24miss'))
+				 , 'LOTMGR'
+		)
 	</insert>
 
 	<!-- 출고이력 등록 시그마 연계전 LOTDB (파라미터 DTO가 달라서 별도로 추가)-->
 	<insert id="insertDmes18Output" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Info">
 		/** [sql-cigmaInterface.xml] CigmaInterfaceMapper.insertDmes18Output **/
+		<selectKey resultType="int" keyProperty="chlseq" order="BEFORE">
+			SELECT COALESCE(MAX(CHLSEQ)+1,1) AS CHLSEQ
+			FROM DMES_18
+			WHERE CHLLOT = #{st03Lot}
+			AND CHLRTG ='I'
+		</selectKey>
+
 		INSERT INTO DMES_18 (
 							  CHLLOT
 							, CHLRTG
@@ -65,6 +95,10 @@
 							, CHLPNS
 							, CHLQYS
 							, CHLIDS
+							, CHLSEQ
+							, CRTDT
+							, CRTTM
+							, CRTID
 		) VALUES (
 				   #{st03Lot}
 				 , 'I'
@@ -74,6 +108,10 @@
 				 , #{st03Code}
 				 , #{st03Moq}
 				 , 'LOTMGR'
+				 , #{chlseq}
+				, TO_NUMBER(TO_CHAR(SYSDATE,'YYYYMMDD'))
+				, TO_NUMBER(TO_CHAR(SYSDATE,'hh24miss'))
+				, 'LOTMGR'
 				 )
 	</insert>
 

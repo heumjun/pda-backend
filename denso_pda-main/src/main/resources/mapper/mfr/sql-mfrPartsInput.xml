@@ -2,7 +2,41 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.denso.pdabackend.domain.mfr.mapper.MfrPartsInputMapper">
-	<!-- 부품 투입 Barcode를 읽었을 시 로드되는 정보 -->
+
+	<select id="getMfrPartsInputInfo" parameterType="com.denso.pdabackend.domain.mfr.dto.MfrPartsInputRequestDto$Request"
+		resultType="com.denso.pdabackend.response.ResultMap">
+		/** [sql-materialsRelease.xml] MaterialsReleaseMapper.getMaterialsRelease **/
+		SELECT ST02.ST02_CODE AS ST02_CODE
+		, '' AS ST02_NAME
+		, ST02.ST02_QRCODE AS ST02_QRCODE
+		, ST02.ST02_IPQTY AS ST02_QTY
+		, ST02.ST02_STOK AS ST02_STOK
+		, ST02.ST02_DIST AS ST02_DIST
+		, ST02.ST02_STOK AS ST02_CUR_STOK
+		, ST02.ST02_DIST AS ST02_CUR_DIST
+		, ST02.ST02_LOT
+		, ST02.ST02_LOT_SEQ
+		, ST02.ST02_IPUNT
+		, ST02.ST02_IPQTY
+		, '' AS ST02_CUS
+		, ST02.ST02_DAT
+		, ST02.ST02_MOQ
+		, ST02.ST02_DEF_LOT
+		, ST02.ST02_QRCODE
+		FROM TB_ST_02 ST02
+		WHERE 1=1
+		AND ST02.ST02_COMPANY 	= #{company}
+		AND ST02.ST02_FACTORY 	= #{factory}
+		<if test="st02Qrcode != null and !st02Qrcode.equalsIgnoreCase('')" >
+			AND ST02.ST02_QRCODE = #{st02Qrcode}
+		</if>
+		<if test="st02LotSeq != null and !st02LotSeq.equalsIgnoreCase('')" >
+			AND ST02.ST02_LOT_SEQ = #{st02LotSeq}
+		</if>
+		AND ROWNUM = 1
+		ORDER BY ST02.ST02_NO DESC
+	</select>
+
 	<select id="getPartsInputRequestInfo" parameterType="com.denso.pdabackend.domain.mfr.dto.MfrPartsInputRequestDto$Request"
 		resultType="com.denso.pdabackend.response.ResultMap">
 		/** [sql-mfrPartsInput.xml] MfrPartsInputMapper.getPartsInputRequestInfo **/

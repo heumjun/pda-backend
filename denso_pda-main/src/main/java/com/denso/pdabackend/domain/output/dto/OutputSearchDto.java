@@ -54,6 +54,8 @@ public class OutputSearchDto {
 
         private String mf13No;
 
+        private int chlseq;
+
     }
 
 	@Data

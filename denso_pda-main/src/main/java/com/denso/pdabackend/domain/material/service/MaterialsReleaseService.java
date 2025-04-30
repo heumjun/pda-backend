@@ -30,6 +30,10 @@ public class MaterialsReleaseService {
 		return materialsReleaseMapper.getMaterialsRelease(params);
 	}
 
+	public Map<String, Object> getLotBox(Map<String,Object> params) throws Exception {
+		return materialsReleaseMapper.getLotBox(params);
+	}
+
 	public Map<String, Object> getSeq(Request request) throws Exception {
 		return materialsReleaseMapper.getSeq(request);
 	}
@@ -119,6 +123,23 @@ public class MaterialsReleaseService {
         return true;
 		
 	}
+
+
+    public boolean insertOfOnlyOutnputHistory(List<Info> insertList) throws Exception {
+
+        insertList.forEach(item -> {
+
+            try {
+
+                cigmaInterfaceMapper.insertDmes18(item);
+
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        return true;
+    }
 
 }
 

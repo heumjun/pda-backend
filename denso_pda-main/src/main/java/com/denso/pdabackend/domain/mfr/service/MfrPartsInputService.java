@@ -27,6 +27,10 @@ public class MfrPartsInputService {
 		return mfrPartsInputMapper.getPartsInputRequestInfo(params);
 	}
 
+    public Map<String, Object> getMfrPartsInputInfo(Map<String,Object> params) throws Exception {
+        return mfrPartsInputMapper.getMfrPartsInputInfo(params);
+    }
+
     /**
      * 부품투입 ( SMD 출고하고 현장입고)
      * @param insertParam

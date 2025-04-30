@@ -13,6 +13,8 @@ public interface MaterialsReleaseMapper {
 
 	Map<String, Object> getMaterialsRelease(Map<String,Object> params) throws Exception;
 
+	Map<String, Object> getLotBox(Map<String,Object> params) throws Exception;
+
 	boolean updateOfStok(StockDto.Info stockInfo);
 
 	Map<String, Object> getSeq(Request request) throws Exception;

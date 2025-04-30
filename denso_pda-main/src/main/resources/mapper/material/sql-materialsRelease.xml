@@ -35,6 +35,19 @@
 		AND ROWNUM = 1
 		ORDER BY ST02.ST02_NO DESC
     </select>
+
+    <select id="getLotBox" parameterType="java.util.Map" resultType="com.denso.pdabackend.response.ResultMap">
+        SELECT
+        MAT_ID AS ST02_CODE
+        , '' AS ST02_NAME
+        , A.BOX_ID AS ST02_QRCODE
+        , A.QTY_1 AS ST02_MOQ
+        , 1 AS ST02_QTY
+        , A.LOT_ID AS ST02_LOT
+        FROM COSPLOTBOX@TOMESMA A
+        LEFT JOIN cosplothis@TOMESMA B ON A.LOT_ID = B.LOT_ID
+        WHERE A.BOX_ID = #{st02Qrcode}
+    </select>
     
     <select id="getSt02Seq" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto$Info" resultType="int">
     	 SELECT COALESCE(MAX(ST03_SEQ)+1,1) AS ST02_SEQ
