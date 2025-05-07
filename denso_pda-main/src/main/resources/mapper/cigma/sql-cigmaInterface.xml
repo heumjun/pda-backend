@@ -60,6 +60,7 @@
 							, CRTDT
 							, CRTTM
 							, CRTID
+							, QR_CODE
 		) VALUES (
 				   #{st02Lot}
 				 , 'I'
@@ -73,6 +74,7 @@
 				 , TO_NUMBER(TO_CHAR(SYSDATE,'YYYYMMDD'))
 				 , TO_NUMBER(TO_CHAR(SYSDATE,'hh24miss'))
 				 , 'LOTMGR'
+				, #{st02Qrcode}
 		)
 	</insert>
 
@@ -99,6 +101,7 @@
 							, CRTDT
 							, CRTTM
 							, CRTID
+							, QR_CODE
 		) VALUES (
 				   #{st03Lot}
 				 , 'I'
@@ -112,6 +115,7 @@
 				, TO_NUMBER(TO_CHAR(SYSDATE,'YYYYMMDD'))
 				, TO_NUMBER(TO_CHAR(SYSDATE,'hh24miss'))
 				, 'LOTMGR'
+				, #{st03Qr}
 				 )
 	</insert>
 

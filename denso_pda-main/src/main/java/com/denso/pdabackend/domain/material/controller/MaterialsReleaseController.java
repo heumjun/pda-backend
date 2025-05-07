@@ -126,7 +126,6 @@ public class MaterialsReleaseController {
 				result.add(info);
 
 				if(resultMap != null){
-					System.out.println("not null");
 					// 출고 히스토리 등록 및 재고수량 감소
 					materialsReleaseService.insertOfOutputHistory(result);
 
@@ -134,7 +133,6 @@ public class MaterialsReleaseController {
 					materialsReleaseService.insertOfInputHistory(result);
 				}
 				else{
-					System.out.println("null");
 					materialsReleaseService.insertOfOnlyOutnputHistory(result);
 				}
 
