@@ -47,29 +47,37 @@ public class MfrPartsInputService {
 		List<MfrPartsInputRequestDto.Info> insertList = (List<MfrPartsInputRequestDto.Info>) insertParam.get("insertList");
 		insertList.forEach(item ->{
             try{
-                // 재고테이블 재고 감소
-                StockDto.Info stockInfo = new StockDto.Info();
-                BeanUtils.copyProperties(item, stockInfo);
-                stockInfo.setOperator("minus");
-                stockInfo.setOutQty(Double.parseDouble(item.getSt01Qty())); // 출고수량
-                stockInfo.setCode(item.getSt01Code()); // 품목코드
-                stockInfo.setStock(item.getSt01Stok()); // 보관창고
-                stockInfo.setSt01District( StringUtils.nullString(insertParam.get("compMfLine"))); // 보관창고
-                stockInfo.setLot(item.getSt01Lot()); // LOT번호
-                stockInfo.setGbn(item.getCm08Gbn()); // 품목구분
-                stockInfo.setUnt(item.getSt01Unt()); // 출고단위 = 재고단위
-                stockInfo.setLotSeq(String.valueOf(item.getSt01LotSeq())); // lotSEQ
-                //재고 감소
-                mfrPartsInputMapper.updateOfPdStock(stockInfo);
 
-                stockInfo.setStock(item.getSt01Stok()); // 보관창고
-                stockInfo.setSt01District(StringUtils.nullString(insertParam.get("compMfLine"))); // 보관창고
-                mfrPartsInputMapper.updateOfStok(stockInfo);
+                if(item.getSt01LotSeq() != 0){
+                    // 재고테이블 재고 감소
+                    StockDto.Info stockInfo = new StockDto.Info();
+                    BeanUtils.copyProperties(item, stockInfo);
+                    stockInfo.setOperator("minus");
+                    stockInfo.setOutQty(Double.parseDouble(item.getSt01Qty())); // 출고수량
+                    stockInfo.setCode(item.getSt01Code()); // 품목코드
+                    stockInfo.setStock(item.getSt01Stok()); // 보관창고
+                    stockInfo.setSt01District( StringUtils.nullString(insertParam.get("compMfLine"))); // 보관창고
+                    stockInfo.setLot(item.getSt01Lot()); // LOT번호
+                    stockInfo.setGbn(item.getCm08Gbn()); // 품목구분
+                    stockInfo.setUnt(item.getSt01Unt()); // 출고단위 = 재고단위
+                    stockInfo.setLotSeq(String.valueOf(item.getSt01LotSeq())); // lotSEQ
+                    //재고 감소
+                    mfrPartsInputMapper.updateOfPdStock(stockInfo);
 
-                // 생산 지시서 디테일 생성 -- tb_mf_01 ?
-                item.setMf02Pcc((String)insertParam.get("mf01Pcc"));
-                mfrPartsInputMapper.createMfOrderDetail(item);
-                mfrPartsInputMapper.insertOfSmdOutStock(item);
+                    stockInfo.setStock(item.getSt01Stok()); // 보관창고
+                    stockInfo.setSt01District(StringUtils.nullString(insertParam.get("compMfLine"))); // 보관창고
+                    mfrPartsInputMapper.updateOfStok(stockInfo);
+
+                    // 생산 지시서 디테일 생성 -- tb_mf_01 ?
+                    item.setMf02Pcc((String)insertParam.get("mf01Pcc"));
+                    mfrPartsInputMapper.createMfOrderDetail(item);
+                    mfrPartsInputMapper.insertOfSmdOutStock(item);
+                }
+                else {
+                    item.setMf02Pcc((String)insertParam.get("mf01Pcc"));
+                    mfrPartsInputMapper.insertXcpt(item);
+                }
+
             }catch(Exception e){
                 e.printStackTrace();
             }

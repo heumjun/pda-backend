@@ -20,6 +20,9 @@
 		<if test="mfLine != null and !mfLine.equalsIgnoreCase('') and smdLine == null" >
 			AND MF_LINE =  #{mfLine}
 		</if>
+		<if test="pkLine != null and !pkLine.equalsIgnoreCase('')" >
+			AND PK_LINE =  #{pkLine}
+		</if>
 		<if test="mfLine != null and !mfLine.equalsIgnoreCase('') and smdLine != null and !smdLine.equalsIgnoreCase('')" >
 			AND (MF_LINE =  #{mfLine} OR SMD_LINE = #{smdLine})
 		</if>

@@ -22,6 +22,8 @@ public interface MfrPartsInputMapper {
 
 	void insertOfPartInputHistory(MfrPartsInputRequestDto.Info item);
 
+	void insertXcpt(MfrPartsInputRequestDto.Info item);
+
 	void insertOfSmdOutStock(MfrPartsInputRequestDto.Info item);
 
 	List<Map<String, Object>> getCompMfList(MfrPartsInputRequestDto.Request params);

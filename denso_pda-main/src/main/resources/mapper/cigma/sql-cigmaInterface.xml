@@ -41,10 +41,18 @@
 	<insert id="insertDmes18" parameterType="com.denso.pdabackend.domain.material.dto.MaterialsReleaseDto$Info">
 		/** [sql-cigmaInterface.xml] CigmaInterfaceMapper.insertDmes18 **/
 		<selectKey resultType="int" keyProperty="chlseq" order="BEFORE">
-			SELECT COALESCE(MAX(CHLSEQ)+1,1) AS CHLSEQ
-			FROM DMES_18
-			WHERE CHLLOT = #{st02Lot}
-			AND CHLRTG ='I'
+			SELECT COALESCE(MAX(A.CHLSEQ)+1,1) AS CHLSEQ
+			FROM (
+				SELECT CHLSEQ
+				FROM PSEDBLIB.DMES_18@todb2
+				WHERE CHLLOT =  #{st02Lot}
+				AND CHLRTG ='I'
+				UNION ALL
+				SELECT CHLSEQ
+				FROM DMES_18
+				WHERE CHLLOT =  #{st02Lot}
+				AND CHLRTG ='I'
+			) A
 		</selectKey>
 
 		INSERT INTO DMES_18 (
@@ -82,10 +90,18 @@
 	<insert id="insertDmes18Output" parameterType="com.denso.pdabackend.domain.output.dto.OutputSearchDto$Info">
 		/** [sql-cigmaInterface.xml] CigmaInterfaceMapper.insertDmes18Output **/
 		<selectKey resultType="int" keyProperty="chlseq" order="BEFORE">
-			SELECT COALESCE(MAX(CHLSEQ)+1,1) AS CHLSEQ
-			FROM DMES_18
-			WHERE CHLLOT = #{st03Lot}
-			AND CHLRTG ='I'
+			SELECT COALESCE(MAX(A.CHLSEQ)+1,1) AS CHLSEQ
+			FROM (
+					SELECT CHLSEQ
+					FROM PSEDBLIB.DMES_18@todb2
+					WHERE CHLLOT =  #{st03Lot}
+					AND CHLRTG ='I'
+					UNION ALL
+					SELECT CHLSEQ
+					FROM DMES_18
+					WHERE CHLLOT =  #{st03Lot}
+					AND CHLRTG ='I'
+			) A
 		</selectKey>
 
 		INSERT INTO DMES_18 (

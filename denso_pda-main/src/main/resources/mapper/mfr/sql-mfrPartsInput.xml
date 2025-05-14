@@ -259,6 +259,18 @@
 		)
 	</insert>
 
+	<insert id="insertXcpt" parameterType="com.denso.pdabackend.domain.mfr.dto.MfrPartsInputRequestDto$Request">
+		/** [sql-mfrPartsInput.xml] MfrPartsInputMapper.updateOfSmdOutStock **/
+		INSERT INTO TB_MF_02_XCPT
+		(
+			pcc
+			, qr_code
+		) VALUES (
+		 #{mf02Pcc}
+		,#{st01Qrcode}
+		)
+	</insert>
+
 	<select id="getCompMfList"	parameterType="com.denso.pdabackend.domain.mfr.dto.MfrPartsInputRequestDto$Request"	resultType="com.denso.pdabackend.response.ResultMap">
 		SELECT CM08.*, (CM08.CM08_NAME || '[' || CM08.CM08_CODE || ']') AS MF_DISP
 		FROM TB_CM_08 CM08

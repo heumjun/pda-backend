@@ -58,6 +58,7 @@ public class LotFaultDto {
         private String viewYn;
         private String smdLine;
         private String mfLine;
+        private String pkLine;
         
     }
 

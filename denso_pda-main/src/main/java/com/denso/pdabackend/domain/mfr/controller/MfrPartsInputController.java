@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.denso.pdabackend.domain.material.service.MaterialsReleaseService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +36,7 @@ public class MfrPartsInputController {
 
 	private final AuthenticationFacade auth;
     private final MfrPartsInputService mfrPartsInputService;
-
+    private final MaterialsReleaseService materialsReleaseService;
     @GetMapping("/getPartsInputRequestInfo")
     @Operation(summary = "부품투입 QR READ", description = "부품투입 QR READ")
     public ResponseEntity<?> getPartsInputRequestInfo(MfrPartsInputRequestDto.Request request) throws Exception{
@@ -94,6 +95,10 @@ public class MfrPartsInputController {
         params.put("factory", factory);
 
         Map<String,Object> materialsMove =  mfrPartsInputService.getMfrPartsInputInfo(params);
+
+        if(materialsMove == null){
+            materialsMove =  materialsReleaseService.getLotBox(params);
+        }
 
         return ResponseEntityUtil.ok(materialsMove);
     }
@@ -177,13 +182,16 @@ public class MfrPartsInputController {
                 request.setSt01LotSeq(info.getSt01LotSeq());
 
                 // 같은 출고요청서 2개이상 출고하는 경우를 없애야함
-                Map<String, Object> resultMap = mfrPartsInputService.getPartsInputRequestInfo(request);
-                if (resultMap == null) {
-                    return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "유효하지 않은 부품이 있습니다.");
-                }
 
-                if(Integer.parseInt(String.valueOf(resultMap.get("st01Qty"))) == 0) {
-                	return ResponseEntityUtil.error(StatusCode.NOT_FOUND,"부품투입된 항목입니다.");
+                if(info.getSt01LotSeq() != 0) {
+                    Map<String, Object> resultMap = mfrPartsInputService.getPartsInputRequestInfo(request);
+                    if (resultMap == null) {
+                        return ResponseEntityUtil.error(StatusCode.NO_CONTENT, "유효하지 않은 부품이 있습니다.");
+                    }
+
+                    if (Integer.parseInt(String.valueOf(resultMap.get("st01Qty"))) == 0) {
+                        return ResponseEntityUtil.error(StatusCode.NOT_FOUND, "부품투입된 항목입니다.");
+                    }
                 }
             }
         }
